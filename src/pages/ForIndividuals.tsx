@@ -18,8 +18,10 @@ const ForIndividuals = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-16">
-        <SolvHeroSection />
+      <main className="pt-16 sm:pt-20">
+        <div className="pt-0">
+          <SolvHeroSection />
+        </div>
         <SolvImpactStats />
         <SolvWhoThisIsFor />
         <SolvRealityCheck />

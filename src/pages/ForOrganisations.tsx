@@ -16,8 +16,10 @@ const ForOrganisations = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-20">
-        <OrgHeroSection />
+      <main className="pt-16 sm:pt-20">
+        <div className="pt-0">
+          <OrgHeroSection />
+        </div>
         <OrgBusinessRealityStrip />
         <OrgBusinessCase />
         <OrgStrategicGap />

@@ -74,7 +74,7 @@ const JourneySection = () => {
   const handleCardClick = (route: string) => {
     navigate(route);
   };
-  return <section ref={sectionRef} className="relative py-24 px-6 lg:px-16 bg-card overflow-hidden">
+  return <section ref={sectionRef} className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-16 bg-card overflow-hidden">
       {/* Background Journey Footprints */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <svg className="absolute w-full h-full" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" style={{
@@ -190,25 +190,25 @@ const JourneySection = () => {
 
       <div className="container mx-auto max-w-7xl relative z-10">
         {/* Section Headings */}
-        <div className="text-center space-y-4 mb-16">
-          <h1 className="font-sans text-3xl md:text-4xl lg:text-5xl text-primary font-semibold">
+        <div className="text-center space-y-3 sm:space-y-4 mb-12 sm:mb-16">
+          <h1 className="font-sans text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-primary font-semibold">
             Your Journey is Our Journey
           </h1>
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
+          <h2 className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
             Start Where You Are
           </h2>
-          <p className="font-sans text-lg text-foreground/80 max-w-xl mx-auto">
+          <p className="font-sans text-base sm:text-lg text-foreground/80 max-w-xl mx-auto">
             There's no right or wrong place to begin.{" "}
             <span className="text-primary font-medium">Choose to begin.</span>
           </p>
         </div>
 
         {/* Journey Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
           {journeyCards.map((card, index) => {
           const Icon = card.icon;
           const isFlipped = flippedCards[card.id] || false;
-          return <div key={card.id} className="perspective-1000 h-[340px] cursor-pointer group" style={{
+          return <div key={card.id} className="perspective-1000 h-[280px] sm:h-[340px] cursor-pointer group" style={{
             transitionDelay: `${index * 100}ms`
           }} onMouseEnter={() => handleFlip(card.id)} onMouseLeave={() => handleFlip(card.id)} onClick={() => handleCardClick(card.route)}>
                 <div className={`relative w-full h-full transition-all duration-700 ease-out preserve-3d ${isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"} ${isFlipped ? "rotate-y-180" : ""}`} style={{
@@ -218,32 +218,32 @@ const JourneySection = () => {
               transformStyle: "preserve-3d"
             }}>
                   {/* Card Front */}
-                  <div className={`absolute inset-0 bg-white rounded-2xl p-6 flex flex-col items-center justify-center text-center backface-hidden transition-shadow duration-600 ${isVisible ? "shadow-[0_15px_40px_-10px_hsl(var(--primary)/0.15)]" : "shadow-none"}`} style={{
+                  <div className={`absolute inset-0 bg-white rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center backface-hidden transition-shadow duration-600 ${isVisible ? "shadow-[0_15px_40px_-10px_hsl(var(--primary)/0.15)]" : "shadow-none"}`} style={{
                 backfaceVisibility: "hidden"
               }}>
-                    <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-5">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 sm:mb-5">
                       <Icon className="w-7 h-7 text-primary" />
                     </div>
-                    <h3 className="font-sans text-lg font-bold text-foreground mb-3">
+                    <h3 className="font-sans text-base sm:text-lg font-bold text-foreground mb-2 sm:mb-3">
                       {card.title}
                     </h3>
-                    <p className="font-sans text-sm text-foreground leading-relaxed">
+                    <p className="font-sans text-xs sm:text-sm text-foreground leading-relaxed">
                       "{card.frontText}"
                     </p>
                   </div>
 
                   {/* Card Back */}
-                  <div className={`absolute inset-0 bg-white rounded-2xl p-5 flex flex-col items-center justify-center text-center rotate-y-180 backface-hidden transition-shadow duration-600 ${isVisible ? "shadow-[0_15px_40px_-10px_hsl(var(--primary)/0.15)]" : "shadow-none"}`} style={{
+                  <div className={`absolute inset-0 bg-white rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center text-center rotate-y-180 backface-hidden transition-shadow duration-600 ${isVisible ? "shadow-[0_15px_40px_-10px_hsl(var(--primary)/0.15)]" : "shadow-none"}`} style={{
                 backfaceVisibility: "hidden",
                 transform: "rotateY(180deg)"
               }}>
-                    <h3 className="font-sans text-base font-bold text-foreground mb-3">
+                    <h3 className="font-sans text-sm sm:text-base font-bold text-foreground mb-2 sm:mb-3">
                       {card.title}
                     </h3>
-                    <p className="font-sans text-xs text-foreground/80 leading-relaxed mb-4">
+                    <p className="font-sans text-[10px] sm:text-xs text-foreground/80 leading-relaxed mb-3 sm:mb-4">
                       {card.backText}
                     </p>
-                    <p className="font-sans text-xs text-primary font-medium">
+                    <p className="font-sans text-[10px] sm:text-xs text-primary font-medium">
                       {card.products}
                     </p>
                   </div>

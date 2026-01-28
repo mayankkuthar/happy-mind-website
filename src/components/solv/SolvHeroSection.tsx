@@ -45,28 +45,28 @@ const SolvHeroSection = () => {
       emblaApi.off("select", onSelect);
     };
   }, [emblaApi, onSelect]);
-  return <section className="h-[calc(100vh-80px)] w-full overflow-hidden">
-      <div className="h-full w-full grid lg:grid-cols-2 relative">
+  return <section className="h-[calc(100vh-64px)] sm:h-[calc(100vh-80px)] w-full overflow-x-hidden">
+      <div className="h-full w-full grid sm:grid-cols-1 lg:grid-cols-2 relative">
         {/* Left Content */}
-        <div className="relative z-20 flex items-center px-6 lg:px-16 py-12 lg:py-0">
-          <div className="space-y-8 max-w-xl">
-            <div className="space-y-6">
-              <h1 className="text-4xl lg:text-6xl font-semibold text-foreground leading-tight font-sans md:text-3xl">
-                A <span className="text-primary text-3xl">Conscious Growth Space</span> For Life's Real Decisions.
+        <div className="relative z-20 flex items-center px-4 sm:px-6 lg:px-16 py-8 sm:py-12 lg:py-0">
+          <div className="space-y-6 sm:space-y-8 max-w-xl w-full">
+            <div className="space-y-4 sm:space-y-6">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-foreground leading-tight font-sans">
+                A <span className="text-primary">Conscious Growth<br className="sm:hidden" /> Space</span> For Life's Real Decisions.
               </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed font-serif font-semibold text-left md:text-2xl">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed font-serif font-semibold text-left">
                 SOLV helps you understand yourself better, make clearer choices, and move forward with confidence through psychology-powered, human-led guidance.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-4">
-              <Button size="lg" variant="outline" className="rounded-full px-8">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
+              <Button size="lg" variant="outline" className="rounded-full px-6 sm:px-8 text-sm sm:text-base py-2 sm:py-3">
                 Learn More
               </Button>
-              <Button size="lg" variant="outline" className="rounded-full px-8">
+              <Button size="lg" variant="outline" className="rounded-full px-6 sm:px-8 text-sm sm:text-base py-2 sm:py-3">
                 My Personality Snapshot
               </Button>
-              <Button size="lg" className="rounded-full px-8">
+              <Button size="lg" className="rounded-full px-6 sm:px-8 text-sm sm:text-base py-2 sm:py-3">
                 Book My SOLV Session
               </Button>
             </div>
@@ -74,7 +74,7 @@ const SolvHeroSection = () => {
         </div>
 
         {/* Right Carousel - Full Height */}
-        <div className="absolute inset-0 lg:relative lg:inset-auto h-full">
+        <div className="absolute inset-0 sm:relative sm:inset-auto h-full">
           {/* Gradient overlay for text readability - only on left portion */}
           <div className="absolute inset-0 z-10 pointer-events-none lg:hidden" style={{
           background: "linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0.95) 30%, hsl(var(--background) / 0.7) 50%, transparent 70%)"
@@ -96,10 +96,9 @@ const SolvHeroSection = () => {
             </div>
           </div>
 
-
           {/* Dot Navigation */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
-            {slides.map((_, index) => <button key={index} onClick={() => scrollTo(index)} className={`w-3 h-3 rounded-full transition-all duration-300 ease-in-out ${index === selectedIndex ? "bg-primary scale-110" : "border-2 border-foreground/50 bg-transparent hover:border-foreground"}`} />)}
+          <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2 sm:gap-3">
+            {slides.map((_, index) => <button key={index} onClick={() => scrollTo(index)} className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ease-in-out ${index === selectedIndex ? "bg-primary scale-110" : "border-2 border-foreground/50 bg-transparent hover:border-foreground"}`} />)}
           </div>
         </div>
       </div>
