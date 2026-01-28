@@ -27,25 +27,25 @@ const SolvBackedByPsychology = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 lg:px-16 bg-card overflow-hidden">
-      <div className="container mx-auto max-w-6xl">
+    <section ref={sectionRef} className="py-16 sm:py-24 px-4 sm:px-6 lg:px-16 bg-card overflow-hidden">
+      <div className="container mx-auto max-w-6xl px-0">
         {/* Header */}
         <div
           className={`text-center space-y-4 mb-8 transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground">
             Built on psychological science
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
             5+ years of behavioural and emotional intelligence research, validated through lakhs of real user journeys on the HappiMynd platform.
           </p>
         </div>
 
         {/* Solar System Container */}
         <div
-          className={`relative w-full h-[500px] md:h-[600px] flex items-center justify-center transition-all duration-1000 ${
+          className={`relative w-full h-[400px] sm:h-[500px] md:h-[600px] flex items-center justify-center transition-all duration-1000 overflow-hidden ${
             isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
           }`}
         >
@@ -53,34 +53,34 @@ const SolvBackedByPsychology = () => {
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             {/* Ring 1 - tilted */}
             <div 
-              className="absolute w-[280px] h-[280px] md:w-[380px] md:h-[380px] rounded-full border border-foreground/10"
-              style={{ transform: "rotateX(70deg) rotateZ(-15deg)" }}
+              className="absolute w-[200px] sm:w-[280px] md:w-[380px] h-[200px] sm:h-[280px] md:h-[380px] rounded-full border border-foreground/10"
+              style={{ transform: "rotate(70deg)" }}
             />
             {/* Ring 2 - tilted opposite */}
             <div 
-              className="absolute w-[320px] h-[320px] md:w-[440px] md:h-[440px] rounded-full border border-foreground/8"
-              style={{ transform: "rotateX(75deg) rotateZ(20deg)" }}
+              className="absolute w-[240px] sm:w-[320px] md:w-[440px] h-[240px] sm:h-[320px] md:h-[440px] rounded-full border border-foreground/8"
+              style={{ transform: "rotate(-75deg)" }}
             />
             {/* Ring 3 - subtle */}
             <div 
-              className="absolute w-[360px] h-[360px] md:w-[500px] md:h-[500px] rounded-full border border-foreground/5"
-              style={{ transform: "rotateX(68deg) rotateZ(-5deg)" }}
+              className="absolute w-[280px] sm:w-[360px] md:w-[500px] h-[280px] sm:h-[360px] md:h-[500px] rounded-full border border-foreground/5"
+              style={{ transform: "rotate(68deg)" }}
             />
           </div>
 
           {/* Central Globe */}
           <div 
-            className="absolute z-20 w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-primary/40 via-primary/60 to-primary/30 flex items-center justify-center shadow-lg"
+            className="absolute z-20 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-primary/40 via-primary/60 to-primary/30 flex items-center justify-center shadow-lg"
             style={{ 
-              animation: "spin-slow 40s linear infinite",
-              boxShadow: "0 0 60px hsl(var(--primary) / 0.3), inset 0 0 30px hsl(var(--primary) / 0.2)"
+              animation: "spin-slow 60s linear infinite",
+              boxShadow: "0 0 40px hsl(var(--primary) / 0.3), inset 0 0 20px hsl(var(--primary) / 0.2)"
             }}
           >
-            <div className="text-center px-3">
-              <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-primary-foreground leading-tight block">
+            <div className="text-center px-2 sm:px-3">
+              <span className="text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider text-primary-foreground leading-tight block">
                 Psychological
               </span>
-              <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-primary-foreground leading-tight block">
+              <span className="text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider text-primary-foreground leading-tight block">
                 Science
               </span>
             </div>
@@ -88,11 +88,11 @@ const SolvBackedByPsychology = () => {
 
           {/* Orbiting Planets Container */}
           <div 
-            className="absolute w-[400px] h-[400px] md:w-[520px] md:h-[520px]"
-            style={{ animation: "orbit 60s linear infinite" }}
+            className="absolute w-[300px] sm:w-[400px] md:w-[520px] h-[300px] sm:h-[400px] md:h-[520px]"
+            style={{ animation: "orbit 80s linear infinite" }}
           >
             {frameworks.map((framework, index) => {
-              const orbitRadius = framework.orbit === 1 ? 42 : 48;
+              const orbitRadius = framework.orbit === 1 ? 100 : 140;
               const angleRad = (framework.angle * Math.PI) / 180;
               const x = Math.cos(angleRad) * orbitRadius;
               const y = Math.sin(angleRad) * orbitRadius;
@@ -106,9 +106,9 @@ const SolvBackedByPsychology = () => {
               return (
                 <div
                   key={framework.name}
-                  className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                  className="absolute left-1/2 top-1/2"
                   style={{
-                    transform: `translate(calc(-50% + ${x}%), calc(-50% + ${y}%)) scale(${scale})`,
+                    transform: `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`,
                     opacity,
                     zIndex,
                     transition: "transform 0.3s ease-out, opacity 0.3s ease-out",
@@ -116,7 +116,7 @@ const SolvBackedByPsychology = () => {
                 >
                   <div
                     className={`
-                      w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center p-2 text-center
+                      w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center p-1 sm:p-2 text-center
                       ${index % 3 === 0 
                         ? "bg-gradient-to-br from-primary/20 to-primary/30" 
                         : index % 3 === 1 
@@ -128,10 +128,10 @@ const SolvBackedByPsychology = () => {
                       boxShadow: isBack 
                         ? "0 4px 15px hsl(var(--primary) / 0.1)" 
                         : "0 8px 25px hsl(var(--primary) / 0.2)",
-                      animation: `counter-orbit 60s linear infinite`,
+                      animation: `counter-orbit 80s linear infinite`,
                     }}
                   >
-                    <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wide text-foreground/80 leading-tight">
+                    <span className="text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-wide text-foreground/80 leading-tight">
                       {framework.name}
                     </span>
                   </div>
@@ -145,28 +145,28 @@ const SolvBackedByPsychology = () => {
       {/* Custom Keyframes */}
       <style>{`
         @keyframes orbit {
-          from {
+          0% {
             transform: rotate(0deg);
           }
-          to {
+          100% {
             transform: rotate(360deg);
           }
         }
         
         @keyframes counter-orbit {
-          from {
+          0% {
             transform: rotate(0deg);
           }
-          to {
+          100% {
             transform: rotate(-360deg);
           }
         }
         
         @keyframes spin-slow {
-          from {
+          0% {
             transform: rotate(0deg);
           }
-          to {
+          100% {
             transform: rotate(360deg);
           }
         }
