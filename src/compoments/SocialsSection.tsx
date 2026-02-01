@@ -1,0 +1,159 @@
+import { useEffect, useRef, useState } from "react";
+
+const socialCards = [
+  {
+    id: 1,
+    label: "#socials",
+    type: "video",
+    link: "https://www.instagram.com/happimynd/reels/",
+    videoSrc: "https://assets.mixkit.co/videos/preview/mixkit-woman-meditating-in-the-mountains-2155-large.mp4",
+    tilt: "-rotate-2",
+  },
+  {
+    id: 2,
+    label: "#youtube",
+    type: "video",
+    link: "https://www.youtube.com/@happimynd",
+    videoSrc: "https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4",
+    tilt: "rotate-1",
+  },
+  {
+    id: 3,
+    label: "#community",
+    type: "image",
+    link: "https://happimynd.com/community",
+    imageSrc: "",
+    tilt: "-rotate-1",
+  },
+];
+
+const SocialsSection = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+        
+        // Control video playback based on visibility
+        videoRefs.current.forEach((video) => {
+          if (video) {
+            if (entry.isIntersecting) {
+              video.play().catch(() => {});
+            } else {
+              video.pause();
+            }
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section 
+      ref={sectionRef}
+      className="py-24 md:py-32 px-6 lg:px-16 bg-muted/30"
+    >
+      <div className="container mx-auto max-w-6xl">
+        {/* Headings */}
+        <div className="text-center space-y-3 mb-16">
+          <p 
+            className={`font-sans text-primary tracking-widest uppercase text-sm font-medium transition-all duration-700 ease-out ${
+              isVisible 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 translate-y-4"
+            }`}
+          >
+            CHECK OUR
+          </p>
+          <h2 
+            className={`font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground transition-all duration-700 ease-out ${
+              isVisible 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 translate-y-4"
+            }`}
+            style={{ transitionDelay: "0.15s" }}
+          >
+            Our Socials and Community
+          </h2>
+          <p 
+            className={`font-mono text-muted-foreground text-sm md:text-base transition-all duration-700 ease-out ${
+              isVisible 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 translate-y-4"
+            }`}
+            style={{ transitionDelay: "0.3s" }}
+          >
+            Click and explore
+          </p>
+        </div>
+
+        {/* Cards Grid */}
+        <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+          {socialCards.map((card, index) => (
+            <a
+              key={card.id}
+              href={card.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`group block transition-all duration-700 ease-out ${
+                isVisible 
+                  ? "opacity-100 translate-y-0" 
+                  : "opacity-0 translate-y-12"
+              }`}
+              style={{ transitionDelay: `${0.4 + index * 0.15}s` }}
+            >
+              {/* Polaroid Frame */}
+              <div 
+                className={`bg-card rounded-xl p-3 pb-6 ${card.tilt} hover:rotate-0 transition-transform duration-500 ease-out ${
+                  isVisible ? "shadow-lg" : "shadow-none"
+                }`}
+                style={{
+                  boxShadow: isVisible 
+                    ? "0 10px 40px -10px rgba(0, 0, 0, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.02)" 
+                    : "none",
+                  transition: "box-shadow 0.7s ease-out, transform 0.5s ease-out",
+                  transitionDelay: `${0.4 + index * 0.15}s`,
+                }}
+              >
+                {/* Media Container */}
+                <div className="aspect-square rounded-lg overflow-hidden bg-muted/50 mb-4">
+                  {card.type === "video" ? (
+                    <video
+                      ref={(el) => (videoRefs.current[index] = el)}
+                      src={card.videoSrc}
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-accent/30">
+                      <span className="text-muted-foreground text-sm">Community Image</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Label */}
+                <p className="text-center text-primary text-sm font-medium">
+                  {card.label}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default SocialsSection;
