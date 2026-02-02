@@ -61,13 +61,13 @@ const SocialsSection = () => {
   return (
     <section 
       ref={sectionRef}
-      className="py-24 md:py-32 px-6 lg:px-16 bg-muted/30"
+      className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 lg:px-16 bg-muted/30"
     >
       <div className="container mx-auto max-w-6xl">
         {/* Headings */}
         <div className="text-center space-y-3 mb-16">
           <p 
-            className={`font-sans text-primary tracking-widest uppercase text-sm font-medium transition-all duration-700 ease-out ${
+            className={`font-sans text-primary tracking-widest uppercase text-xs sm:text-sm font-medium transition-all duration-700 ease-out ${
               isVisible 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 translate-y-4"
@@ -76,7 +76,7 @@ const SocialsSection = () => {
             CHECK OUR
           </p>
           <h2 
-            className={`font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground transition-all duration-700 ease-out ${
+            className={`font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground transition-all duration-700 ease-out ${
               isVisible 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 translate-y-4"
@@ -86,7 +86,7 @@ const SocialsSection = () => {
             Our Socials and Community
           </h2>
           <p 
-            className={`font-mono text-muted-foreground text-sm md:text-base transition-all duration-700 ease-out ${
+            className={`font-mono text-muted-foreground text-xs sm:text-sm md:text-base transition-all duration-700 ease-out ${
               isVisible 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 translate-y-4"
@@ -98,7 +98,7 @@ const SocialsSection = () => {
         </div>
 
         {/* Cards Grid */}
-        <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
           {socialCards.map((card, index) => (
             <a
               key={card.id}
@@ -114,7 +114,7 @@ const SocialsSection = () => {
             >
               {/* Polaroid Frame */}
               <div 
-                className={`bg-card rounded-xl p-3 pb-6 ${card.tilt} hover:rotate-0 transition-transform duration-500 ease-out ${
+                className={`bg-card rounded-xl p-2 sm:p-3 pb-4 sm:pb-6 ${card.tilt} hover:rotate-0 transition-transform duration-500 ease-out ${
                   isVisible ? "shadow-lg" : "shadow-none"
                 }`}
                 style={{
@@ -144,7 +144,7 @@ const SocialsSection = () => {
                 </div>
 
                 {/* Label */}
-                <p className="text-center text-primary text-sm font-medium">
+                <p className="text-center text-primary text-xs sm:text-sm font-medium">
                   {card.label}
                 </p>
               </div>

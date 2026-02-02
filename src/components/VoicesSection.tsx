@@ -50,13 +50,13 @@ const VoicesSection = () => {
     }
     return () => observer.disconnect();
   }, []);
-  return <section ref={sectionRef} className="py-24 md:py-32 px-6 lg:px-16 bg-background overflow-hidden">
+  return <section ref={sectionRef} className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 lg:px-16 bg-background overflow-hidden">
       <div className="container mx-auto max-w-6xl mb-12">
         <div className={`text-center transition-all duration-700 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          <p className="text-primary tracking-widest uppercase mb-4 text-4xl font-semibold">
+          <p className="text-primary tracking-widest uppercase mb-4 text-2xl sm:text-3xl md:text-4xl font-semibold">
             Voices
           </p>
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground">
             What People Say
           </h2>
         </div>
@@ -74,7 +74,7 @@ const VoicesSection = () => {
         <div className={`flex gap-6 ${isVisible ? "animate-slide" : ""}`} style={{
         width: "fit-content"
       }}>
-          {duplicatedReviews.map((review, index) => <div key={index} className="w-72 h-72 flex-shrink-0 bg-card rounded-2xl p-6 shadow-sm border border-border/20 flex flex-col justify-between">
+          {duplicatedReviews.map((review, index) => <div key={index} className="w-64 sm:w-72 h-64 sm:h-72 flex-shrink-0 bg-card rounded-2xl p-4 sm:p-6 shadow-sm border border-border/20 flex flex-col justify-between">
               <div className="space-y-4">
                 {/* Star Rating */}
                 <div className="flex gap-1">

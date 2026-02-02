@@ -14,8 +14,8 @@ const trustPills = [{
 }];
 
 const HeroSection = () => {
-  return <section className="min-h-[110vh] flex items-center py-8 px-6 lg:px-16 overflow-hidden">
-      <div className="container mx-auto grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+  return <section className="min-h-[100vh] sm:min-h-[110vh] flex items-center py-8 px-4 sm:px-6 lg:px-16 overflow-hidden">
+      <div className="container mx-auto grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center">
         {/* Left Content */}
         <div className="space-y-8 text-center lg:text-left">
           {/* Trust Pills */}
@@ -36,12 +36,12 @@ const HeroSection = () => {
           </p>
           
           {/* H1 */}
-          <h1 className="font-sans text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-muted-foreground">
+          <h1 className="font-sans text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-muted-foreground">
             A <span className="text-primary">Conscious Growth Ecosystem</span> Where
           </h1>
           
           {/* H2 - Hero Statement */}
-          <h2 className="font-serif text-xl md:text-2xl lg:text-3xl font-medium leading-relaxed text-black">
+          <h2 className="font-serif text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium leading-relaxed text-black">
             Technology empowers people & organisations to become more{" "}
             <span className="text-primary">aware, capable, and connected.</span>
           </h2>
@@ -69,7 +69,7 @@ const HeroSection = () => {
           <img 
             src={whatSpaceHero} 
             alt="People growing together in a conscious space" 
-            className="w-full max-w-lg lg:max-w-xl h-auto object-contain rounded-2xl shadow-lg" 
+            className="w-full max-w-xs sm:max-w-lg lg:max-w-xl h-auto object-contain rounded-2xl shadow-lg" 
           />
         </div>
       </div>

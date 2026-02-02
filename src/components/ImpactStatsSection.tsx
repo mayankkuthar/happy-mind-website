@@ -26,10 +26,10 @@ const ImpactStatsSection = () => {
     }
     return () => observer.disconnect();
   }, []);
-  return <section ref={sectionRef} className="py-24 md:py-32 px-6 lg:px-16 bg-card">
+  return <section ref={sectionRef} className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 lg:px-16 bg-card">
       <div className="container mx-auto max-w-6xl">
         <div className={`text-center transition-all duration-700 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          <p className="text-primary tracking-widest uppercase mb-12 font-medium text-4xl">
+          <p className="text-primary tracking-widest uppercase mb-8 sm:mb-12 font-medium text-2xl sm:text-3xl md:text-4xl">
             Impact
           </p>
           
@@ -37,10 +37,10 @@ const ImpactStatsSection = () => {
             {stats.map((stat, index) => <div key={stat.label} className={`space-y-3 transition-all duration-700 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`} style={{
             transitionDelay: `${0.2 + index * 0.15}s`
           }}>
-                <div className="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground">
+                <div className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-foreground">
                   {stat.value}
                 </div>
-                <div className="text-muted-foreground text-sm md:text-base">
+                <div className="text-muted-foreground text-xs sm:text-sm md:text-base">
                   {stat.label}
                 </div>
               </div>)}

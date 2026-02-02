@@ -44,7 +44,7 @@ const WhatSpaceSection = () => {
   };
 
   return (
-    <section className="pt-24 pb-24 md:pt-24 md:pb-24 px-6 lg:px-16 bg-background">
+    <section className="pt-16 sm:pt-24 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-16 bg-background">
       <div className="mx-auto max-w-[1100px]">
         {/* Headline Block */}
         <div className="text-center">
@@ -54,7 +54,7 @@ const WhatSpaceSection = () => {
           </h1>
 
           {/* H2 - Above carousel */}
-          <h2 className="font-serif text-[26px] lg:text-[44px] leading-tight text-foreground max-w-[900px] mx-auto md:text-2xl font-medium mb-10">
+          <h2 className="font-serif text-xl sm:text-[26px] lg:text-[44px] leading-tight text-foreground max-w-[900px] mx-auto md:text-2xl font-medium mb-8 sm:mb-10">
             When life feels overwhelming, growth shouldn't wait for a breaking point.
             <br />
             This is a space designed to help people pause, reflect, and grow consciously
@@ -63,14 +63,14 @@ const WhatSpaceSection = () => {
           </h2>
 
           {/* 3D Carousel */}
-          <div className="mb-12 w-full max-w-[900px] mx-auto relative h-[400px] md:h-[500px]">
+          <div className="mb-8 sm:mb-12 w-full max-w-[900px] mx-auto relative h-[300px] sm:h-[400px] md:h-[500px]">
             <div className="relative w-full h-full flex items-center justify-center" style={{
               perspective: "1000px"
             }}>
               {carouselImages.map((img, index) => (
                 <div
                   key={index}
-                  className="absolute w-64 md:w-72 lg:w-80 aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-700 ease-out cursor-pointer"
+                  className="absolute w-48 sm:w-64 md:w-72 lg:w-80 aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-700 ease-out cursor-pointer"
                   style={{
                     ...getCardStyle(index),
                     boxShadow: index === activeIndex 

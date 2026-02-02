@@ -42,7 +42,7 @@ const TrustedBySection = () => {
   return (
     <section 
       ref={sectionRef}
-      className="relative py-24 md:py-32 px-6 lg:px-16 bg-background overflow-hidden min-h-[80vh] flex items-center"
+      className="relative py-16 sm:py-24 md:py-32 px-4 sm:px-6 lg:px-16 bg-background overflow-hidden min-h-[60vh] sm:min-h-[80vh] flex items-center"
     >
       {/* Floating Logo Circles - positioned relative to section */}
       {logoPlaceholders.map((logo) => (
@@ -90,7 +90,7 @@ const TrustedBySection = () => {
 
           {/* Main Heading - H2 */}
           <h2 
-            className={`font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground transition-all duration-700 ease-out ${
+            className={`font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground transition-all duration-700 ease-out ${
               isVisible 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 translate-y-4"
@@ -102,7 +102,7 @@ const TrustedBySection = () => {
 
           {/* Subheading - H3 */}
           <p 
-            className={`text-muted-foreground text-lg md:text-xl transition-all duration-700 ease-out ${
+            className={`text-muted-foreground text-base sm:text-lg md:text-xl transition-all duration-700 ease-out ${
               isVisible 
                 ? "opacity-100 translate-y-0" 
                 : "opacity-0 translate-y-4"

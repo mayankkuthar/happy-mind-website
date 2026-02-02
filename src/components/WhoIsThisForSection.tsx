@@ -23,17 +23,17 @@ const WhoIsThisForSection = () => {
     }
     return () => observer.disconnect();
   }, []);
-  return <section className="py-24 px-6 lg:px-16" ref={sectionRef}>
+  return <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-16" ref={sectionRef}>
       <div className="container mx-auto max-w-5xl">
         <div className="text-center mb-10">
-          <h2 className="text-4xl text-primary text-center font-sans font-semibold md:text-4xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl text-primary text-center font-sans font-semibold">
             Who Is This For?
           </h2>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Individuals Card */}
-          <Link to="/for-individuals" className={`group relative bg-card rounded-3xl p-8 lg:p-10 border border-border/50 overflow-hidden block transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0 shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)]' : 'opacity-0 translate-y-8 shadow-none'} hover:shadow-[0_12px_40px_-12px_hsl(var(--primary)/0.25)]`} style={{
+          <Link to="/for-individuals" className={`group relative bg-card rounded-3xl p-6 sm:p-8 lg:p-10 border border-border/50 overflow-hidden block transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0 shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)]' : 'opacity-0 translate-y-8 shadow-none'} hover:shadow-[0_12px_40px_-12px_hsl(var(--primary)/0.25)]`} style={{
           transitionDelay: '0ms'
         }}>
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -57,7 +57,7 @@ const WhoIsThisForSection = () => {
           </Link>
 
           {/* Organisations Card */}
-          <Link to="/for-organisations" className={`group relative bg-card rounded-3xl p-8 lg:p-10 border border-border/50 overflow-hidden block transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0 shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)]' : 'opacity-0 translate-y-8 shadow-none'} hover:shadow-[0_12px_40px_-12px_hsl(var(--primary)/0.25)]`} style={{
+          <Link to="/for-organisations" className={`group relative bg-card rounded-3xl p-6 sm:p-8 lg:p-10 border border-border/50 overflow-hidden block transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0 shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)]' : 'opacity-0 translate-y-8 shadow-none'} hover:shadow-[0_12px_40px_-12px_hsl(var(--primary)/0.25)]`} style={{
           transitionDelay: '150ms'
         }}>
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
