@@ -39,8 +39,7 @@ const Solv = () => {
                   For Individuals
                 </h2>
                 <p className="text-muted-foreground text-sm sm:text-base mb-4 sm:mb-6 flex-grow">
-                  Your personal space for conscious growth. Understand yourself better, 
-                  navigate life transitions, and build emotional resilience with expert guidance.
+                  If your mind feels busy, emotions feel unclear, or stress feels constant even when life looks fine, HappiMynd is here for you.
                 </p>
                 <ul className="text-muted-foreground text-xs sm:text-sm space-y-2 mb-6 sm:mb-8">
                   <li className="flex items-center gap-2">
@@ -73,8 +72,7 @@ const Solv = () => {
                   For Organisations
                 </h2>
                 <p className="text-muted-foreground text-sm sm:text-base mb-4 sm:mb-6 flex-grow">
-                  Support emotionally healthier teams. Reduce burnout, improve focus, 
-                  engagement, and sustainability at work.
+                  Looking to work on Culture, Outcomes, Retention & Relations backed by Effective Leadership, then this is the space to explore.
                 </p>
                 <ul className="text-muted-foreground text-xs sm:text-sm space-y-2 mb-6 sm:mb-8">
                   <li className="flex items-center gap-2">

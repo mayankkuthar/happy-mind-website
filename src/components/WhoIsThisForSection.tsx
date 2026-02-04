@@ -23,7 +23,7 @@ const WhoIsThisForSection = () => {
     }
     return () => observer.disconnect();
   }, []);
-  return <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-16" ref={sectionRef}>
+  return <section className="pb-16 sm:pb-24 px-4 sm:px-6 lg:px-16" ref={sectionRef}>
       <div className="container mx-auto max-w-5xl">
         <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl md:text-4xl text-primary text-center font-sans font-semibold">
@@ -72,7 +72,7 @@ const WhoIsThisForSection = () => {
                 <h3 className="font-serif text-2xl font-semibold text-foreground">For Organisations</h3>
               </div>
               <p className="text-muted-foreground leading-relaxed mt-5 flex-grow">
-                Support emotionally healthier teams. Reduce burnout. Improve focus, engagement, and sustainability at work.
+                Looking to work on Culture, Outcomes, Retention & Relations backed by Effective Leadership, then this is the space to explore.
               </p>
               <button className="mt-4 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors self-start">
                 Explore

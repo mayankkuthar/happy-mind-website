@@ -25,24 +25,32 @@ const AnnouncementBanner = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 lg:px-16 py-8 md:py-10 lg:py-12 flex flex-col items-center justify-center text-center">
+      <div className="relative z-10 container mx-auto px-6 lg:px-16 py-4 md:py-6 lg:py-8 flex flex-col items-center justify-center text-center">
         {/* Main line */}
-        <h3 className="font-serif text-xl md:text-2xl lg:text-3xl font-semibold text-foreground mb-2 md:mb-3">
-          You're one conversation away from feeling sorted.
-        </h3>
+        <h1 className="font-serif text-xl md:text-2xl lg:text-3xl font-semibold text-foreground mb-2 md:mb-3">
+          Begin Your Growth Journey Complimentary!
+        </h1>
         
-        {/* Supporting line */}
-        <p className="font-sans text-sm md:text-base lg:text-lg text-foreground/80 mb-5 md:mb-6">
-          Start your conscious growth journey — complimentary today.
-        </p>
+        {/* Supporting text */}
+        <div className="space-y-3">
+          <p className="font-sans text-sm md:text-base lg:text-lg text-foreground/80">
+            Two minutes. One Form. Your Conscious Growth Begins
+          </p>
+          <p className="font-sans text-xs md:text-sm lg:text-base text-foreground/80">
+            Special Offer for our early users.<br /> Grow with SOLV- psychology-powered, people-first guidance designed to help you grow with awareness, confidence, and clarity.
+          </p>
+          <p className="font-sans text-xs md:text-xs lg:text-sm text-foreground/80">
+            100% Confidential. Safe.Secured
+          </p>
+        </div>
         
         {/* CTA Button */}
         <Link to="/solv">
           <Button 
             variant="outline" 
-            className="bg-white/90 hover:bg-white border-white/50 text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20"
+            className="mt-6 bg-white/90 hover:bg-white border-white/50 text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20"
           >
-            Explore SOLV
+            Begin Now
           </Button>
         </Link>
       </div>

@@ -34,7 +34,7 @@ const Navbar = () => {
               About
             </a>
             <a href="#blog" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-              Blog
+              Vibe with Us
             </a>
           </div>
 
@@ -76,7 +76,7 @@ const Navbar = () => {
               About
             </a>
             <a href="#blog" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
-              Blog
+              Vibe with Us
             </a>
             <div className="flex gap-4 pt-4">
               <Button variant="ghost" size="sm" className="text-muted-foreground">

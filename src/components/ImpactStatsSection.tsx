@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 const stats = [{
-  value: "50,000+",
-  label: "Individuals Supported"
+  value: "2,00,000+",
+  label: "Platform Users"
 }, {
-  value: "200+",
-  label: "Organisations Partnered"
+  value: "40+",
+  label: "Corporate Clients"
 }, {
-  value: "92%",
-  label: "Adoption Rate"
+  value: "91%",
+  label: "Tool Adoption Rate"
 }, {
-  value: "4.8/5",
-  label: "Satisfaction Score"
+  value: "4.7/5",
+  label: "Ratings"
 }];
 const ImpactStatsSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);

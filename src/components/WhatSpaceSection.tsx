@@ -54,12 +54,12 @@ const WhatSpaceSection = () => {
           </h1>
 
           {/* H2 - Above carousel */}
-          <h2 className="font-serif text-xl sm:text-[26px] lg:text-[44px] leading-tight text-foreground max-w-[900px] mx-auto md:text-2xl font-medium mb-8 sm:mb-10">
+          <h2 className="font-sans text-lg sm:text-xl md:text-2xl lg:text-3xl leading-[1.3] text-foreground max-w-[900px] mx-auto font-medium mb-8 sm:mb-10">
             When life feels overwhelming, growth shouldn't wait for a breaking point.
-            <br />
+          
             This is a space designed to help people pause, reflect, and grow consciously
-            <br />
-            <span className="text-primary">before stress turns into struggle.</span>
+            
+            <span className="text-primary">&nbsp;before stress turns into struggle.</span>
           </h2>
 
           {/* 3D Carousel */}

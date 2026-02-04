@@ -39,13 +39,13 @@ const FinalInvitationSection = () => {
 
         {/* Contact row */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm">
-          <a href="mailto:hello@happimynd.com" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+          <a href="mailto:info@happimynd.com" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
             <Mail className="w-4 h-4" />
-            <span>hello@happimynd.com</span>
+            <span>info@happimynd.com</span>
           </a>
-          <a href="tel:+919876543210" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+          <a href="tel:+918860393400" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
             <Phone className="w-4 h-4" />
-            <span>+91 98765 43210</span>
+            <span>+91 8860393400</span>
           </a>
           <Link to="/live-chat" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
             <MessageCircle className="w-4 h-4" />
