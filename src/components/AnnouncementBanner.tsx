@@ -1,7 +1,54 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+const useTypewriter = (texts: string[], speed: number = 100, backspaceSpeed: number = 50) => {
+  const [currentText, setCurrentText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [textIndex, setTextIndex] = useState(0);
+
+  useEffect(() => {
+    const handleTyping = () => {
+      const current = texts[textIndex];
+      
+      if (isDeleting) {
+        // Backspace effect
+        setCurrentText(current.substring(0, currentIndex - 1));
+        setCurrentIndex(prev => prev - 1);
+        
+        if (currentIndex === 0) {
+          setIsDeleting(false);
+          setTextIndex((prev) => (prev + 1) % texts.length);
+        }
+      } else {
+        // Typing effect
+        setCurrentText(current.substring(0, currentIndex + 1));
+        setCurrentIndex(prev => prev + 1);
+        
+        if (currentIndex === current.length) {
+          // Wait before backspacing
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      }
+    };
+
+    const timer = setTimeout(handleTyping, isDeleting ? backspaceSpeed : speed);
+    return () => clearTimeout(timer);
+  }, [currentIndex, isDeleting, textIndex, texts, speed, backspaceSpeed]);
+
+  return currentText;
+};
 
 const AnnouncementBanner = () => {
+  const texts = [
+    "Two minutes. One Form. Your Conscious Growth Begins",
+    "Special Offer for our early users.",
+    "Grow with SOLV- psychology-powered, people-first guidance designed to help you grow with awareness, confidence, and clarity."
+  ];
+  
+  const animatedText = useTypewriter(texts, 50, 25);
+
   return (
     <div className="relative w-full overflow-hidden group cursor-pointer transition-all duration-500 hover:brightness-105">
       {/* Animated lavender gradient background */}
@@ -31,16 +78,14 @@ const AnnouncementBanner = () => {
           Begin Your Growth Journey Complimentary!
         </h1>
         
-        {/* Supporting text */}
+        {/* Animated Supporting Text */}
         <div className="space-y-3">
-          <p className="font-sans text-sm md:text-base lg:text-lg text-foreground/80">
-            Two minutes. One Form. Your Conscious Growth Begins
+          <p className="font-sans text-sm md:text-base lg:text-lg text-foreground/80 text-center min-h-[30px] flex items-center justify-center">
+            {animatedText}
+            <span className="inline-block w-2 h-5 bg-foreground/80 ml-1 animate-pulse"></span>
           </p>
-          <p className="font-sans text-xs md:text-sm lg:text-base text-foreground/80">
-            Special Offer for our early users.<br /> Grow with SOLV- psychology-powered, people-first guidance designed to help you grow with awareness, confidence, and clarity.
-          </p>
-          <p className="font-sans text-xs md:text-xs lg:text-sm text-foreground/80">
-            100% Confidential. Safe.Secured
+          <p className="font-sans text-xs md:text-xs lg:text-sm text-foreground/80 text-center">
+            100% Confidential. Safe. Secured.
           </p>
         </div>
         

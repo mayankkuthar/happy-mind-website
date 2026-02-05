@@ -67,14 +67,14 @@ const SolvHowItWorks = () => {
 
           {/* Curved Path SVG - positioned behind content */}
           <svg
-            className="absolute top-[calc(50%-20px)] left-0 w-full h-40 pointer-events-none z-0 hidden md:block"
+            className="absolute top-[calc(20%-20px)] left-0 w-full h-40 pointer-events-none z-0 hidden md:block"
             viewBox="0 0 1200 160"
             preserveAspectRatio="none"
             fill="none"
           >
             {/* Wave path connecting the three dots */}
             <path
-              d="M100 40 C250 40, 350 120, 600 120 S950 40, 1100 40"
+              d="M100 10 C250 10, 350 90, 600 90 S950 10, 1100 10"
               stroke="url(#gradient)"
               strokeWidth="2"
               fill="none"
