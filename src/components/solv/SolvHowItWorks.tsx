@@ -1,24 +1,27 @@
 import { useEffect, useRef, useState } from "react";
-import { FileText, Calendar, Compass } from "lucide-react";
+import { ClipboardCheck, Calendar, Compass } from "lucide-react";
 
 const steps = [
   {
-    icon: FileText,
-    number: "01",
-    title: "Fill a 2-minute form",
-    description: "Free",
+    icon: ClipboardCheck,
+    number: "1",
+    title: "Do a Super Short Check-In",
+    description: "A quick rewind to understand your current state and growth areas.",
+    time: "60 Seconds",
   },
   {
     icon: Calendar,
-    number: "02",
-    title: "Schedule your 20-minute intro call",
-    description: "At your convenience",
+    number: "2",
+    title: "Schedule your intro call",
+    description: "Book your complimentary 20-minute session with a growth coach.",
+    time: "20 minutes",
   },
   {
     icon: Compass,
-    number: "03",
+    number: "3",
     title: "Get personalised direction",
-    description: "Clarity awaits",
+    description: "Receive clarity on your growth path and actionable next steps.",
+    time: "At your pace",
   },
 ];
 
@@ -36,46 +39,99 @@ const SolvHowItWorks = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 lg:px-16">
-      <div className="container mx-auto max-w-5xl">
+    <section ref={sectionRef} className="py-24 px-6 lg:px-16 bg-background overflow-hidden">
+      <div className="container mx-auto max-w-6xl">
+        {/* Header */}
         <div
-          className={`text-center space-y-4 mb-16 transition-all duration-700 ${
+          className={`text-center space-y-4 mb-20 transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
+          <p className="text-primary font-medium text-sm tracking-wider">— How it works —</p>
           <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
-            How it works
+            A simple three-step process
           </h2>
-          <p className="text-primary font-medium">A simple three-step process</p>
           <p className="text-muted-foreground max-w-xl mx-auto">
             No complex onboarding. No long forms. Just clarity in three simple steps.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {steps.map((step, index) => (
-            <div
-              key={step.number}
-              className={`relative text-center space-y-6 transition-all duration-700 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
-              style={{ transitionDelay: `${0.1 + index * 0.15}s` }}
-            >
-              {/* Connector Line */}
-              {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-10 left-[calc(50%+3rem)] w-[calc(100%-6rem)] h-px bg-gradient-to-r from-primary/30 to-primary/10" />
-              )}
+        {/* Visual Process Flow */}
+        <div className="relative">
+          {/* Large Background Numbers */}
+          <div className="absolute inset-0 flex justify-between items-center pointer-events-none select-none z-0">
+            <span className="text-[180px] md:text-[220px] font-serif font-bold text-primary/5 leading-none -ml-4">1</span>
+            <span className="text-[180px] md:text-[220px] font-serif font-bold text-primary/5 leading-none">2</span>
+            <span className="text-[180px] md:text-[220px] font-serif font-bold text-primary/5 leading-none -mr-4">3</span>
+          </div>
 
-              <div className="w-20 h-20 mx-auto rounded-full bg-accent flex items-center justify-center">
-                <step.icon className="w-8 h-8 text-primary" />
-              </div>
-              <div className="space-y-2">
-                <span className="text-primary/60 font-mono text-sm">{step.number}</span>
-                <h3 className="font-semibold text-foreground text-lg">{step.title}</h3>
-                <p className="text-muted-foreground text-sm">{step.description}</p>
-              </div>
-            </div>
-          ))}
+          {/* Curved Path SVG - positioned behind content */}
+          <svg
+            className="absolute top-[calc(50%-20px)] left-0 w-full h-40 pointer-events-none z-0 hidden md:block"
+            viewBox="0 0 1200 160"
+            preserveAspectRatio="none"
+            fill="none"
+          >
+            {/* Wave path connecting the three dots */}
+            <path
+              d="M100 40 C250 40, 350 120, 600 120 S950 40, 1100 40"
+              stroke="url(#gradient)"
+              strokeWidth="2"
+              fill="none"
+              strokeLinecap="round"
+              className={`transition-all duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+              style={{
+                strokeDasharray: 2000,
+                strokeDashoffset: isVisible ? 0 : 2000,
+                transition: 'stroke-dashoffset 1.5s ease-out, opacity 0.5s ease-out'
+              }}
+            />
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.4" />
+                <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.4" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          {/* Steps */}
+          <div className="relative z-10 grid md:grid-cols-3 gap-8 md:gap-12">
+            {steps.map((step, index) => {
+              // Position steps at different heights to follow the curve
+              const verticalOffset = index === 1 ? 'md:mt-16' : 'md:mt-0';
+              
+              return (
+                <div
+                  key={step.number}
+                  className={`relative flex flex-col items-center text-center space-y-4 ${verticalOffset} transition-all duration-700 ${
+                    isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                  }`}
+                  style={{ transitionDelay: `${0.2 + index * 0.2}s` }}
+                >
+                  {/* Icon Circle with connector dot */}
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-full bg-background border-2 border-primary/30 flex items-center justify-center shadow-lg shadow-primary/10">
+                      <step.icon className="w-7 h-7 text-primary" />
+                    </div>
+                    {/* Connector dot on the wave line */}
+                    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-background shadow-md hidden md:block" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="space-y-2 max-w-xs pt-2">
+                    <h3 className="font-semibold text-foreground text-lg">{step.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+                    {step.time && (
+                      <span className="inline-block bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-medium mt-2">
+                        {step.time}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

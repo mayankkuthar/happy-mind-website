@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 
 const explorations = [
-  "Your growth stage",
-  "Priority area",
-  "Personality influence",
-  "Patterns affecting outcomes",
-  "Next-level direction",
+  "Where you are in your growth journey",
+  "Which area matters most right now",
+  "How your personality shapes your choices",
+  "What patterns influence your outcomes",
+  "What direction can move you forward",
 ];
 
 const SolvIntroSession = () => {
@@ -35,7 +35,8 @@ const SolvIntroSession = () => {
             What happens in your 20-minute intro session
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-            Your growth coach helps you understand where you truly stand and what direction can unlock your next level. No pressure. No commitments.
+            Your growth expert (subject matter expert) helps you understand where you truly stand
+            and what direction can unlock your next level. No pressure. No commitments.
           </p>
         </div>
 
@@ -49,10 +50,12 @@ const SolvIntroSession = () => {
             {explorations.map((item, index) => (
               <div
                 key={item}
-                className="flex items-center gap-3"
+                className={`flex items-start gap-3 transition-all duration-500 ${
+                  isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                }`}
                 style={{ transitionDelay: `${0.3 + index * 0.1}s` }}
               >
-                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-4 h-4 text-primary" />
                 </div>
                 <span className="text-muted-foreground">{item}</span>
@@ -61,12 +64,12 @@ const SolvIntroSession = () => {
           </div>
 
           <div className="text-center space-y-4">
-            <Button size="lg" className="rounded-full px-10">
-              Book your free intro session
-            </Button>
-            <p className="text-muted-foreground text-sm">
-              Continue with weekly 20-minute check-ins if you choose.
+            <p className="text-primary font-medium text-lg italic">
+              You're One conversation away to feel sorted!
             </p>
+            <Button size="lg" className="rounded-full px-10">
+              Book your Growth Session
+            </Button>
           </div>
         </div>
       </div>

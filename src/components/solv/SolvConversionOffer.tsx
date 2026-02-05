@@ -23,7 +23,7 @@ const SolvConversionOffer = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 lg:px-16">
+    <section ref={sectionRef} className="py-24 px-6 lg:px-16 bg-background">
       <div className="container mx-auto max-w-4xl">
         <div
           className={`bg-gradient-to-br from-primary/5 to-accent/50 rounded-3xl p-8 md:p-16 text-center transition-all duration-700 ${
@@ -35,13 +35,14 @@ const SolvConversionOffer = () => {
               Limited Time Offer
             </div>
             <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground">
-              Free intro session worth ₹199
+              COMPLIMENTARY SOLV Session!
             </h2>
             <p className="text-primary font-medium text-lg">
               Two minutes. One form. Your conscious growth begins.
             </p>
             <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              We're offering early users a complimentary intro session — psychology-powered, people-first guidance to help you become more aware, capable, and connected.
+              We're offering early users a complimentary intro session — powered by conscious science,
+              people-first guidance to help you become more aware, capable, and connected.
             </p>
           </div>
 

@@ -29,7 +29,8 @@ const SolvPrivacySecurity = () => {
             Your space. Your data. Your control.
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed max-w-xl mx-auto">
-            Your journey is personal. Your data stays private. We protect your space with respect, responsibility, and trust.
+            Your journey is personal. Your data stays private.
+            We protect your space with the same care we design our experience — with respect, responsibility, and trust.
           </p>
         </div>
       </div>
