@@ -1,4 +1,4 @@
-import { Shield, Lock, CheckCircle2, XCircle, Eye } from "lucide-react";
+import { CheckCircle2, XCircle, Shield, Lock, Eye } from "lucide-react";
 
 const leadershipReceives = [
   "Aggregated, anonymised emotional trend data",
@@ -14,23 +14,20 @@ const leadershipDoesNot = [
 
 const employeeExperience = [
   "Confidential emotional support",
-  "Simple daily tools",
+  "Simple, daily tools",
   "Access to professional guidance",
   "Voluntary participation built on trust",
 ];
 
-const securityBadges = [
-  { icon: Shield, text: "Enterprise-grade security" },
-  { icon: Lock, text: "GDPR compliant" },
-  { icon: Eye, text: "ISO 27001 ready" },
-];
-
 const OrgTrustConfidentiality = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-background">
+    <section className="py-20 px-6 lg:px-16 bg-muted/30">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center mb-16">
+          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
+            Privacy, Trust & Ethics
+          </p>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
             Confidentiality is foundational to adoption and impact
           </h2>
@@ -40,7 +37,7 @@ const OrgTrustConfidentiality = () => {
         </div>
 
         {/* Three Column Trust Structure */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid lg:grid-cols-3 gap-8 mb-12">
           {/* What Leadership Receives */}
           <div className="bg-primary/5 rounded-2xl p-8 border border-primary/20">
             <h3 className="font-serif text-lg font-semibold text-foreground mb-6">
@@ -57,7 +54,7 @@ const OrgTrustConfidentiality = () => {
           </div>
 
           {/* What Leadership Does NOT Receive */}
-          <div className="bg-muted/50 rounded-2xl p-8 border border-border/30">
+          <div className="bg-background rounded-2xl p-8 border border-border/30">
             <h3 className="font-serif text-lg font-semibold text-foreground mb-6">
               What leadership does NOT receive
             </h3>
@@ -85,21 +82,6 @@ const OrgTrustConfidentiality = () => {
               ))}
             </div>
           </div>
-        </div>
-
-        {/* Security Strip */}
-        <div className="flex flex-wrap justify-center gap-6">
-          {securityBadges.map((badge, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-3 bg-muted/50 rounded-full px-6 py-3 border border-border/30"
-            >
-              <badge.icon className="w-5 h-5 text-primary" />
-              <span className="text-sm font-medium text-foreground">
-                {badge.text}
-              </span>
-            </div>
-          ))}
         </div>
       </div>
     </section>

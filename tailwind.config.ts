@@ -153,6 +153,14 @@ export default {
 				'50%': {
 					opacity: '0.6'
 				}
+			},
+			'scroll-left': {
+				'0%': {
+					transform: 'translateX(100%)'
+				},
+				'100%': {
+					transform: 'translateX(-100%)'
+				}
 			}
 		},
 		animation: {
@@ -165,7 +173,8 @@ export default {
 			'mist-left-slow': 'mist-left-slow 10s ease-in-out infinite',
 			'mist-right': 'mist-right 6s ease-in-out infinite',
 			'mist-right-slow': 'mist-right-slow 10s ease-in-out infinite',
-			'mist-pulse': 'mist-pulse 4s ease-in-out infinite'
+			'mist-pulse': 'mist-pulse 4s ease-in-out infinite',
+			'scroll-left': 'scroll-left 20s linear infinite'
 		},
   		boxShadow: {
   			'2xs': 'var(--shadow-2xs)',

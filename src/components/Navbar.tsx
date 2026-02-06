@@ -30,9 +30,9 @@ const Navbar = () => {
             <Link to="/for-organisations" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               For Organisations
             </Link>
-            <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+            <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               About
-            </a>
+            </Link>
             <a href="#blog" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Vibe with Us
             </a>
@@ -72,9 +72,9 @@ const Navbar = () => {
             <Link to="/for-organisations" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
               For Organisations
             </Link>
-            <a href="#about" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
+            <Link to="/about" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
               About
-            </a>
+            </Link>
             <a href="#blog" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
               Vibe with Us
             </a>

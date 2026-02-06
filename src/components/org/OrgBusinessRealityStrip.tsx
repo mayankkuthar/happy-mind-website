@@ -1,56 +1,78 @@
-import { TrendingUp, DollarSign, Users } from "lucide-react";
+import { AlertTriangle, TrendingDown, Users, Target } from "lucide-react";
 
-const stats = [
+const realityTiles = [
   {
-    icon: TrendingUp,
-    value: "76%",
-    label: "of employees report burnout symptoms at work",
+    icon: AlertTriangle,
+    title: "Talent Continuity Risk",
+    description: "Quiet disengagement is draining leadership pipelines and institutional memory.",
   },
   {
-    icon: DollarSign,
-    value: "$322B",
-    label: "global cost of turnover linked to burnout",
+    icon: TrendingDown,
+    title: "Execution Pressure",
+    description: "Stressed leaders manage output — not people. Performance becomes fragile.",
   },
   {
     icon: Users,
-    value: "4×",
-    label: "higher engagement with emotionally aware leaders",
+    title: "Multigenerational Challenges",
+    description: "Emotional overload in the system slows judgment, raises escalations and depletes accountability.",
+  },
+  {
+    icon: Target,
+    title: "Misplaced Interventions",
+    description: "Most fixes target processes & products. The real friction sits in people dynamics.",
   },
 ];
 
 const OrgBusinessRealityStrip = () => {
   return (
-    <section className="py-16 px-6 lg:px-16 bg-primary/5">
-      <div className="container mx-auto">
-        {/* Title */}
-        <div className="text-center mb-12">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground mb-4">
-            Why this matters
-          </h2>
-        </div>
+    <section className="py-20 px-6 lg:px-16 bg-muted/30">
+      <div className="container mx-auto max-w-6xl">
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          {/* Left Content */}
+          <div className="space-y-6">
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground leading-tight">
+              The performance risks leaders are managing — often without the right lens
+            </h2>
 
-        {/* Stats Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="bg-background rounded-2xl p-8 shadow-sm border border-border/30 text-center"
-            >
-              <stat.icon className="w-8 h-8 text-primary mx-auto mb-4" />
-              <div className="font-serif text-4xl font-bold text-primary mb-2">
-                {stat.value}
-              </div>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
+            <h3 className="font-serif text-xl md:text-2xl font-semibold text-foreground">
+              Great Strategy. Great Technology. Great Team.
+            </h3>
+
+            <p className="font-sans text-lg text-muted-foreground">
+              So what's holding performance back?
+            </p>
+
+            <p className="font-sans text-base text-muted-foreground leading-relaxed">
+              Those unexpected delivery gaps, leadership strain and talent erosion along the execution journey.
+            </p>
+
+            {/* Quote with left border */}
+            <div className="border-l-4 border-primary pl-6 py-2">
+              <blockquote className="font-serif text-lg text-muted-foreground italic leading-relaxed">
+                "Until organisations assimilate the human drivers of performance, every solution remains incomplete."
+              </blockquote>
             </div>
-          ))}
-        </div>
+          </div>
 
-        {/* Pull Quote */}
-        <div className="max-w-3xl mx-auto text-center">
-          <blockquote className="font-serif text-xl md:text-2xl text-foreground italic leading-relaxed">
-            "Most organisations intervene only after performance drops.
-            HappiMynd helps you move earlier."
-          </blockquote>
+          {/* Right Side - 2x2 Tiles Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {realityTiles.map((tile, index) => (
+              <div
+                key={index}
+                className="bg-card rounded-2xl p-6 border border-border/30 shadow-sm hover:shadow-md transition-shadow duration-300"
+              >
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+                  <tile.icon className="w-6 h-6 text-primary" />
+                </div>
+                <h4 className="font-serif text-lg font-semibold text-foreground mb-2">
+                  {tile.title}
+                </h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {tile.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

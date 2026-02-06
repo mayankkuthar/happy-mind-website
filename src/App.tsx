@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import ForIndividuals from "./pages/ForIndividuals";
 import ForOrganisations from "./pages/ForOrganisations";
 import Solv from "./pages/Solv";
+import About from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/for-individuals" element={<ForIndividuals />} />
           <Route path="/for-organisations" element={<ForOrganisations />} />
           <Route path="/solv" element={<Solv />} />
+          <Route path="/about" element={<About />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
