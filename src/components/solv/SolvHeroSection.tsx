@@ -8,7 +8,7 @@ const pills = [
 
 const SolvHeroSection = () => {
   return (
-    <section className="py-24 md:py-32 px-6 lg:px-16 bg-background">
+    <section className="py-12 md:py-16 px-6 lg:px-16 bg-background">
       <div className="container mx-auto max-w-5xl text-center">
         {/* Pills */}
         <div className="flex flex-wrap justify-center gap-3 mb-8">

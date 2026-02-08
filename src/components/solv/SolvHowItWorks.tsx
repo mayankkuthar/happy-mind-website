@@ -39,16 +39,16 @@ const SolvHowItWorks = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 lg:px-16 bg-background overflow-hidden">
+    <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-background overflow-hidden">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div
-          className={`text-center space-y-4 mb-20 transition-all duration-700 ${
+          className={`text-center space-y-4 mb-10 transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <p className="text-primary font-medium text-sm tracking-wider">— How it works —</p>
-          <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
+          <h1 className="text-primary font-medium text-3xl md:text-4xl tracking-wider">— How it works —</h1>
+          <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground">
             A simple three-step process
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
