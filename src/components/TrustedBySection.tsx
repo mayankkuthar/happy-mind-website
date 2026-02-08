@@ -42,7 +42,7 @@ const TrustedBySection = () => {
   return (
     <section 
       ref={sectionRef}
-      className="relative py-16 sm:py-24 md:py-32 px-4 sm:px-6 lg:px-16 bg-background overflow-hidden min-h-[60vh] sm:min-h-[80vh] flex items-center"
+      className="relative py-4 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-16 bg-background overflow-hidden min-h-[60vh] sm:min-h-[80vh] flex items-center"
     >
       {/* Floating Logo Circles - positioned relative to section */}
       {logoPlaceholders.map((logo) => (

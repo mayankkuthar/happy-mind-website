@@ -61,7 +61,7 @@ const SocialsSection = () => {
   return (
     <section 
       ref={sectionRef}
-      className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 lg:px-16 bg-muted/30"
+      className="py-4 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-16 bg-muted/30"
     >
       <div className="container mx-auto max-w-6xl">
         {/* Headings */}

@@ -26,10 +26,10 @@ const ImpactStatsSection = () => {
     }
     return () => observer.disconnect();
   }, []);
-  return <section ref={sectionRef} className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 lg:px-16 bg-card">
+  return <section ref={sectionRef} className="py-4 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-16 bg-card">
       <div className="container mx-auto max-w-6xl">
         <div className={`text-center transition-all duration-700 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          <p className="text-primary tracking-widest uppercase mb-8 sm:mb-12 font-medium text-2xl sm:text-3xl md:text-4xl">
+          <p className="text-primary tracking-widest uppercase mb-4 sm:mb-8 font-medium text-2xl sm:text-3xl md:text-4xl">
             Impact
           </p>
           
