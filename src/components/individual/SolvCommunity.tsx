@@ -15,7 +15,7 @@ const SolvCommunity = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 lg:px-16">
+    <section ref={sectionRef} className="py-12 px-6 lg:px-16">
       <div className="container mx-auto max-w-3xl text-center">
         <div
           className={`space-y-6 transition-all duration-700 ${

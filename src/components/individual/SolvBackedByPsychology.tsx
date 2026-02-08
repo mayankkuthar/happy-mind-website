@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 
 const frameworks = [
-  { name: "Personality Science", orbit: 1, angle: 0 },
-  { name: "Emotional Intelligence Mapping", orbit: 2, angle: 36 },
-  { name: "Cognitive Behaviour Therapy", orbit: 1, angle: 72 },
-  { name: "Cognitive Pattern Analysis", orbit: 2, angle: 108 },
-  { name: "Behaviour Therapy", orbit: 1, angle: 144 },
-  { name: "Solution-Focused Brief Therapy", orbit: 2, angle: 180 },
-  { name: "Single Session Therapy", orbit: 1, angle: 216 },
-  { name: "Cognitive Overload Reduction", orbit: 2, angle: 252 },
-  { name: "Motivational Interviewing", orbit: 1, angle: 288 },
-  { name: "Evidence-Based Coaching", orbit: 2, angle: 324 },
+  { name: "Personality Science", orbitRadius: 140, speed: 50, startAngle: 0, color: "primary" },
+  { name: "Emotional Intelligence Mapping", orbitRadius: 190, speed: 65, startAngle: 36, color: "muted" },
+  { name: "Cognitive Behaviour Therapy", orbitRadius: 150, speed: 55, startAngle: 72, color: "accent" },
+  { name: "Cognitive Pattern Analysis", orbitRadius: 180, speed: 70, startAngle: 108, color: "primary" },
+  { name: "Behaviour Therapy", orbitRadius: 145, speed: 52, startAngle: 144, color: "muted" },
+  { name: "Solution-Focused Brief Therapy", orbitRadius: 195, speed: 68, startAngle: 180, color: "accent" },
+  { name: "Single Session Therapy", orbitRadius: 155, speed: 58, startAngle: 216, color: "primary" },
+  { name: "Cognitive Overload Reduction", orbitRadius: 185, speed: 72, startAngle: 252, color: "muted" },
+  { name: "Motivational Interviewing", orbitRadius: 160, speed: 60, startAngle: 288, color: "accent" },
+  { name: "Evidence-Based Coaching", orbitRadius: 175, speed: 66, startAngle: 324, color: "primary" },
 ];
 
 const SolvBackedByPsychology = () => {
@@ -27,7 +27,7 @@ const SolvBackedByPsychology = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 lg:px-16 bg-card overflow-hidden">
+    <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-card overflow-hidden">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div
@@ -45,34 +45,31 @@ const SolvBackedByPsychology = () => {
 
         {/* Solar System Container */}
         <div
-          className={`relative w-full h-[500px] md:h-[600px] flex items-center justify-center transition-all duration-1000 ${
+          className={`relative w-full h-[400px] md:h-[500px] flex items-center justify-center transition-all duration-1000 ${
             isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
           }`}
         >
-          {/* Orbital Rings */}
+          {/* Orbital Rings - Perfect circles matching planet paths */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            {/* Ring 1 - tilted */}
-            <div 
-              className="absolute w-[280px] h-[280px] md:w-[380px] md:h-[380px] rounded-full border border-foreground/10"
-              style={{ transform: "rotateX(70deg) rotateZ(-15deg)" }}
-            />
-            {/* Ring 2 - tilted opposite */}
-            <div 
-              className="absolute w-[320px] h-[320px] md:w-[440px] md:h-[440px] rounded-full border border-foreground/8"
-              style={{ transform: "rotateX(75deg) rotateZ(20deg)" }}
-            />
-            {/* Ring 3 - subtle */}
-            <div 
-              className="absolute w-[360px] h-[360px] md:w-[500px] md:h-[500px] rounded-full border border-foreground/5"
-              style={{ transform: "rotateX(68deg) rotateZ(-5deg)" }}
-            />
+            {Array.from(new Set(frameworks.map(f => f.orbitRadius)))
+              .sort((a, b) => a - b)
+              .map((radius) => (
+                <div 
+                  key={radius}
+                  className="absolute rounded-full border border-foreground/10"
+                  style={{ 
+                    width: `${radius * 2}px`,
+                    height: `${radius * 2}px`,
+                  }}
+                />
+              ))
+            }
           </div>
 
           {/* Central Globe */}
           <div 
             className="absolute z-20 w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-primary/40 via-primary/60 to-primary/30 flex items-center justify-center shadow-lg"
             style={{ 
-              animation: "spin-slow 40s linear infinite",
               boxShadow: "0 0 60px hsl(var(--primary) / 0.3), inset 0 0 30px hsl(var(--primary) / 0.2)"
             }}
           >
@@ -86,90 +83,67 @@ const SolvBackedByPsychology = () => {
             </div>
           </div>
 
-          {/* Orbiting Planets Container */}
-          <div 
-            className="absolute w-[400px] h-[400px] md:w-[520px] md:h-[520px]"
-            style={{ animation: "orbit 60s linear infinite" }}
-          >
-            {frameworks.map((framework, index) => {
-              const orbitRadius = framework.orbit === 1 ? 42 : 48;
-              const angleRad = (framework.angle * Math.PI) / 180;
-              const x = Math.cos(angleRad) * orbitRadius;
-              const y = Math.sin(angleRad) * orbitRadius;
-              
-              // Determine size and depth based on position
-              const isBack = framework.angle > 90 && framework.angle < 270;
-              const scale = isBack ? 0.85 : 1;
-              const opacity = isBack ? 0.7 : 1;
-              const zIndex = isBack ? 10 : 30;
-
-              return (
+          {/* Individual Orbiting Planets */}
+          {frameworks.map((framework, index) => {
+            const animationDelay = `-${(framework.startAngle / 360) * framework.speed}s`;
+            
+            return (
+              <div
+                key={framework.name}
+                className="absolute left-1/2 top-1/2"
+                style={{
+                  animation: `planet-orbit-${index} ${framework.speed}s linear infinite`,
+                  animationDelay,
+                }}
+              >
                 <div
-                  key={framework.name}
-                  className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center p-2 text-center"
                   style={{
-                    transform: `translate(calc(-50% + ${x}%), calc(-50% + ${y}%)) scale(${scale})`,
-                    opacity,
-                    zIndex,
-                    transition: "transform 0.3s ease-out, opacity 0.3s ease-out",
+                    animation: `planet-counter-${index} ${framework.speed}s linear infinite`,
+                    animationDelay,
+                    background: framework.color === "primary" 
+                      ? "linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.3))"
+                      : framework.color === "muted"
+                      ? "linear-gradient(to bottom right, hsl(var(--muted) / 0.6), hsl(var(--muted) / 0.8))"
+                      : "linear-gradient(to bottom right, hsl(var(--primary) / 0.15), hsl(var(--muted) / 0.5))",
+                    boxShadow: "0 8px 25px hsl(var(--primary) / 0.15)",
                   }}
                 >
-                  <div
-                    className={`
-                      w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center p-2 text-center
-                      ${index % 3 === 0 
-                        ? "bg-gradient-to-br from-primary/20 to-primary/30" 
-                        : index % 3 === 1 
-                          ? "bg-gradient-to-br from-muted/60 to-muted/80" 
-                          : "bg-gradient-to-br from-primary/15 to-muted/50"
-                      }
-                    `}
-                    style={{
-                      boxShadow: isBack 
-                        ? "0 4px 15px hsl(var(--primary) / 0.1)" 
-                        : "0 8px 25px hsl(var(--primary) / 0.2)",
-                      animation: `counter-orbit 60s linear infinite`,
-                    }}
-                  >
-                    <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wide text-foreground/80 leading-tight">
-                      {framework.name}
-                    </span>
-                  </div>
+                  <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wide text-foreground/80 leading-tight">
+                    {framework.name}
+                  </span>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* Custom Keyframes */}
       <style>{`
-        @keyframes orbit {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        
-        @keyframes counter-orbit {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(-360deg);
-          }
-        }
-        
-        @keyframes spin-slow {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
+        ${frameworks.map((framework, index) => {
+          const radius = framework.orbitRadius;
+          
+          return `
+            @keyframes planet-orbit-${index} {
+              0% {
+                transform: translate(-50%, -50%) 
+                          rotate(0deg) 
+                          translateX(${radius}px);
+              }
+              100% {
+                transform: translate(-50%, -50%) 
+                          rotate(360deg) 
+                          translateX(${radius}px);
+              }
+            }
+            
+            @keyframes planet-counter-${index} {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(-360deg); }
+            }
+          `;
+        }).join('\n')}
       `}</style>
     </section>
   );
