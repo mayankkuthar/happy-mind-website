@@ -13,13 +13,27 @@ const About = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-16 lg:pt-20">
-        <AboutHeroSection />
-        <AboutGapSection />
-        <AboutMissionVisionSection />
-        <AboutApproachSection />
-        <AboutMilestonesSection />
-        <AboutTeamSection />
-        <FinalInvitationSection />
+        <div className="bg-background">
+          <AboutHeroSection />
+        </div>
+        <div className="bg-muted/30">
+          <AboutGapSection />
+        </div>
+        <div className="bg-background">
+          <AboutMissionVisionSection />
+        </div>
+        <div className="bg-muted/30">
+          <AboutApproachSection />
+        </div>
+        <div className="bg-background">
+          <AboutMilestonesSection />
+        </div>
+        <div className="bg-muted/30">
+          <AboutTeamSection />
+        </div>
+        <div className="bg-background">
+          <FinalInvitationSection />
+        </div>
       </main>
       <Footer />
     </div>

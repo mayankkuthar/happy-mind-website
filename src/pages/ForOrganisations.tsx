@@ -17,17 +17,39 @@ const ForOrganisations = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-20">
-        <OrgHeroSection />
-        <OrgScrollingBanner />
-        <OrgBusinessRealityStrip />
-        <OrgStrategicGapWithHappiMynd />
-        <OrgImpactSection />
-        <OrgHowWeWork />
-        <OrgProofSection />
-        <OrgClientReviews />
-        <OrgTrustConfidentiality />
-        <OrgScalability />
-        <OrgStrategicClosing />
+        <div className="bg-background">
+          <OrgHeroSection />
+        </div>
+        <div className="bg-muted/30">
+          <OrgScrollingBanner />
+        </div>
+        <div className="bg-background">
+          <OrgBusinessRealityStrip />
+        </div>
+        <div className="bg-muted/30">
+          <OrgStrategicGapWithHappiMynd />
+        </div>
+        <div className="bg-background">
+          <OrgImpactSection />
+        </div>
+        <div className="bg-muted/30">
+          <OrgHowWeWork />
+        </div>
+        <div className="bg-background">
+          <OrgProofSection />
+        </div>
+        <div className="bg-muted/30">
+          <OrgClientReviews />
+        </div>
+        <div className="bg-background">
+          <OrgTrustConfidentiality />
+        </div>
+        <div className="bg-muted/30">
+          <OrgScalability />
+        </div>
+        <div className="bg-background">
+          <OrgStrategicClosing />
+        </div>
       </main>
       <Footer />
     </div>

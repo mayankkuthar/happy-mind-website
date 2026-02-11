@@ -14,14 +14,30 @@ const ForIndividuals = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-16">
-        <SolvHeroSection />
-        <SolvImpactStats />
-        <SolvWhoThisIsFor />
-        <SolvRealityCheck />
-        <JourneySection />
-        <SolvBackedByPsychology />
-        <SolvCommunity />
-        <SolvPrivacySecurity />
+        <div className="bg-background">
+          <SolvHeroSection />
+        </div>
+        <div className="bg-muted/30">
+          <SolvImpactStats />
+        </div>
+        <div className="bg-background">
+          <SolvWhoThisIsFor />
+        </div>
+        <div className="bg-muted/30">
+          <SolvRealityCheck />
+        </div>
+        <div className="bg-background">
+          <JourneySection />
+        </div>
+        <div className="bg-muted/30">
+          <SolvBackedByPsychology />
+        </div>
+        <div className="bg-background">
+          <SolvCommunity />
+        </div>
+        <div className="bg-muted/30">
+          <SolvPrivacySecurity />
+        </div>
       </main>
       <Footer />
     </div>

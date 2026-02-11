@@ -23,7 +23,7 @@ const WhoIsThisForSection = () => {
     }
     return () => observer.disconnect();
   }, []);
-  return <section className="pb-16 sm:pb-24 px-4 sm:px-6 lg:px-16" ref={sectionRef}>
+  return <section className="pb-16 sm:py-12 px-4 sm:px-6 lg:px-16" ref={sectionRef}>
       <div className="container mx-auto max-w-5xl">
         <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl md:text-4xl text-primary text-center font-sans font-semibold">

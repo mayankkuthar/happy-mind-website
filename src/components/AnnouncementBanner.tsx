@@ -52,7 +52,7 @@ const AnnouncementBanner = () => {
   return (
     <div className="relative w-full overflow-hidden group cursor-pointer transition-all duration-500 hover:brightness-105">
       {/* Animated lavender gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[hsl(265,60%,88%)] via-[hsl(270,50%,85%)] to-[hsl(265,60%,88%)] animate-gradient-flow" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[hsl(265,85%,94%)] via-[hsl(270,85%,90%)] to-[hsl(265,85%,94%)] animate-gradient-flow" />
       
       {/* Secondary flowing gradient layer */}
       <div className="absolute inset-0 bg-gradient-to-br from-[hsl(270,40%,92%)/0.5] via-transparent to-[hsl(265,50%,90%)/0.5] animate-gradient-slow" />
