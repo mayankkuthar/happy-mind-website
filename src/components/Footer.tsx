@@ -63,7 +63,7 @@ const Footer = () => {
         <Separator className="mb-8" />
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-xs sm:text-sm">
-          <p className="text-center md:text-left">© 2024 HappiMynd. All rights reserved.</p>
+          <p className="text-center md:text-left">© 2026 HappiMynd. All rights reserved.</p>
           <div className="flex gap-4">
             <a href="#" className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all duration-300" aria-label="LinkedIn">
               <Linkedin className="w-4 h-4" />
