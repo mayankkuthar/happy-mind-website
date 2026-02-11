@@ -55,10 +55,10 @@ const HeroSection = () => {
             
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-              <Button variant="default" size="lg" className="rounded-full px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
+              <Button variant="default" size="lg" className="rounded-md px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
                 Start for Myself
               </Button>
-              <Button variant="outline" size="lg" className="rounded-full px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium border-2 border-primary text-primary bg-background hover:bg-primary/5 transition-all duration-300 w-full sm:w-auto">
+              <Button variant="outline" size="lg" className="rounded-md px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium w-full sm:w-auto">
                 Explore for My Team
               </Button>
             </div>

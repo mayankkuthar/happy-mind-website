@@ -50,7 +50,7 @@ const WhoIsThisForSection = () => {
               <p className="text-muted-foreground leading-relaxed mt-5 flex-grow">
                 ​If your mind feels busy, emotions feel unclear, or stress feels constant even when life looks fine, HappiMynd is here for you.
               </p>
-              <button className="mt-4 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors self-start">
+              <button className="mt-4 px-4 py-2 text-sm font-medium border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-md transition-colors self-start">
                 Explore
               </button>
             </div>
@@ -74,7 +74,7 @@ const WhoIsThisForSection = () => {
               <p className="text-muted-foreground leading-relaxed mt-5 flex-grow">
                 Looking to work on Culture, Outcomes, Retention & Relations backed by Effective Leadership, then this is the space to explore.
               </p>
-              <button className="mt-4 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors self-start">
+              <button className="mt-4 px-4 py-2 text-sm font-medium border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-md transition-colors self-start">
                 Explore
               </button>
             </div>
