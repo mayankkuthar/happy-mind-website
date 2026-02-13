@@ -25,7 +25,7 @@ const impactStats = [
 
 const OrgImpactSection = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-primary/5">
+    <section className="py-20 px-6 lg:px-16 bg-gradient-to-r from-purple-200 via-purple-100 to-purple-200">
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
         <div className="text-center mb-12">

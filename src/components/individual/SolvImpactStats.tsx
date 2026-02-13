@@ -22,7 +22,7 @@ const SolvImpactStats = () => {
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
-  return <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-card">
+  return <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-gradient-to-r from-purple-200 via-purple-100 to-purple-200">
       <div className="container mx-auto max-w-5xl">
         <div className={`text-center space-y-4 mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <h2 className="text-3xl md:text-4xl font-semibold text-primary font-sans">

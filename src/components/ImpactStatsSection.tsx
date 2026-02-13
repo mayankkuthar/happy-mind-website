@@ -26,7 +26,7 @@ const ImpactStatsSection = () => {
     }
     return () => observer.disconnect();
   }, []);
-  return <section ref={sectionRef} className="py-4 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-16 bg-gradient-to-b from-[hsl(265,70%,75%)] to-white">
+  return <section ref={sectionRef} className="py-4 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-16 bg-gradient-to-r from-purple-200 via-purple-100 to-purple-200">
       <div className="container mx-auto max-w-6xl">
         <div className={`text-center transition-all duration-700 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <p className="text-primary tracking-widest uppercase mb-4 sm:mb-8 font-medium text-2xl sm:text-3xl md:text-4xl">
