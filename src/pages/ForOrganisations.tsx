@@ -23,16 +23,16 @@ const ForOrganisations = () => {
         <div className="bg-muted/30">
           <OrgScrollingBanner />
         </div>
-        <div className="bg-background">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <OrgBusinessRealityStrip />
         </div>
-        <div className="bg-muted/30">
+        <div className="bg-background">
           <OrgStrategicGapWithHappiMynd />
         </div>
-        <div className="bg-background">
+        <div className="bg-muted/30">
           <OrgImpactSection />
         </div>
-        <div className="bg-muted/30">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <OrgHowWeWork />
         </div>
         <div className="bg-background">
@@ -41,13 +41,13 @@ const ForOrganisations = () => {
         <div className="bg-muted/30">
           <OrgClientReviews />
         </div>
-        <div className="bg-background">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <OrgTrustConfidentiality />
         </div>
-        <div className="bg-muted/30">
+        <div className="bg-background">
           <OrgScalability />
         </div>
-        <div className="bg-background">
+        <div className="bg-muted/30">
           <OrgStrategicClosing />
         </div>
       </main>

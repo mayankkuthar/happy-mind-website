@@ -30,7 +30,7 @@ const OrgStrategicClosing = () => {
               >
                 Talk to HappiMynd
               </Button>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Explore how people intelligence strengthens performance.
               </p>
             </div>
@@ -43,11 +43,11 @@ const OrgStrategicClosing = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="rounded-full px-10 py-6 text-base font-medium border-2 border-primary text-primary bg-background hover:bg-primary/5 transition-all duration-300 mb-3"
+                className="rounded-full px-10 py-6 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 mb-3"
               >
                 Explore for Your Organisation
               </Button>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Build conscious, high-performing workplaces.
               </p>
             </div>

@@ -15,7 +15,7 @@ const SolvHeroSection = () => {
           {pills.map((pill) => (
             <span
               key={pill}
-              className="bg-accent text-primary px-4 py-2 rounded-full text-sm font-medium"
+              className="bg-white text-primary px-4 py-2 rounded-md text-sm font-medium"
             >
               {pill}
             </span>

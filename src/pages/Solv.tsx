@@ -25,22 +25,22 @@ const Solv = () => {
         </div>
 
         {/* 3. Reality Check */}
-        <div className="bg-background">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <SolvRealityCheck />
         </div>
 
         {/* 4. Bridge Statement */}
-        <div className="bg-muted/30">
+        <div className="bg-background">
           <SolvBridgeStatement />
         </div>
 
         {/* 5. How It Works */}
-        <div className="bg-background">
+        <div className="bg-muted/30">
           <SolvHowItWorks />
         </div>
 
         {/* 6. Intro Session Experience */}
-        <div className="bg-muted/30">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <SolvIntroSession />
         </div>
 

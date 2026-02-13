@@ -42,7 +42,7 @@ const OrgHeroSection = () => {
           {microTablets.map((tablet, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2"
+              className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-md px-4 py-2"
             >
               <tablet.icon className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary">{tablet.text}</span>
@@ -103,14 +103,14 @@ const OrgHeroSection = () => {
               {heroPills.slice(0, 2).map((pill, index) => (
                 <div
                   key={index}
-                  className="bg-primary/10 border border-primary/30 rounded-full px-5 py-2.5"
+                  className="bg-primary/10 border border-primary/30 rounded-md px-5 py-2.5"
                 >
                   <span className="text-sm font-medium text-primary">{pill}</span>
                 </div>
               ))}
             </div>
             <div className="flex justify-center">
-              <div className="bg-primary/10 border border-primary/30 rounded-full px-5 py-2.5">
+              <div className="bg-primary/10 border border-primary/30 rounded-md px-5 py-2.5">
                 <span className="text-sm font-medium text-primary">{heroPills[2]}</span>
               </div>
             </div>

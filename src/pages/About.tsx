@@ -19,16 +19,16 @@ const About = () => {
         <div className="bg-muted/30">
           <AboutGapSection />
         </div>
-        <div className="bg-background">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <AboutMissionVisionSection />
         </div>
-        <div className="bg-muted/30">
+        <div className="bg-background">
           <AboutApproachSection />
         </div>
-        <div className="bg-background">
+        <div className="bg-muted/30">
           <AboutMilestonesSection />
         </div>
-        <div className="bg-muted/30">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <AboutTeamSection />
         </div>
         <div className="bg-background">

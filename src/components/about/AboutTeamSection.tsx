@@ -64,7 +64,7 @@ const AboutTeamSection = () => {
                   />
                 </div>
                 
-                {/* LinkedIn Button */}
+                {/* LinkedIn Button 
                 <a
                   href={member.linkedin}
                   target="_blank"
@@ -72,7 +72,7 @@ const AboutTeamSection = () => {
                   className="absolute bottom-0 right-0 w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors"
                 >
                   <Linkedin className="w-5 h-5 text-primary-foreground" />
-                </a>
+                </a>*/}
               </div>
 
               {/* Info */}

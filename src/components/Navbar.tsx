@@ -33,9 +33,9 @@ const Navbar = () => {
             <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               About
             </Link>
-            <a href="#blog" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+            {/*<a href="#blog" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Vibe with Us
-            </a>
+            </a>*/}
           </div>
 
           {/* Desktop CTA */}
@@ -43,7 +43,7 @@ const Navbar = () => {
             <Button variant="ghost" size="sm" className="text-muted-foreground">
               Log In
             </Button>
-            <Button variant="default" size="sm" className="rounded-md px-6">
+            <Button variant="default" size="sm" className="rounded-full px-6">
               Get Started
             </Button>
           </div>
@@ -82,7 +82,7 @@ const Navbar = () => {
               <Button variant="ghost" size="sm" className="text-muted-foreground">
                 Log In
               </Button>
-              <Button variant="default" size="sm" className="rounded-md px-6">
+              <Button variant="default" size="sm" className="rounded-full px-6">
                 Get Started
               </Button>
             </div>

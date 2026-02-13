@@ -93,9 +93,9 @@ const AnnouncementBanner = () => {
         <Link to="/solv">
           <Button 
             variant="outline" 
-            className="mt-6 bg-[hsl(var(--background))] text-foreground rounded-md px-8 py-2.5 font-medium shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20 hover:bg-primary hover:text-white"
+            className="mt-6 bg-[hsl(var(--background))] text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20 hover:bg-primary hover:text-white"
           >
-            SOLV Now
+            LET'S SOLV IT
           </Button>
         </Link>
       </div>

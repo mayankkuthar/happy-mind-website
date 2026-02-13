@@ -24,7 +24,7 @@ const AboutApproachSection = () => {
           {approaches.map((approach, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 bg-background px-6 py-3 rounded-full border border-border/50 shadow-sm"
+              className="flex items-center gap-2 bg-background px-6 py-3 rounded-md border border-border/50 shadow-sm"
             >
               <approach.icon className="w-5 h-5 text-primary" />
               <span className="font-sans text-foreground font-medium">

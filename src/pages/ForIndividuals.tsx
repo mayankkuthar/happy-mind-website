@@ -20,16 +20,16 @@ const ForIndividuals = () => {
         <div className="bg-muted/30">
           <SolvImpactStats />
         </div>
-        <div className="bg-background">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <SolvWhoThisIsFor />
         </div>
-        <div className="bg-muted/30">
+        <div className="bg-background">
           <SolvRealityCheck />
         </div>
-        <div className="bg-background">
+        <div className="bg-muted/30">
           <JourneySection />
         </div>
-        <div className="bg-muted/30">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <SolvBackedByPsychology />
         </div>
         <div className="bg-background">

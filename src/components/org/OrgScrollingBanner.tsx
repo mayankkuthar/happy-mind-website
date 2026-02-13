@@ -33,21 +33,21 @@ const OrgScrollingBanner = () => {
           <Button
             variant="default"
             size="lg"
-            className="rounded-md px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+            className="rounded-full px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Talk To HappiMynd
           </Button>
           <Button
-            variant="outline"
+            variant="default"
             size="lg"
-            className="rounded-md px-8 py-6 text-base font-medium border-primary/30 hover:bg-primary/5"
+            className="rounded-full px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Explore the Solutions
           </Button>
           <Button
-            variant="outline"
+            variant="default"
             size="lg"
-            className="rounded-md px-8 py-6 text-base font-medium border-primary/30 hover:bg-primary/5"
+            className="rounded-full px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Download Brochure
           </Button>

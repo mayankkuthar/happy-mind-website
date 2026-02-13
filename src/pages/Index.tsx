@@ -28,16 +28,16 @@ const Index = () => {
         <div className="bg-muted/30">
           <WhoIsThisForSection />
         </div>
-        <div className="bg-background">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <ImpactStatsSection />
         </div>
-        <div className="bg-muted/30">
+        <div className="bg-background">
           <TrustedBySection />
         </div>
-        <div className="bg-background">
+        <div className="bg-muted/30">
           <VoicesSection />
         </div>
-        <div className="bg-muted/30">
+        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
           <SocialsSection />
         </div>
         <div className="bg-background">

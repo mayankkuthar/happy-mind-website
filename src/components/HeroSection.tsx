@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Users, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 import whatSpaceHero from "@/assets/what-space-hero.png";
 
 const trustPills = [{
@@ -20,7 +21,7 @@ const HeroSection = () => {
         {/* Trust Pills - Full width above content */}
         <div className="flex flex-wrap gap-2 sm:gap-4 justify-center mb-8 sm:mb-12">
           {trustPills.map((pill, index) => (
-            <div key={index} className="flex items-center gap-2 bg-white border border-border/30 rounded-full px-3 py-2 sm:px-5 sm:py-2.5 shadow-md flex-shrink-0">
+            <div key={index} className="flex items-center gap-2 bg-white border border-border/30 rounded-md px-3 py-2 sm:px-5 sm:py-2.5 shadow-md flex-shrink-0">
               <pill.icon className="w-4 h-4 text-primary" />
               <span className="text-[10px] sm:text-xs font-medium text-foreground whitespace-normal text-center" style={{
                 fontFamily: "'IBM Plex Sans', sans-serif"
@@ -55,12 +56,16 @@ const HeroSection = () => {
             
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-              <Button variant="default" size="lg" className="rounded-md px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
+              <Link to="/for-individuals">
+              <Button variant="default" size="lg" className="rounded-full px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
                 Start for Myself
               </Button>
-              <Button variant="outline" size="lg" className="rounded-md px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium w-full sm:w-auto">
+              </Link>
+              <Link to="/for-organisations">
+              <Button variant="outline" size="lg" className="rounded-full px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium w-full sm:w-auto">
                 Explore for My Team
               </Button>
+              </Link>
             </div>
           </div>
 
