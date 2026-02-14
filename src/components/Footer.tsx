@@ -18,13 +18,13 @@ const Footer = () => {
 
           {/* Platform */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground text-sm">Platform</h4>
+            <h4 className="font-semibold text-foreground text-sm">Services</h4>
             <ul className="space-y-2 text-muted-foreground text-xs sm:text-sm">
-              <li><a href="#" className="hover:text-primary transition-colors">HappiLIFE</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">HappiGUIDE</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">HappiBUDDY</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">HappiSELF</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">HappiTALK</a></li>
+              <li><a href="" className="hover:text-primary transition-colors">HappiLIFE</a></li>
+              <li><a href="" className="hover:text-primary transition-colors">HappiGUIDE</a></li>
+              <li><a href="" className="hover:text-primary transition-colors">HappiBUDDY</a></li>
+              <li><a href="" className="hover:text-primary transition-colors">HappiSELF</a></li>
+              <li><a href="" className="hover:text-primary transition-colors">HappiTALK</a></li>
             </ul>
           </div>
 
@@ -32,9 +32,9 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground text-sm">Solutions</h4>
             <ul className="space-y-2 text-muted-foreground text-xs sm:text-sm">
-              <li><a href="#" className="hover:text-primary transition-colors">For Individuals</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">For Organisations</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">SOLV</a></li>
+              <li><a href="/for-individuals" className="hover:text-primary transition-colors">For Individuals</a></li>
+              <li><a href="/for-organisations" className="hover:text-primary transition-colors">For Organisations</a></li>
+              <li><a href="/solv" className="hover:text-primary transition-colors">SOLV</a></li>
             </ul>
           </div>
 
@@ -42,19 +42,19 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground text-sm">Company</h4>
             <ul className="space-y-2 text-muted-foreground text-xs sm:text-sm">
-              <li><a href="#" className="hover:text-primary transition-colors">About</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Team</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Contact</a></li>
+              <li><a href="" className="hover:text-primary transition-colors">About</a></li>
+              <li><a href="" className="hover:text-primary transition-colors">Team</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }} className="hover:text-primary transition-colors cursor-pointer">Contact</a></li>
             </ul>
           </div>
 
           {/* Legal */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground text-sm">Legal</h4>
+            <h4 className="font-semibold text-foreground text-sm">Policy</h4>
             <ul className="space-y-2 text-muted-foreground text-xs sm:text-sm">
-              <li><a href="#" className="hover:text-primary transition-colors">Privacy</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Terms</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Cookies</a></li>
+              <li><a href="" className="hover:text-primary transition-colors">Privacy</a></li>
+              <li><a href="" className="hover:text-primary transition-colors">Terms</a></li>
+
             </ul>
           </div>
         </div>
