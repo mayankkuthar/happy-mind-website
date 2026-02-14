@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import individualHero from "@/assets/individual-hero.png";
-import organizationHero from "@/assets/organization-hero.png";
+import individualHero from "@/assets/Home Page-section 3-for Individual.png";
+import organizationHero from "@/assets/Home Page-section 3-for org.png";
 const WhoIsThisForSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);

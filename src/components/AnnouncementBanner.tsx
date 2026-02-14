@@ -86,7 +86,7 @@ const AnnouncementBanner = () => {
             <span className="inline-block w-2 h-5 bg-foreground/80 ml-1 animate-pulse"></span>
           </p>
           <p className="font-sans text-xs md:text-xs lg:text-sm text-foreground/80 text-center">
-            100% Confidential. Safe. Secured.
+            An expert led program, for guidance on difficult life situations.
           </p>
         </div>
         
@@ -96,8 +96,8 @@ const AnnouncementBanner = () => {
             variant="outline" 
             className="mt-6 bg-[hsl(var(--background))] text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20 hover:bg-primary hover:text-white flex items-center gap-2"
           >
-            <img src={solvLogo} alt="SOLV Logo" className="h-6 w-auto" />
-            <span>LET'S SOLV IT</span>
+           
+            LET'S SOLV IT
           </Button>
         </Link>
       </div>

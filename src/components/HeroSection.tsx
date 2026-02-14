@@ -11,7 +11,7 @@ const trustPills = [{
   text: "200K+ Users Trust Us"
 }, {
   icon: Star,
-  text: "5000+ counselling"
+  text: "5000+ counselling hours"
 }];
 
 const HeroSection = () => {

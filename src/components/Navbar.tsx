@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "@/assets/happimynd-logo.png";
+import solvLogo from "@/assets/SOLV -Final Logo.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,8 +22,8 @@ const Navbar = () => {
             <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Home
             </Link>
-            <Link to="/solv" className="text-primary hover:text-primary/80 transition-colors text-sm font-medium">
-              SOLV
+            <Link to="/solv" className="text-primary hover:text-primary/80 transition-colors text-sm font-medium flex items-center">
+              <img src={solvLogo} alt="SOLV" className="h-5 w-auto" />
             </Link>
             <Link to="/for-individuals" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               For Individuals
@@ -63,8 +64,8 @@ const Navbar = () => {
             <Link to="/" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
               Home
             </Link>
-            <Link to="/solv" className="block text-primary hover:text-primary/80 transition-colors py-2 font-medium">
-              SOLV
+            <Link to="/solv" className="block text-primary hover:text-primary/80 transition-colors py-2 font-medium flex items-center">
+              <img src={solvLogo} alt="SOLV" className="h-5 w-auto" />
             </Link>
             <Link to="/for-individuals" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
               For Individuals
