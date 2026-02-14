@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import solvLogo from "@/assets/SOLV -Final Logo.png";
+import solvLogo from "@/assets/solv-final-logo.png";
 
 const useTypewriter = (texts: string[], speed: number = 100, backspaceSpeed: number = 50) => {
   const [currentText, setCurrentText] = useState('');

@@ -1,5 +1,5 @@
 import { Target, Lightbulb, TrendingUp } from "lucide-react";
-import organizationHero from "@/assets/Organization Page-section 3.png";
+import organizationHero from "@/assets/organization-page-section-3.png";
 
 const gaps = [
   { label: "Reactive", desc: "Support begins only after crisis" },

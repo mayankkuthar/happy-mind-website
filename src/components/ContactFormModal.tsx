@@ -60,7 +60,7 @@ const ContactFormModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
             </button>
           </div>
           
-          <p className="text-muted-foreground mb-6">Reach out and we'll get in touch with you.</p>
+          <p className="text-muted-foreground mb-6">We are transitioning our website, kindly share your details & we shall get in touch. 100% confidential & secure.</p>
           
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -76,7 +76,7 @@ const ContactFormModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="John"
+                  placeholder="Amit"
                 />
               </div>
               
@@ -92,14 +92,14 @@ const ContactFormModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="Doe"
+                  placeholder="Rathi"
                 />
               </div>
             </div>
             
             <div className="mb-4">
               <label htmlFor="phoneNumber" className="block text-sm font-medium text-foreground mb-1">
-                Phone Number*
+                Mobile Number*
               </label>
               <input
                 type="tel"
@@ -109,13 +109,13 @@ const ContactFormModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="+1 (555) 123-4567"
+                placeholder="9136899581"
               />
             </div>
             
             <div className="mb-4">
               <label htmlFor="reason" className="block text-sm font-medium text-foreground mb-1">
-                Select Reason*
+                Query For*
               </label>
               <select
                 id="reason"
@@ -126,10 +126,11 @@ const ContactFormModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                 className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="">Select a reason</option>
-                <option value="general">General Inquiry</option>
-                <option value="support">Support</option>
-                <option value="partnership">Partnership</option>
-                <option value="feedback">Feedback</option>
+                <option value="personal_support">Personal Support</option>
+                <option value="corporate_query">Corporate Query</option>
+                <option value="solv_session_request">SOLV Session Request</option>
+                <option value="counselling_support">Counselling Support</option>
+                <option value="self_help_support">Self Help Support</option>
                 <option value="other">Other</option>
               </select>
             </div>
@@ -151,7 +152,7 @@ const ContactFormModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
             
             <div className="mb-6">
               <label htmlFor="discoverSource" className="block text-sm font-medium text-foreground mb-1">
-                How did you find out about us?
+                Select Preferred Reachout Slot*
               </label>
               <select
                 id="discoverSource"
@@ -161,14 +162,9 @@ const ContactFormModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                 className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="">Select an option</option>
-                <option value="google">Google</option>
-                <option value="social_media">Social Media</option>
-                <option value="friend">Friend</option>
-                <option value="linkedin">LinkedIn</option>
-                <option value="advertisement">Advertisement</option>
-                <option value="event">Event/Seminar</option>
-                <option value="referral">Referral</option>
-                <option value="other">Other</option>
+                <option value="Morning (9 am - 12 pm)">Morning (9 am - 12 pm)</option>
+                <option value="Afternoon (12 pm - 4 pm)">Afternoon (12 pm - 4 pm)</option>
+                <option value="Evening (4 pm - 8 pm)">Evening (4 pm - 8 pm)</option>
               </select>
             </div>
             

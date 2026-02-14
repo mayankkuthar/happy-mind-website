@@ -4,14 +4,14 @@ import { ArrowRight, Star, Award, Users } from "lucide-react";
 import axisMaxLifeLogo from "@/assets/brand_logo/AXISmaxlife.png";
 import bptpLogo from "@/assets/brand_logo/BPTP.png";
 import bigFMLogo from "@/assets/brand_logo/BigFM.jpg";
-import cityFloLogo from "@/assets/brand_logo/CITY FLO.png";
+import cityFloLogo from "@/assets/brand_logo/city-flo.png";
 import centralParkLogo from "@/assets/brand_logo/CentralPark.jpg";
 import chintelsLogo from "@/assets/brand_logo/Chintels.jpg";
 import ekartLogo from "@/assets/brand_logo/EKART.jpeg";
 import flipkartLogo from "@/assets/brand_logo/Flipkart.jpeg";
 import googleLogo from "@/assets/brand_logo/Google.webp";
 import m3mLogo from "@/assets/brand_logo/M3M.png";
-import mmtcPampLogo from "@/assets/brand_logo/MMTC PAMP.jpg";
+import mmtcPampLogo from "@/assets/brand_logo/mmtc-pamp.jpg";
 import nuvocoLogo from "@/assets/brand_logo/Nuvoco.jpeg";
 import signatureGlobalLogo from "@/assets/brand_logo/SignatureGlobal.webp";
 

@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
-import careerDirectionImg from "@/assets/individual/CAREER DIRECTION.png";
-import moneyIndependenceImg from "@/assets/individual/MONEY & INDEPENDENCE.png";
-import personalHabitsImg from "@/assets/individual/PERSONAL HABITS.png";
+import careerDirectionImg from "@/assets/individual/career-direction.png";
+import moneyIndependenceImg from "@/assets/individual/money-independence.png";
+import personalHabitsImg from "@/assets/individual/personal-habits.png";
 import relationshipImg from "@/assets/individual/RELATIONSHIP.png";
 const SolvHeroSection = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);

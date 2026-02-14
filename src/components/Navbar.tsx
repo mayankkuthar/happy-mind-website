@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "@/assets/happimynd-logo.png";
-import solvLogo from "@/assets/SOLV -Final Logo.png";
+import solvLogo from "@/assets/solv-final-logo.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);

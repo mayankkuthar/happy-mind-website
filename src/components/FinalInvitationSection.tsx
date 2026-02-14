@@ -6,7 +6,7 @@ const FinalInvitationSection = () => {
       <div className="container mx-auto max-w-4xl space-y-10">
         {/* Main Heading */}
         <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold leading-tight font-sans text-primary">
-          Ready for conscious growth?
+          Ready For Conscious Growth?
         </h1>
 
         {/* Subtext */}

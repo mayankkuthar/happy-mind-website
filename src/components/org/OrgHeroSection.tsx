@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Lock, Eye } from "lucide-react";
-import organizationHero from "@/assets/Org page hero.png";
+import organizationHero from "@/assets/org-page-hero.png";
 
 const microTablets = [
   { icon: Shield, text: "Enterprise-grade security" },
