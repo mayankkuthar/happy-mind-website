@@ -27,7 +27,7 @@ const WhoIsThisForSection = () => {
       <div className="container mx-auto max-w-5xl">
         <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl md:text-4xl text-primary text-center font-sans font-semibold">
-            Who Is This For?
+            WHO IS THIS FOR?
           </h2>
         </div>
 

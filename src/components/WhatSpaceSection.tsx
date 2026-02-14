@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Sparkles, Heart, Compass } from "lucide-react";
-import carousel1 from "@/assets/carousel-1.jpg";
-import carousel2 from "@/assets/carousel-2.jpg";
-import carousel3 from "@/assets/carousel-3.jpg";
+import carousel1 from "@/assets/Home Page-Section 2-image1.png";
+import carousel2 from "@/assets/Home Page section 2-image 2.png";
+import carousel3 from "@/assets/Home Page-section 2- image 3.png";
 
 const carouselImages = [carousel1, carousel2, carousel3];
 

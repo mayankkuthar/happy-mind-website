@@ -6,7 +6,7 @@ const principles = [{
 }, {
   icon: Lock,
   title: "You own your data",
-  description: "Your information stays private and secure. Always."
+  description: "Your information stays private and secure through data privacy laws & policies."
 }, {
   icon: Clock,
   title: "We respect your pace",

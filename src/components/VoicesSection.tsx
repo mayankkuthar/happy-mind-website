@@ -107,13 +107,13 @@ const VoicesSection = () => {
                   </div>
                   
                   {/* Testimonial */}
-                  <p className="text-foreground text-sm leading-relaxed">
+                  <p className="text-foreground text-xl leading-relaxed">
                     "{review.testimonial}"
                   </p>
                 </div>
 
                 {/* Reviewer Name */}
-                <div className="pt-4 border-t border-border/20">
+                <div className="pt-1 border-t border-border/20">
                   <p className="font-semibold text-foreground text-sm">
                     {review.name}
                   </p>

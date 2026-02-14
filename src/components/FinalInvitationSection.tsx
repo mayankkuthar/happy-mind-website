@@ -47,10 +47,10 @@ const FinalInvitationSection = () => {
             <Phone className="w-4 h-4" />
             <span>+91 8860393400</span>
           </a>
-          <Link to="/live-chat" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+          {/*<Link to="/live-chat" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
             <MessageCircle className="w-4 h-4" />
             <span>Live Chat</span>
-          </Link>
+          </Link>*/}
         </div>
       </div>
     </section>;

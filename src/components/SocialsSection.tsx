@@ -32,12 +32,24 @@ const socialCards = [
 
 const SocialsSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
+        
+        // Control video playback based on visibility
+        videoRefs.current.forEach((video) => {
+          if (video) {
+            if (entry.isIntersecting) {
+              video.play().catch(() => {});
+            } else {
+              video.pause();
+            }
+          }
+        });
       },
       { threshold: 0.2 }
     );
@@ -126,7 +138,7 @@ const SocialsSection = () => {
                 </div>
 
                 {/* Label */}
-                <p className="text-center text-primary text-xs sm:text-sm font-medium">
+                <p className="text-center text-primary text-base sm:text-lg font-medium">
                   {card.label}
                 </p>
               </div>
