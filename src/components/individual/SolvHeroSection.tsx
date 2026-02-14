@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import careerDirectionImg from "@/assets/Individual/career-direction.png";
-import moneyIndependenceImg from "@/assets/Individual/money-independence.png";
 import personalHabitsImg from "@/assets/Individual/personal-habits.png";
 import relationshipImg from "@/assets/Individual/RELATIONSHIP.png";
+import moneyIndependenceImg from "@/assets/Individual/money-independence.png";
+
 const SolvHeroSection = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -21,7 +22,7 @@ const SolvHeroSection = () => {
     id: 2,
     image: moneyIndependenceImg,
     title: "Money & Independence"
-  }, {
+  },, {
     id: 3,
     image: personalHabitsImg,
     title: "Personal Habits"
@@ -51,24 +52,24 @@ const SolvHeroSection = () => {
       emblaApi.off("select", onSelect);
     };
   }, [emblaApi, onSelect]);
-  return <section className="h-[calc(100vh-80px)] w-full overflow-hidden">
+  return <section className="h-[calc(90vh-80px)] w-full overflow-hidden">
       <div className="h-full w-full grid lg:grid-cols-2 relative">
         {/* Left Content */}
         <div className="relative z-20 flex items-center px-6 lg:px-16 py-12 lg:py-0">
           <div className="space-y-8 max-w-xl">
             <div className="space-y-6">
-              <h1 className="text-4xl lg:text-6xl font-semibold text-foreground leading-tight font-sans md:text-3xl">
-                A <span className="text-primary text-3xl">Conscious Growth Space</span> For Life's Real Decisions.
+              <h1 className="text-2xl lg:text-3xl font-semibold text-foreground leading-tight font-sans md:text-3xl">
+                A <span className="text-primary text-5xl">Conscious Growth Space</span> For Life's Real progress.
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed font-serif font-semibold text-left md:text-2xl">
-                SOLV helps you understand yourself better, make clearer choices, and move forward with confidence through psychology-powered, human-led guidance.
+                We help you understand yourself better, make clearer choices and move forward with confidence through <span className="text-primary">psychology-powered, phygital guidance</span>. 
               </p>
             </div>
 
             <div className="flex flex-wrap gap-4">
            
               <Button size="lg" variant="outline" className="rounded-full px-8">
-                My Personality Snapshot
+                My Emo Snapshot
               </Button>
               <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
               <Button size="lg" className="rounded-full px-8">
@@ -101,7 +102,7 @@ const SolvHeroSection = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-background/20 to-transparent" />
                     <div className="absolute bottom-8 left-8 right-8">
-                      <h3 className="text-2xl font-bold text-foreground">{slide.title}</h3>
+                      
                     </div>
                   </div>
                 </div>)}

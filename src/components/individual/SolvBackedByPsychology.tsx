@@ -36,10 +36,11 @@ const SolvBackedByPsychology = () => {
           }`}
         >
           <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
-            Built on psychological science
+            Built On Psychological Science
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            5+ years of behavioural and emotional intelligence research, validated through lakhs of real user journeys on the HappiMynd platform.
+            5+ years of behavioural and emotional intelligence research. 
+            Our framework is grounded in <span className="text-primary font-bold">proven methodologies</span>, validated through lakhs of real users assessments on HappiMynd platform.
           </p>
         </div>
 

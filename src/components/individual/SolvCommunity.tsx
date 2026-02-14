@@ -23,7 +23,7 @@ const SolvCommunity = () => {
           }`}
         >
           <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
-            Join our growing community
+            Join Our Growing Community of HappiVIBES
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed">
             You don't grow alone. Be part of conversations, learning, and shared journeys that make conscious growth easier and more human.

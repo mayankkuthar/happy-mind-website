@@ -218,7 +218,7 @@ const JourneySection = () => {
               transformStyle: "preserve-3d"
             }}>
                   {/* Card Front */}
-                  <div className={`absolute inset-0 bg-white rounded-2xl p-6 flex flex-col items-center justify-center text-center backface-hidden transition-shadow duration-600 ${isVisible ? "shadow-[0_15px_40px_-10px_hsl(var(--primary)/0.15)]" : "shadow-none"}`} style={{
+                  <div className={`absolute inset-0 bg-white rounded-2xl p-2 flex flex-col items-center justify-center text-center backface-hidden transition-shadow duration-600 ${isVisible ? "shadow-[0_15px_40px_-10px_hsl(var(--primary)/0.15)]" : "shadow-none"}`} style={{
                 backfaceVisibility: "hidden"
               }}>
                     <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-5">
@@ -227,7 +227,7 @@ const JourneySection = () => {
                     <h3 className="font-sans text-lg font-bold text-foreground mb-3">
                       {card.title}
                     </h3>
-                    <p className="font-sans text-sm text-foreground leading-relaxed">
+                    <p className="font-sans text-xs text-foreground leading-relaxed">
                       "{card.frontText}"
                     </p>
                   </div>
@@ -243,9 +243,9 @@ const JourneySection = () => {
                     <p className="font-sans text-xs text-foreground/80 leading-relaxed mb-4">
                       {card.backText}
                     </p>
-                    <p className="font-sans text-xs text-primary font-medium">
+                    {/*<p className="font-sans text-xs text-primary font-medium">
                       {card.products}
-                    </p>
+                    </p>*/}
                   </div>
                 </div>
               </div>;

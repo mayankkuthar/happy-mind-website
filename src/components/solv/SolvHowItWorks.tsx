@@ -47,9 +47,9 @@ const SolvHowItWorks = () => {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <h1 className="text-primary font-medium text-3xl md:text-4xl tracking-wider">— How it works —</h1>
+          <h1 className="text-primary font-medium text-3xl md:text-5xl tracking-wider">HOW IT WORKS</h1>
           <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground">
-            A simple three-step process
+            A Simple Three-Step Process
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
             No complex onboarding. No long forms. Just clarity in three simple steps.

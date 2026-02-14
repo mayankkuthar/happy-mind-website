@@ -43,7 +43,7 @@ const SolvRealityCheck = () => {
           <h2 className="text-3xl md:text-4xl font-semibold text-primary font-sans">
             Why Conscious Growth Matters?
           </h2>
-          <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
             Mental and emotional strain acts as the biggest stumbling blocks in the path of growth.
           </p>
         </div>
@@ -53,8 +53,8 @@ const SolvRealityCheck = () => {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <p className="text-foreground text-lg leading-relaxed max-w-3xl mx-auto">
-            Early awareness makes a real difference. More than 95% of people never reach their life growth goals. When you understand your emotional state, you can respond before things run out of control.
+          <p className="text-foreground text-2xl leading-relaxed max-w-4xl mx-auto">
+            <span className="text-primary">Early awareness makes a real difference.</span> More than 95% of people never reach their life growth goals. When you understand your emotional state, you can respond before things run out of control.
           </p>
         </div>
 
@@ -64,7 +64,7 @@ const SolvRealityCheck = () => {
           }`}
         >
           <h3 className="text-xl md:text-2xl font-semibold text-foreground font-sans">
-            Fact Check about Growth Blockers:
+            Fact Check About Growth Blockers
           </h3>
         </div>
 

@@ -102,8 +102,8 @@ const SolvWhoThisIsFor = () => {
         <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">
           If You're Figuring Life Out, This Is For You.
         </h2>
-        <p className="text-lg max-w-2xl mx-auto">
-          SOLV supports the moments that shape your direction, not just the ones that feel difficult.
+        <p className="text-lg max-w-3xl mx-auto">
+          We support the moments that shape your direction, not just the ones that feel difficult.
         </p>
       </div>
 

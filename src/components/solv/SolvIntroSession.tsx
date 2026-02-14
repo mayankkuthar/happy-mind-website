@@ -33,11 +33,11 @@ const SolvIntroSession = () => {
           }`}
         >
           <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
-            What happens in your 20-minute intro session
+            What Happens In Your 20-minute Intro Session
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-            Your growth expert (subject matter expert) helps you understand where you truly stand
-            and what direction can unlock your next level. No pressure. No commitments.
+            Your <span className="text-primary">GROWTH EXPERT </span>(Subject Matter Expert) helps you understand where you truly stand
+            and what direction can unlock your next level. <br />No pressure. No commitments.
           </p>
         </div>
 
@@ -66,11 +66,11 @@ const SolvIntroSession = () => {
 
           <div className="text-center space-y-4">
             <p className="text-primary font-medium text-lg italic">
-              You're One conversation away to feel sorted!
+              You're one conversation away to feel sorted!
             </p>
             <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
-            <Button size="lg" className="rounded-full px-10">
-              Book your Growth Session
+            <Button size="lg" className="rounded-full px-10 mt-4">
+              Book Your Growth Session
             </Button>
             </Link>
           </div>

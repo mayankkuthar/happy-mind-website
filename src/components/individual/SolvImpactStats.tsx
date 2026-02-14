@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 const stats = [{
-  value: "25,000+",
+  value: "200,000+",
   label: "Assessments completed"
 }, {
-  value: "6,500+",
-  label: "Reports delivered"
+  value: "1,500+",
+  label: "User Reviews"
 }, {
-  value: "1,800+",
-  label: "Individuals guided"
+  value: "10,000+",
+  label: "Journeys Started"
 }, {
-  value: "1,100+",
-  label: "Hours of support"
+  value: "5000+",
+  label: "Counseling Hours"
 }];
 const SolvImpactStats = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -26,7 +26,7 @@ const SolvImpactStats = () => {
       <div className="container mx-auto max-w-5xl">
         <div className={`text-center space-y-4 mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <h2 className="text-3xl md:text-4xl font-semibold text-primary font-sans">
-            Real people. Real clarity. Real impact.
+            Real People. Real Clarity. Real Impact.
           </h2>
         </div>
 
@@ -41,7 +41,7 @@ const SolvImpactStats = () => {
             </div>)}
         </div>
 
-        <p className={`text-center text-muted-foreground mt-12 transition-all duration-700 delay-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+        <p className={`text-center text-muted-foreground mt-12 transition-all duration-700 delay-500 italic text-2xl ${isVisible ? "opacity-100" : "opacity-0"}`}>
           Built on real journeys, not assumptions.
         </p>
       </div>
