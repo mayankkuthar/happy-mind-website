@@ -15,7 +15,7 @@ const SolvHeroSection = () => {
   // 4 slides with actual images
   const slides = [{
     id: 1,
-    image: careerDirectionImg,
+    image: moneyIndependenceImg,
     title: "Career Direction"
   }, {
     id: 2,
