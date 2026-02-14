@@ -9,7 +9,7 @@ const stats = [
   },
   {
     icon: Clock,
-    value: "4,500+",
+    value: "5,000+",
     label: "Counseling Minutes",
   },
   {

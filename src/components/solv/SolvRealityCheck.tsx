@@ -41,7 +41,7 @@ const SolvRealityCheck = () => {
           }`}
         >
           <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
-            The truth about young adults today
+            The Truth About Young Adults Today
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl mx-auto">
             Comparison pressure, emotional confusion, and decision fatigue define modern life.

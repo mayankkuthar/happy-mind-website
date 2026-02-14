@@ -22,7 +22,7 @@ const SolvBridgeStatement = () => {
           }`}
         >
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground leading-tight">
-            The Problem Isn't You.{" "}
+            The Problem Isn't You.{" "}<br />
             <span className="text-primary">The Problem Is Lack Of Awareness.</span>
           </h2>
 
