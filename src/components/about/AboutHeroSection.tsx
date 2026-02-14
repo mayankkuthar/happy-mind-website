@@ -20,13 +20,7 @@ const AboutHeroSection = () => {
               Growth that feels natural. Impact that lasts.
             </h3>
             
-            <Button
-              variant="default"
-              size="lg"
-              className="rounded-full px-10 py-6 text-base font-medium mt-4"
-            >
-              Explore
-            </Button>
+            
           </div>
 
           {/* Right Image */}

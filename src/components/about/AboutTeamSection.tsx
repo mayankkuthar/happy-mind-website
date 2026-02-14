@@ -1,42 +1,27 @@
 import { Linkedin } from "lucide-react";
+import amitRathiImage from "@/assets/team/1630081769-amit_rathi.png";
+import raviKantImage from "@/assets/team/1630082349-ravi_kant.png";
+import neerajTripathiImage from "@/assets/team/1630092178-neeraj_tripathi.png";
 
 const teamMembers = [
   {
-    name: "Team Member 1",
-    role: "Founder & CEO",
-    image: "/placeholder.svg",
+    name: "Amit Rathi",
+    role: "Founder",
+    image: amitRathiImage,
     linkedin: "#",
   },
   {
-    name: "Team Member 2",
-    role: "Co-Founder & COO",
-    image: "/placeholder.svg",
+    name: "Ravi Kant Suman",
+    role: "Co-Founder",
+    image: raviKantImage,
     linkedin: "#",
   },
   {
-    name: "Team Member 3",
-    role: "Chief Psychology Officer",
-    image: "/placeholder.svg",
+    name: "Dr. Neeraj Tripathi",
+    role: "Co-Founder",
+    image: neerajTripathiImage,
     linkedin: "#",
-  },
-  {
-    name: "Team Member 4",
-    role: "Head of Technology",
-    image: "/placeholder.svg",
-    linkedin: "#",
-  },
-  {
-    name: "Team Member 5",
-    role: "Head of Corporate Solutions",
-    image: "/placeholder.svg",
-    linkedin: "#",
-  },
-  {
-    name: "Team Member 6",
-    role: "Head of Product",
-    image: "/placeholder.svg",
-    linkedin: "#",
-  },
+  }
 ];
 
 const AboutTeamSection = () => {

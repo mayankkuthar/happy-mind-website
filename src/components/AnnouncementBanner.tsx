@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import solvLogo from "@/assets/SOLV -Final Logo.png";
 
 const useTypewriter = (texts: string[], speed: number = 100, backspaceSpeed: number = 50) => {
   const [currentText, setCurrentText] = useState('');
@@ -93,9 +94,10 @@ const AnnouncementBanner = () => {
         <Link to="/solv">
           <Button 
             variant="outline" 
-            className="mt-6 bg-[hsl(var(--background))] text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20 hover:bg-primary hover:text-white"
+            className="mt-6 bg-[hsl(var(--background))] text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20 hover:bg-primary hover:text-white flex items-center gap-2"
           >
-            LET'S SOLV IT
+            <img src={solvLogo} alt="SOLV Logo" className="h-6 w-auto" />
+            <span>LET'S SOLV IT</span>
           </Button>
         </Link>
       </div>

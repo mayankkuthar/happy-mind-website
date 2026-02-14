@@ -23,7 +23,7 @@ const FinalInvitationSection = () => {
             <Link to="/for-organisations">Explore Corporate Solutions</Link>
           </Button>
           <Button asChild variant="secondary" size="lg" className="rounded-full px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium">
-            <Link to="/talk-to-professional">Talk to a Professional</Link>
+            <Link to="/solv">Talk to a Professional</Link>
           </Button>
         </div>
 

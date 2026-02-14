@@ -42,13 +42,6 @@ const OrgScrollingBanner = () => {
             size="lg"
             className="rounded-full px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
           >
-            Explore the Solutions
-          </Button>
-          <Button
-            variant="default"
-            size="lg"
-            className="rounded-full px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-          >
             Download Brochure
           </Button>
         </div>

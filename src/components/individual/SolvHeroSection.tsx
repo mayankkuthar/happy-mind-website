@@ -1,28 +1,34 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
+import careerDirectionImg from "@/assets/individual/CAREER DIRECTION.png";
+import moneyIndependenceImg from "@/assets/individual/MONEY & INDEPENDENCE.png";
+import personalHabitsImg from "@/assets/individual/PERSONAL HABITS.png";
+import relationshipImg from "@/assets/individual/RELATIONSHIP.png";
 const SolvHeroSection = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true
   });
 
-  // 5 placeholder slides
+  // 4 slides with actual images
   const slides = [{
     id: 1,
-    placeholder: "Image 1"
+    image: careerDirectionImg,
+    title: "Career Direction"
   }, {
     id: 2,
-    placeholder: "Image 2"
+    image: moneyIndependenceImg,
+    title: "Money & Independence"
   }, {
     id: 3,
-    placeholder: "Image 3"
+    image: personalHabitsImg,
+    title: "Personal Habits"
   }, {
     id: 4,
-    placeholder: "Image 4"
-  }, {
-    id: 5,
-    placeholder: "Image 5"
+    image: relationshipImg,
+    title: "Relationship"
   }];
   const scrollTo = useCallback((index: number) => {
     if (emblaApi) emblaApi.scrollTo(index);
@@ -60,15 +66,15 @@ const SolvHeroSection = () => {
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" variant="outline" className="rounded-full px-8">
-                Learn More
-              </Button>
+           
               <Button size="lg" variant="outline" className="rounded-full px-8">
                 My Personality Snapshot
               </Button>
+              <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
               <Button size="lg" className="rounded-full px-8">
                 Book My SOLV Session
               </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -87,10 +93,16 @@ const SolvHeroSection = () => {
           <div className="h-full w-full overflow-hidden" ref={emblaRef}>
             <div className="flex h-full">
               {slides.map(slide => <div key={slide.id} className="flex-[0_0_100%] min-w-0 h-full relative">
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 via-accent/40 to-primary/10 flex items-center justify-center">
-                    <span className="text-muted-foreground font-medium text-2xl">
-                      {slide.placeholder}
-                    </span>
+                  <div className="w-full h-full relative">
+                    <img 
+                      src={slide.image} 
+                      alt={slide.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-background/20 to-transparent" />
+                    <div className="absolute bottom-8 left-8 right-8">
+                      <h3 className="text-2xl font-bold text-foreground">{slide.title}</h3>
+                    </div>
                   </div>
                 </div>)}
             </div>

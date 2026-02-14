@@ -9,6 +9,7 @@ import ForIndividuals from "./pages/ForIndividuals";
 import ForOrganisations from "./pages/ForOrganisations";
 import Solv from "./pages/Solv";
 import About from "./pages/About";
+import FloatingContactButton from "./components/FloatingContactButton";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <FloatingContactButton />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

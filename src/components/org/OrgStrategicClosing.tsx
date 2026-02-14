@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const OrgStrategicClosing = () => {
   return (
@@ -23,6 +24,7 @@ const OrgStrategicClosing = () => {
           <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
             {/* Primary CTA */}
             <div className="text-center">
+              <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
               <Button
                 variant="default"
                 size="lg"
@@ -30,27 +32,13 @@ const OrgStrategicClosing = () => {
               >
                 Talk to HappiMynd
               </Button>
+              </Link>
               <p className="text-xs text-muted-foreground">
                 Explore how people intelligence strengthens performance.
               </p>
             </div>
 
-            {/* Divider */}
-            <div className="hidden md:block w-px h-20 bg-border/50" />
-
-            {/* Secondary CTA */}
-            <div className="text-center">
-              <Button
-                variant="outline"
-                size="lg"
-                className="rounded-full px-10 py-6 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 mb-3"
-              >
-                Explore for Your Organisation
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Build conscious, high-performing workplaces.
-              </p>
-            </div>
+           
           </div>
         </div>
       </div>

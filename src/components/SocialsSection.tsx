@@ -1,20 +1,23 @@
 import { useEffect, useRef, useState } from "react";
+import socialsCardImg from "@/assets/community/HomePage-sec8-SocialsCard.jpeg";
+import youtubeCardImg from "@/assets/community/HomePage-sec8-YoutubeCard.png";
+import communityCardImg from "@/assets/community/HomePage-sec8-CommunityCard.png";
 
 const socialCards = [
   {
     id: 1,
     label: "#socials",
-    type: "video",
+    type: "image",
     link: "https://www.instagram.com/happimynd/reels/",
-    videoSrc: "https://assets.mixkit.co/videos/preview/mixkit-woman-meditating-in-the-mountains-2155-large.mp4",
+    imageSrc: socialsCardImg,
     tilt: "-rotate-2",
   },
   {
     id: 2,
     label: "#youtube",
-    type: "video",
+    type: "image",
     link: "https://www.youtube.com/@happimynd",
-    videoSrc: "https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4",
+    imageSrc: youtubeCardImg,
     tilt: "rotate-1",
   },
   {
@@ -22,31 +25,19 @@ const socialCards = [
     label: "#community",
     type: "image",
     link: "https://happimynd.com/community",
-    imageSrc: "",
+    imageSrc: communityCardImg,
     tilt: "-rotate-1",
   },
 ];
 
 const SocialsSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
-        
-        // Control video playback based on visibility
-        videoRefs.current.forEach((video) => {
-          if (video) {
-            if (entry.isIntersecting) {
-              video.play().catch(() => {});
-            } else {
-              video.pause();
-            }
-          }
-        });
       },
       { threshold: 0.2 }
     );
@@ -127,20 +118,11 @@ const SocialsSection = () => {
               >
                 {/* Media Container */}
                 <div className="aspect-square rounded-lg overflow-hidden bg-muted/50 mb-4">
-                  {card.type === "video" ? (
-                    <video
-                      ref={(el) => (videoRefs.current[index] = el)}
-                      src={card.videoSrc}
-                      muted
-                      loop
-                      playsInline
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-accent/30">
-                      <span className="text-muted-foreground text-sm">Community Image</span>
-                    </div>
-                  )}
+                  <img
+                    src={card.imageSrc}
+                    alt={card.label}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
                 </div>
 
                 {/* Label */}

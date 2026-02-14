@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Lock, Check, FlaskConical, Heart } from "lucide-react";
 
 const trustMarkers = [
@@ -47,9 +48,11 @@ const SolvConversionOffer = () => {
           </div>
 
           <div className="space-y-4 mb-10">
+            <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
             <Button size="lg" className="rounded-full px-12 text-lg h-14">
               Begin your conscious growth
             </Button>
+            </Link>
             <p className="text-muted-foreground text-sm">Just 2 minutes to start.</p>
           </div>
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Check } from "lucide-react";
 
 const explorations = [
@@ -67,9 +68,11 @@ const SolvIntroSession = () => {
             <p className="text-primary font-medium text-lg italic">
               You're One conversation away to feel sorted!
             </p>
+            <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
             <Button size="lg" className="rounded-full px-10">
               Book your Growth Session
             </Button>
+            </Link>
           </div>
         </div>
       </div>

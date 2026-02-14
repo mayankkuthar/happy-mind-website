@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const pills = [
   "Built for Today's Generation",
@@ -44,12 +45,12 @@ const SolvHeroSection = () => {
 
         {/* CTAs */}
         <div className="flex flex-wrap justify-center gap-4">
+          <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
           <Button size="lg" className="rounded-full px-10">
             Begin Your Growth Session
           </Button>
-          <Button size="lg" variant="outline" className="rounded-full px-10">
-            Explore About SOLV
-          </Button>
+          </Link>
+          
         </div>
       </div>
     </section>
