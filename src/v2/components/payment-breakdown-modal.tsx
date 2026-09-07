@@ -32,7 +32,7 @@ export type PaymentBreakdownModalProps = {
   planId?: number;
   initialCouponId?: number | null;
   initialDiscount?: number; // Discount percentage (0-100)
-  onConfirmPayment: (couponId?: number) => Promise<void>;
+  onConfirmPayment: (couponId?: number, discountedSubtotal?: number, discountPercent?: number) => Promise<void>;
   isLoading?: boolean;
 };
 
@@ -91,9 +91,11 @@ export function PaymentBreakdownModal({
     try {
       const res = await applyCoupon({ plan_id: planId, coupon: couponCode.trim() }, token);
       if (res.status === "success" && res.data) {
-        setDiscountPercent(res.data.discount);
-        setAppliedCouponId(res.data.coupon_id);
-        toast.success(`Coupon applied! ${res.data.discount}% discount added.`);
+        const cId = res.data.coupon_id ?? (res.data as any).coupen_id ?? (res.data as any).id ?? null;
+        const disc = Number(res.data.discount ?? (res.data as any).discount_percent ?? (res.data as any).percentage ?? 0);
+        setDiscountPercent(disc);
+        setAppliedCouponId(cId);
+        toast.success(`Coupon applied! ${disc}% discount added.`);
       } else {
         setCouponError(res.message || "Invalid coupon code.");
       }
@@ -107,7 +109,7 @@ export function PaymentBreakdownModal({
   const handleConfirm = async () => {
     setSubmitting(true);
     try {
-      await onConfirmPayment(appliedCouponId ?? undefined);
+      await onConfirmPayment(appliedCouponId ?? undefined, subtotal, discountPercent);
     } catch (err) {
       console.error("Payment initiation failed", err);
     } finally {

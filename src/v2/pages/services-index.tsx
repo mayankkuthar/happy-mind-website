@@ -343,6 +343,7 @@ function ServicesPage() {
   const navigate = useV2Navigate();
   const search = useSearch();
   const { phase: assessmentPhase } = useAssessmentPhase();
+
   const initial = (search.service && ORDER.includes(search.service as ServiceKey))
     ? (search.service as ServiceKey)
     : "happilife";

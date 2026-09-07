@@ -1,6 +1,6 @@
 import { V2Link, useV2Navigate } from "@/v2/lib/router";
 import { useEffect, useState } from "react";
-import { Sparkles, Zap, LoaderCircle, ArrowRight } from "lucide-react";
+import { Sparkles, Zap, LoaderCircle, ArrowRight, Building2 } from "lucide-react";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
 import { Button } from "@/v2/components/ui/button";
 import {
@@ -8,11 +8,13 @@ import {
   fetchSubscribedServices,
   fetchPackages,
   payForBundle,
+  availFreeService,
   type ApiDashboard,
   type SubscribedServicesResponse,
   type Package,
 } from "@/v2/lib/website-api";
 import { auth, useAuth } from "@/v2/lib/auth";
+import { useOrgStatus } from "@/v2/hooks/use-org-status";
 import { toast } from "sonner";
 
 export default SubscriptionPage;
@@ -24,6 +26,7 @@ import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
 function SubscriptionPage() {
   const navigate = useV2Navigate();
   const { user } = useAuth();
+  const { isOrgUser } = useOrgStatus();
   useProtectedRoute("Please log in to view or manage your subscriptions.");
 
   const [dashboard, setDashboard] = useState<ApiDashboard | null>(null);
@@ -67,7 +70,11 @@ function SubscriptionPage() {
     setBreakdownOpen(true);
   };
 
-  const handleExecutePayment = async (couponId?: number) => {
+  const handleExecutePayment = async (
+    couponId?: number,
+    discountedSubtotal?: number,
+    discountPercent?: number,
+  ) => {
     if (!selectedPkg) return;
     const token = auth.get()?.token;
     const firstPlan = selectedPkg.plans?.[0];
@@ -75,11 +82,31 @@ function SubscriptionPage() {
 
     setBuyingId(selectedPkg.id);
 
+    const baseAmount = firstPlan.selling_price ?? firstPlan.price;
+    const effectiveAmount =
+      discountPercent && discountPercent > 0 && typeof discountedSubtotal === "number"
+        ? discountedSubtotal
+        : baseAmount;
+
     try {
+      if (discountPercent === 100 && token) {
+        const freeRes = await availFreeService(
+          { plan_id: firstPlan.id, coupen_id: couponId ?? undefined },
+          token,
+        );
+        if (freeRes.status === "success") {
+          toast.success(`Purchased ${selectedPkg.name} with 100% Promo Discount!`);
+          setBreakdownOpen(false);
+          return;
+        } else {
+          throw new Error(freeRes.message || "Failed to process free plan activation.");
+        }
+      }
+
       const res = await payForBundle(
         {
           plan_id: firstPlan.id,
-          amount: firstPlan.selling_price ?? firstPlan.price,
+          amount: effectiveAmount,
           coupen_id: couponId ?? 0,
         },
         token,
@@ -158,8 +185,30 @@ function SubscriptionPage() {
           </div>
         </section>
 
-        {/* Section 2 — Growth Plans Catalog (Fetched Dynamically from API) */}
-        <section>
+        {/* Section 2 — Growth Plans Catalog: hidden for org users who already have coverage */}
+        {isOrgUser ? (
+          <section className="rounded-[2rem] border border-lavender-deep/20 bg-gradient-hero p-6 sm:p-9">
+            <div className="flex items-start gap-4">
+              <span className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-lavender-deep/20 text-lavender-deep">
+                <Building2 className="h-5 w-5" strokeWidth={2} />
+              </span>
+              <div>
+                <h3 className="text-lg font-bold text-lavender-deep sm:text-xl">
+                  Organisation Plan Active
+                </h3>
+                <p className="mt-1.5 max-w-xl text-sm text-muted-foreground leading-relaxed">
+                  Your organisation subscription covers your access to HappiMynd services.
+                  Individual growth plans are not available under your corporate account.
+                  Please reach out to your HR admin for plan changes or upgrades.
+                </p>
+                <p className="mt-3 text-xs font-semibold text-lavender-deep/80">
+                  Head to the Experts page to book a session — it&apos;s covered under your plan.
+                </p>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <section>
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-2xl bg-white shadow-soft">
@@ -172,7 +221,7 @@ function SubscriptionPage() {
                 </p>
               </div>
             </div>
-            {/* Compare Features button redirects to plans page (/services/happiself) */}
+            {/* Compare Features button hidden for org users */}
             <Button asChild variant="ghost" size="sm" className="rounded-full text-xs font-semibold text-lavender-deep">
               <V2Link to="/services/happiself">Compare Features →</V2Link>
             </Button>
@@ -246,6 +295,7 @@ function SubscriptionPage() {
             </div>
           )}
         </section>
+        )} {/* end !isOrgUser */}
       </div>
 
       {selectedPkg && (

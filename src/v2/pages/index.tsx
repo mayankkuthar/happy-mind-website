@@ -375,6 +375,8 @@ function QuickActions() {
 function ContinueJourney() {
   const [bookDialogOpen, setBookDialogOpen] = useState(false);
   const { phase: assessmentPhase, hasAnyCompletedReport } = useAssessmentPhase();
+  const happiLearnLink = "/services/happilearn";
+  const happibuddyLink = "/services/happibuddy";
 
   // Reopen the booking dialog when the visitor returns from login mid-booking
   useEffect(() => {
@@ -458,7 +460,7 @@ function ContinueJourney() {
 
         {/* Card 2: HappiLEARN Service */}
         <V2Link
-          to="/services/happilearn"
+          to={happiLearnLink}
           className="group min-w-[260px] snap-start cursor-pointer rounded-3xl bg-white/95 p-5 shadow-soft border border-white/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-card flex flex-col"
         >
           <div className="relative h-32 overflow-hidden rounded-2xl bg-gradient-peach">
@@ -495,7 +497,7 @@ function ContinueJourney() {
 
         {/* Card 3: HappiBUDDY Service */}
         <V2Link
-          to="/services/happibuddy"
+          to={happibuddyLink}
           className="group min-w-[260px] snap-start cursor-pointer rounded-3xl bg-white/95 p-5 shadow-soft border border-white/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-card flex flex-col"
         >
           <div className="relative h-32 overflow-hidden rounded-2xl bg-gradient-aqua">
