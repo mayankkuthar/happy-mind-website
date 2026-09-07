@@ -1,6 +1,6 @@
 import { useV2Navigate } from "@/v2/lib/router";
 import { useMemo, useState, useEffect } from "react";
-import { Search, ShieldCheck, BadgeCheck, Lock, UserCheck, MapPin, Languages as LanguagesIcon, CalendarCheck, Star, Sparkles, ChevronDown, ArrowRight, Check, LoaderCircle } from "lucide-react";
+import { Search, ShieldCheck, BadgeCheck, Lock, UserCheck, MapPin, Languages as LanguagesIcon, CalendarCheck, Star, Sparkles, ChevronDown, ArrowRight, Check, LoaderCircle, Building2 } from "lucide-react";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
 import { Button } from "@/v2/components/ui/button";
 import { Input } from "@/v2/components/ui/input";
@@ -39,10 +39,12 @@ import {
 import {
   fetchPsychologists,
   payForHappiTalk,
+  availFreeService,
   type ApiPsychologist,
   type PsychologistFilters,
 } from "@/v2/lib/website-api";
-import { auth } from "@/v2/lib/auth";
+import { auth, useAuth } from "@/v2/lib/auth";
+import { useOrgStatus } from "@/v2/hooks/use-org-status";
 
 export default ExpertsPage;
 
@@ -55,7 +57,7 @@ const TRUST = [
 
 
 const inr = (n: unknown) => {
-  const num = typeof n === "number" ? n : typeof n === "string" ? parseInt(n, 10) : 0;
+  const num = typeof n === "number" ? n : typeof n === "string" ? Number(n) : 0;
   return `₹${(isNaN(num) ? 0 : num).toLocaleString("en-IN")}`;
 };
 
@@ -222,6 +224,8 @@ function getAvailabilityDetails(p: Psychologist) {
 
 function ExpertsPage() {
   const navigate = useV2Navigate();
+  const { user } = useAuth();
+  const { isOrgUser, orgPlanIds, loading: orgLoading } = useOrgStatus();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("All");
   const [concern, setConcern] = useState<string>("All");
@@ -232,30 +236,59 @@ function ExpertsPage() {
   // API state
   const [apiPsychologists, setApiPsychologists] = useState<ApiPsychologist[]>([]);
   const [apiFilters, setApiFilters] = useState<PsychologistFilters>({});
+  const [orgDetail, setOrgDetail] = useState<{ user_from?: string; organization_name?: string } | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
 
-  // Fetch from API (re-runs when search/filter params change)
+  // Re-fetch whenever filters, auth token, or org status change.
+  // The backend /api/v1/website/psychologists endpoint returns all 66 psychologists
+  // ONLY when called without an individual user token (public). If an individual token is passed,
+  // the backend filters down to 45 consumer-eligible psychologists.
+  // For corporate / org users, sending the token filters to their assigned company panel (4-5).
+  const userToken = user?.token || auth.get()?.token;
+  const effectiveIsOrg = isOrgUser || orgDetail?.user_from === "organization";
+
   useEffect(() => {
+    // If the user has a token, wait until the org check finishes so we don't flash public experts for org users
+    if (userToken && orgLoading) return;
+
+    let ignore = false;
     setLoading(true);
     setApiError(null);
-    fetchPsychologists({
-      search: query || undefined,
-      city: city !== "All" ? city : undefined,
-      expert_category: category !== "All" ? category : undefined,
-      language: language !== "All" ? language : undefined,
-      limit: 100,
-    })
-      .then(({ psychologists, filters }) => {
+
+    // Only pass the Bearer token when the user is an organisation user.
+    // For individual users and unauthenticated visitors, pass undefined so all 66 experts are returned.
+    const tokenForFetch = isOrgUser ? userToken : undefined;
+
+    fetchPsychologists(
+      {
+        search: query || undefined,
+        city: city !== "All" ? city : undefined,
+        expert_category: category !== "All" ? category : undefined,
+        language: language !== "All" ? language : undefined,
+        limit: 100,
+      },
+      tokenForFetch,
+    )
+      .then(({ psychologists, filters, user_detail }) => {
+        if (ignore) return;
         setApiPsychologists(psychologists);
         setApiFilters(filters);
+        if (user_detail) setOrgDetail(user_detail);
       })
       .catch((err) => {
+        if (ignore) return;
         setApiError(err?.message ?? "Failed to load psychologists.");
         toast.error(err?.message ?? "Failed to load psychologists.");
       })
-      .finally(() => setLoading(false));
-  }, [query, city, category, language]);
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [query, city, category, language, userToken, isOrgUser, orgLoading]);
 
   // Map ApiPsychologist -> local Psychologist shape for re-use in existing card/dialog components
   const mappedPsychologists: Psychologist[] = apiPsychologists.map((ap) => {
@@ -308,9 +341,9 @@ function ExpertsPage() {
       typeof rawPrice === "number"
         ? rawPrice
         : typeof rawPrice === "string"
-          ? parseInt(rawPrice, 10) || 0
+          ? Number(rawPrice) || 0
           : typeof rawPrice === "object" && rawPrice !== null && "price" in rawPrice
-            ? parseInt(String((rawPrice as any).price), 10) || 0
+            ? Number((rawPrice as any).price) || 0
             : 0;
 
     const bioText = extractStr((ap as any).summary ?? (ap as any).bio ?? (ap as any).about ?? (ap as any).description);
@@ -327,22 +360,80 @@ function ExpertsPage() {
         .filter(Boolean)
         .map((pObj: any) => {
           const custom = pObj.psychologist_custom_price || {};
-          const sellingPrice = Number(custom.selling_price ?? pObj.price ?? pObj.cost_price ?? 0);
-          const costPrice = Number(custom.cost_price ?? pObj.cost_price ?? pObj.price ?? 0);
-          const sessionSellingPrice = Number(pObj.session_selling_price ?? sellingPrice);
-          const discount = Number(custom.discount ?? pObj.discount ?? 0);
+          const offer = pObj.offer || {};
+
+          // Extract session count from duration
+          const rawDuration = String(pObj.print_duration ?? pObj.duration?.name ?? "Session");
+          let sessions = 1;
+          if (pObj.duration && typeof pObj.duration.frequency === "number" && pObj.duration.frequency > 0) {
+            sessions = pObj.duration.frequency;
+          } else {
+            const match = rawDuration.match(/(\d+)/);
+            if (match) sessions = parseInt(match[1], 10);
+          }
+          if (sessions <= 0) sessions = 1;
+
+          // Selling price: exact from backend
+          // Priority: custom.selling_price > offer.price > (session_selling_price * sessions) > price > cost_price
+          let sellingPrice = 0;
+          if (custom.selling_price !== undefined && custom.selling_price !== null && Number(custom.selling_price) > 0) {
+            sellingPrice = Number(custom.selling_price);
+          } else if (offer.price !== undefined && offer.price !== null && Number(offer.price) > 0) {
+            sellingPrice = Number(offer.price);
+          } else if (pObj.session_selling_price !== undefined && pObj.session_selling_price !== null && Number(pObj.session_selling_price) > 0) {
+            sellingPrice = Number(pObj.session_selling_price) * sessions;
+          } else {
+            sellingPrice = Number(pObj.price ?? pObj.cost_price ?? 0);
+          }
+
+          // Cost price (MRP): exact from backend
+          // Priority: custom.cost_price > cost_price > price > sellingPrice
+          let costPrice = sellingPrice;
+          if (custom.cost_price !== undefined && custom.cost_price !== null && Number(custom.cost_price) > 0) {
+            costPrice = Number(custom.cost_price);
+          } else if (pObj.cost_price !== undefined && pObj.cost_price !== null && Number(pObj.cost_price) > 0) {
+            costPrice = Number(pObj.cost_price);
+          } else if (pObj.price !== undefined && pObj.price !== null && Number(pObj.price) > 0) {
+            costPrice = Number(pObj.price);
+          }
+
+          // Per-session selling price: exact from backend
+          let sessionSellingPrice = 0;
+          if (pObj.session_selling_price !== undefined && pObj.session_selling_price !== null && Number(pObj.session_selling_price) > 0) {
+            sessionSellingPrice = Number(pObj.session_selling_price);
+          } else if (sellingPrice > 0 && sessions > 0) {
+            sessionSellingPrice = sellingPrice / sessions;
+          }
+
+          // Discount %: exact from backend
+          // Priority: custom.discount > offer.discount > calculated from (costPrice - sellingPrice)
+          let discount = 0;
+          if (custom.discount !== undefined && custom.discount !== null && Number(custom.discount) >= 0) {
+            discount = Number(custom.discount);
+          } else if (offer.discount !== undefined && offer.discount !== null && Number(offer.discount) >= 0) {
+            discount = Number(offer.discount);
+          } else if (costPrice > sellingPrice && costPrice > 0) {
+            discount = ((costPrice - sellingPrice) / costPrice) * 100;
+          }
 
           return {
             id: Number(pObj.id ?? pObj.plan_id),
-            printDuration: String(pObj.print_duration ?? "Session"),
+            printDuration: rawDuration,
             price: sellingPrice,
             costPrice,
             sessionSellingPrice,
             discount,
+            sessions,
           };
         })
-        .sort((a, b) => a.price - b.price);
+        .sort((a, b) => (a.sessions ?? 1) - (b.sessions ?? 1));
     };
+
+    const parsedPlans = parsePlans(ap.plans);
+    const finalStartingFrom =
+      price > 0
+        ? price
+        : (parsedPlans[0]?.sessionSellingPrice ?? parsedPlans[0]?.price ?? 0);
 
     return {
       id: String(ap.id),
@@ -357,7 +448,7 @@ function ExpertsPage() {
       category: extractStr(ap.expert_level ?? (ap as any).category ?? (ap as any).expert_category),
       premium: Boolean((ap as any).premium) || extractStr(ap.expert_level).toLowerCase().includes("premium"),
       rci: Boolean((ap as any).rci) || extractStr(ap.expert_level).toLowerCase().includes("rci"),
-      startingFrom: price,
+      startingFrom: finalStartingFrom,
       education: (ap as any).education ? parseSpecializations((ap as any).education) : summaryDetails.education,
       experienceDetail: (ap as any).experience_detail ? parseSpecializations((ap as any).experience_detail) : [],
       approach: extractStr((ap as any).approach) || summaryDetails.approach,
@@ -366,7 +457,7 @@ function ExpertsPage() {
       photo: ap.profile_picture_url || (ap as any).photo,
       slot1: ap.slot1,
       slot2: ap.slot2,
-      plans: parsePlans(ap.plans),
+      plans: parsedPlans,
     };
   });
 
@@ -481,22 +572,46 @@ function ExpertsPage() {
         billing: pack.billing,
       },
       initialStep: "form",
+      orgPlanIds,
     });
     setBookOpen(true);
   };
 
-  const handleConfirmDirectBookingPayment = async (couponId?: number) => {
+  const handleConfirmDirectBookingPayment = async (
+    couponId?: number,
+    discountedSubtotal?: number,
+    discountPercent?: number,
+  ) => {
     if (!breakdownData) return;
     setSubmittingDirectBooking(true);
     const token = auth.get()?.token;
     clearPendingBooking();
 
+    const effectiveAmount =
+      discountPercent && discountPercent > 0 && typeof discountedSubtotal === "number"
+        ? discountedSubtotal
+        : breakdownData.basePrice;
+
     try {
+      if (discountPercent === 100 && token) {
+        const freeRes = await availFreeService(
+          { plan_id: breakdownData.planId, coupen_id: couponId ?? undefined },
+          token,
+        );
+        if (freeRes.status === "success") {
+          toast.success(`Booking Confirmed for ${breakdownData.psychologistName} with 100% Promo Discount!`);
+          setBreakdownOpen(false);
+          return;
+        } else {
+          throw new Error(freeRes.message || "Failed to process free booking.");
+        }
+      }
+
       const res = await payForHappiTalk(
         {
           psychologist_id: breakdownData.psychologistId,
           plan_id: breakdownData.planId,
-          amount: breakdownData.basePrice,
+          amount: effectiveAmount,
           date: breakdownData.dateStr,
           time: breakdownData.timeStr,
           session: 1,
@@ -529,119 +644,42 @@ function ExpertsPage() {
   const getPsychologistPlans = (p: Psychologist | null): PsychologistPlan[] => {
     if (!p) return [];
 
+    // If plans exist directly from the backend API, return them without any manipulation or rounding!
+    if (p.plans && p.plans.length > 0) {
+      return p.plans;
+    }
+
+    // Fallback only if no plans are returned from API
     const basePrice = p.startingFrom > 0 ? p.startingFrom : 999;
-    let rawPlans: PsychologistPlan[] = p.plans && p.plans.length > 0 ? [...p.plans] : [];
-
-    if (rawPlans.length === 0) {
-      rawPlans = [
-        {
-          id: 1,
-          printDuration: "1 Session",
-          price: basePrice,
-          costPrice: basePrice,
-          sessionSellingPrice: basePrice,
-          discount: 0,
-        },
-        {
-          id: 2,
-          printDuration: "2 Sessions",
-          price: Math.round(basePrice * 2 * 0.9),
-          costPrice: basePrice * 2,
-          sessionSellingPrice: Math.round(basePrice * 0.9),
-          discount: 10,
-        },
-        {
-          id: 4,
-          printDuration: "4 Sessions",
-          price: Math.round(basePrice * 4 * 0.8),
-          costPrice: basePrice * 4,
-          sessionSellingPrice: Math.round(basePrice * 0.8),
-          discount: 20,
-        },
-      ];
-    }
-
-    const parsed = rawPlans.map((plan) => {
-      let sessions = 1;
-      const match = plan.printDuration.match(/(\d+)/);
-      if (match) {
-        sessions = parseInt(match[1], 10);
-      }
-      if (sessions <= 0) sessions = 1;
-      return { ...plan, sessions };
-    });
-
-    const oneSessionPlan =
-      parsed.find((pl) => pl.sessions === 1 || /1\s*session|single/i.test(pl.printDuration)) ??
-      parsed[0];
-
-    let oneSessionRate = basePrice;
-    if (oneSessionPlan) {
-      if (oneSessionPlan.sessionSellingPrice > 0) {
-        oneSessionRate = oneSessionPlan.sessionSellingPrice;
-      } else if (oneSessionPlan.price > 0 && oneSessionPlan.sessions === 1) {
-        oneSessionRate = oneSessionPlan.price;
-      }
-    }
-    if (oneSessionRate <= 0) oneSessionRate = basePrice;
-
-    return parsed.map((plan) => {
-      const { sessions } = plan;
-      let rawSessionRate = plan.sessionSellingPrice;
-      let rawPrice = plan.price;
-      let rawCost = plan.costPrice;
-
-      let ratePerSession = 0;
-
-      if (sessions === 1) {
-        ratePerSession = rawSessionRate > 0 ? rawSessionRate : rawPrice > 0 ? rawPrice : oneSessionRate;
-      } else {
-        if (rawSessionRate > 0) {
-          ratePerSession = rawSessionRate;
-        } else if (rawPrice > 0) {
-          if (rawPrice <= oneSessionRate * 1.2) {
-            ratePerSession = rawPrice;
-          } else {
-            ratePerSession = Math.round(rawPrice / sessions);
-          }
-        } else {
-          const discountFactor = sessions === 2 ? 0.95 : sessions === 4 ? 0.8 : 0.85;
-          ratePerSession = Math.round(oneSessionRate * discountFactor);
-        }
-      }
-
-      if (ratePerSession <= 0) ratePerSession = oneSessionRate;
-
-      // Strict Rule: total package price is ALWAYS ratePerSession * sessions
-      const totalSellingPrice = ratePerSession * sessions;
-
-      // Struck-through MRP benchmark
-      const benchmarkTotalMRP = oneSessionRate * sessions;
-      const totalCostPrice = Math.max(
-        rawCost > totalSellingPrice ? rawCost : 0,
-        benchmarkTotalMRP
-      );
-
-      // Save %
-      let savePct = plan.discount;
-      if (totalCostPrice > totalSellingPrice && totalCostPrice > 0) {
-        const calculatedSave = Math.round(
-          ((totalCostPrice - totalSellingPrice) / totalCostPrice) * 100
-        );
-        if (calculatedSave > 0) {
-          savePct = Math.max(savePct, calculatedSave);
-        }
-      }
-
-      return {
-        id: plan.id,
-        printDuration: plan.printDuration,
-        price: totalSellingPrice,
-        costPrice: totalCostPrice,
-        sessionSellingPrice: ratePerSession,
-        discount: savePct,
-      };
-    });
+    return [
+      {
+        id: 1,
+        printDuration: "1 Session",
+        price: basePrice,
+        costPrice: basePrice,
+        sessionSellingPrice: basePrice,
+        discount: 0,
+        sessions: 1,
+      },
+      {
+        id: 2,
+        printDuration: "2 Sessions",
+        price: basePrice * 2,
+        costPrice: basePrice * 2,
+        sessionSellingPrice: basePrice,
+        discount: 0,
+        sessions: 2,
+      },
+      {
+        id: 4,
+        printDuration: "4 Sessions",
+        price: basePrice * 4,
+        costPrice: basePrice * 4,
+        sessionSellingPrice: basePrice,
+        discount: 0,
+        sessions: 4,
+      },
+    ];
   };
 
   return (
@@ -704,40 +742,63 @@ function ExpertsPage() {
         </div>
       </section>
 
-      {/* SECTION 2 — Search & Smart Filters */}
-      <section className="rounded-[1.75rem] bg-white p-4 shadow-soft sm:rounded-[2rem] sm:p-6 lg:p-7">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground sm:left-5 sm:h-5 sm:w-5" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by psychologist name, specialization..."
-            className="h-12 rounded-2xl border-border/70 bg-background/60 pl-11 text-xs shadow-none focus-visible:ring-lavender-deep/40 sm:h-14 sm:pl-14 sm:text-sm lg:text-base"
-          />
-        </div>
+      {/* Org User Banner — shown when backend confirms the user is from an organisation */}
+      {effectiveIsOrg && (
+        <section className="rounded-[1.75rem] border border-lavender-deep/30 bg-gradient-hero p-4 shadow-soft sm:rounded-[2rem] sm:p-6">
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-lavender-deep/20 text-lavender-deep">
+              <Building2 className="h-5 w-5" strokeWidth={2} />
+            </span>
+            <div>
+              <p className="text-sm font-bold text-lavender-deep">
+                {orgDetail?.organization_name
+                  ? `Showing ${orgDetail.organization_name}'s expert panel`
+                  : "Showing your organisation's assigned expert panel"}
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Your company has pre-approved these psychologists for you. Sessions are covered under your corporate plan.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:mt-5">
-          <FilterSelect
-            label="Expert Category"
-            value={category}
-            onChange={setCategory}
-            options={filterCategories.length > 1 ? filterCategories : ["All"]}
-          />
-          <FilterSelect
-            label="I'm Looking Support For"
-            value={concern}
-            onChange={setConcern}
-            options={filterConcerns}
-          />
-          <FilterSelect
-            label="Language"
-            value={language}
-            onChange={setLanguage}
-            options={filterLanguages.length > 1 ? filterLanguages : ["All"]}
-          />
-          <FilterSelect label="City" value={city} onChange={setCity} options={filterCities.length > 1 ? filterCities : ["All"]} />
-        </div>
-      </section>
+      {/* SECTION 2 — Search & Smart Filters (hidden for org users — backend controls the panel) */}
+      {!effectiveIsOrg && (
+        <section className="rounded-[1.75rem] bg-white p-4 shadow-soft sm:rounded-[2rem] sm:p-6 lg:p-7">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground sm:left-5 sm:h-5 sm:w-5" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by psychologist name, specialization..."
+              className="h-12 rounded-2xl border-border/70 bg-background/60 pl-11 text-xs shadow-none focus-visible:ring-lavender-deep/40 sm:h-14 sm:pl-14 sm:text-sm lg:text-base"
+            />
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:mt-5">
+            <FilterSelect
+              label="Expert Category"
+              value={category}
+              onChange={setCategory}
+              options={filterCategories.length > 1 ? filterCategories : ["All"]}
+            />
+            <FilterSelect
+              label="I'm Looking Support For"
+              value={concern}
+              onChange={setConcern}
+              options={filterConcerns}
+            />
+            <FilterSelect
+              label="Language"
+              value={language}
+              onChange={setLanguage}
+              options={filterLanguages.length > 1 ? filterLanguages : ["All"]}
+            />
+            <FilterSelect label="City" value={city} onChange={setCity} options={filterCities.length > 1 ? filterCities : ["All"]} />
+          </div>
+        </section>
+      )}
 
       {/* Microcopy */}
       <section className="rounded-2xl border border-lavender/50 bg-lavender/15 p-4 sm:rounded-3xl sm:p-5 sm:px-7">

@@ -301,8 +301,8 @@ export type ContactPayload = {
 };
 
 // Sponsor Signup
-export type OrganizerItem = { id: number; name: string; [key: string]: unknown };
-export type UserProfileItem = { id: number; name: string; status?: number; [key: string]: unknown };
+export type OrganizerItem = { id: number; name: string;[key: string]: unknown };
+export type UserProfileItem = { id: number; name: string; status?: number;[key: string]: unknown };
 
 // ─── API Methods ─────────────────────────────────────────────────────────────
 
@@ -313,10 +313,21 @@ export async function fetchPackages(token?: string): Promise<Package[]> {
   return Array.isArray(data) ? data : [];
 }
 
-/** GET /api/v1/website/psychologists — Fetch psychologist listing with optional filters. */
+/**
+ * GET /api/v1/website/psychologists — Fetch psychologist listing with optional filters.
+ *
+ * When `token` is provided the backend filters the list to only the psychologists
+ * assigned to the user's organisation (mirrors the mobile app behaviour).
+ * Without a token the full public panel is returned.
+ */
 export async function fetchPsychologists(
   params?: PsychologistFilterParams,
-): Promise<{ psychologists: ApiPsychologist[]; filters: PsychologistFilters }> {
+  token?: string,
+): Promise<{
+  psychologists: ApiPsychologist[];
+  filters: PsychologistFilters;
+  user_detail?: { user_from?: string; organization_name?: string };
+}> {
   const query = new URLSearchParams();
   if (params?.search) query.set("search", params.search);
   if (params?.city && params.city !== "All") query.set("city", params.city);
@@ -327,17 +338,21 @@ export async function fetchPsychologists(
 
   const qs = query.toString();
   const path = `/api/v1/website/psychologists${qs ? `?${qs}` : ""}`;
-  const raw = await apiGet<unknown>(path);
+  // Pass the token so the backend can apply org-specific panel filtering
+  const raw = await apiGet<unknown>(path, token);
 
   const envelope = raw as any;
   const psychologists: ApiPsychologist[] =
     Array.isArray(envelope?.data) ? envelope.data :
-    Array.isArray(envelope) ? envelope :
-    Array.isArray(envelope?.psychologists) ? envelope.psychologists :
-    [];
+      Array.isArray(envelope) ? envelope :
+        Array.isArray(envelope?.psychologists) ? envelope.psychologists :
+          [];
 
   const filters: PsychologistFilters = envelope?.filters ?? {};
-  return { psychologists, filters };
+  const user_detail: { user_from?: string; organization_name?: string } | undefined =
+    envelope?.user_detail ?? undefined;
+
+  return { psychologists, filters, user_detail };
 }
 
 /** GET /api/v1/website/dashboard 🔒 — User dashboard info. Requires Bearer token. */
@@ -352,7 +367,15 @@ export async function fetchUserDashboard(token: string): Promise<ApiDashboard> {
  */
 export async function fetchSubscribedServices(token: string): Promise<SubscribedServicesResponse> {
   const raw = await apiGet<unknown>("/api/v1/website/subscribed-services", token);
-  return ((raw as any)?.data ?? raw) as SubscribedServicesResponse;
+  const data = (raw as any)?.data ?? {};
+  const base = typeof data === "object" && data !== null ? data : {};
+  const root = typeof raw === "object" && raw !== null ? (raw as any) : {};
+  const rawIds = root.organization_plan_ids ?? base.organization_plan_ids ?? [];
+  const organization_plan_ids = Array.isArray(rawIds) ? rawIds.map((id: any) => Number(id)) : [];
+  return {
+    ...base,
+    organization_plan_ids,
+  } as SubscribedServicesResponse;
 }
 
 /**
@@ -405,6 +428,7 @@ export async function payForBundle(
     plan_id: payload.plan_id,
     amount: Math.round(payload.amount * 1.18),
     coupen_id: payload.coupen_id ?? 0,
+    coupon_id: payload.coupen_id ?? 0,
   }, token);
   return raw as PaymentLinkResponse;
 }
@@ -428,6 +452,7 @@ export async function payForHappiTalk(
     session: payload.session,
     user_recording_permission: payload.user_recording_permission ?? 1,
     coupen_id: payload.coupen_id ?? 0,
+    coupon_id: payload.coupen_id ?? 0,
   }, token);
   return raw as PaymentLinkResponse;
 }
@@ -448,6 +473,7 @@ export async function payForHappiGuide(
     date: payload.date,
     time: payload.time,
     coupen_id: payload.coupen_id ?? 0,
+    coupon_id: payload.coupen_id ?? 0,
   }, token);
   return raw as PaymentLinkResponse;
 }
@@ -505,6 +531,8 @@ export async function applyCoupon(
   const raw = await apiPost<unknown>("/api/v1/apply-coupon", {
     plan_id: payload.plan_id,
     coupon: payload.coupon,
+    coupon_code: payload.coupon,
+    coupen: payload.coupon,
   }, token);
   return raw as ApplyCouponResponse;
 }

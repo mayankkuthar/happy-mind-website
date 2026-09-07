@@ -5,6 +5,7 @@ export type PsychologistPlan = {
   costPrice: number;
   sessionSellingPrice: number;
   discount: number;
+  sessions?: number;
 };
 
 export interface Psychologist {

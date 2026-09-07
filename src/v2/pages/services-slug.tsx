@@ -18,9 +18,10 @@ import { BookSessionDialog, type BookServiceContext } from "@/v2/components/book
 import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
 import { consumeBookingResume } from "@/v2/lib/bookings";
 import { getCatalog } from "@/v2/data/service-catalog";
-import { payForBundle, fetchPackages, type Package } from "@/v2/lib/website-api";
+import { payForBundle, fetchPackages, availFreeService, type Package } from "@/v2/lib/website-api";
 import { auth } from "@/v2/lib/auth";
 import { checkAuthOrRedirect } from "@/v2/lib/auth-guard";
+import { useOrgStatus } from "@/v2/hooks/use-org-status";
 import viewPlansHeroImg from "@/v2/assets/view-plans-mascot.png";
 import logoImg from "@/v2/assets/happimynd-logo.png";
 
@@ -483,6 +484,8 @@ const GROWTH_PACKAGE_IDS = new Set([17, 18, 19, 20, 21, 22]);
 function SharedPricingPage() {
   const navigate = useV2Navigate();
   const { slug } = useParams();
+  const { isOrgUser } = useOrgStatus();
+
   const [reviewIdx, setReviewIdx] = useState(0);
   const [isReviewPaused, setIsReviewPaused] = useState(false);
   const [whyPageIndex, setWhyPageIndex] = useState(0);
@@ -493,17 +496,17 @@ function SharedPricingPage() {
   useEffect(() => {
     fetchPackages().then((pkgs) => {
       if (pkgs && pkgs.length > 0) setApiPackages(pkgs);
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
-const VALIDITY_MAP: Record<number, string> = {
-  17: "1 Month",
-  18: "1 Month",
-  19: "3 Months",
-  20: "3 Months",
-  21: "6 Months",
-  22: "12 Months",
-};
+  const VALIDITY_MAP: Record<number, string> = {
+    17: "1 Month",
+    18: "1 Month",
+    19: "3 Months",
+    20: "3 Months",
+    21: "6 Months",
+    22: "12 Months",
+  };
 
   const dynamicPlans: Plan[] = useMemo(() => {
     const growth = apiPackages.filter((pkg) => GROWTH_PACKAGE_IDS.has(pkg.id));
@@ -610,21 +613,43 @@ const VALIDITY_MAP: Record<number, string> = {
     setBreakdownOpen(true);
   };
 
-  const handleExecutePlanPayment = async (couponId?: number) => {
+  const handleExecutePlanPayment = async (
+    couponId?: number,
+    discountedSubtotal?: number,
+    discountPercent?: number,
+  ) => {
     if (!selectedPlanForBreakdown) return;
     const p = selectedPlanForBreakdown;
-    const catalog = getCatalog(slug);
     const planId = p.planId ?? (parseInt(p.id, 10) || 12);
     const token = auth.get()?.token;
 
     setBuyingPlanId(planId);
 
+    const effectiveAmount =
+      discountPercent && discountPercent > 0 && typeof discountedSubtotal === "number"
+        ? discountedSubtotal
+        : p.price;
+
     try {
+      if (discountPercent === 100 && token) {
+        const freeRes = await availFreeService(
+          { plan_id: planId, coupen_id: couponId ?? undefined },
+          token,
+        );
+        if (freeRes.status === "success") {
+          toast.success(`Purchased ${p.name} plan with 100% Promo Discount!`);
+          setBreakdownOpen(false);
+          return;
+        } else {
+          throw new Error(freeRes.message || "Failed to process free plan activation.");
+        }
+      }
+
       // POST /api/v1/payment -> returns hosted Razorpay checkout link
       const res = await payForBundle(
         {
           plan_id: planId,
-          amount: p.price,
+          amount: effectiveAmount,
           coupen_id: couponId ?? 0,
         },
         token,
@@ -844,8 +869,30 @@ const VALIDITY_MAP: Record<number, string> = {
         </ul>
       </section>
 
-      {/* SECTION 5 — Compare Plans */}
-      <ComparePlansSection plans={dynamicPlans} onBuy={buyPlan} />
+      {/* SECTION 5 — Compare Plans (blurred for org users) */}
+      <section className="relative">
+        {isOrgUser && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 rounded-[2rem] bg-white/75 backdrop-blur-md p-6 text-center shadow-soft">
+            <span className="grid h-14 w-14 place-items-center rounded-2xl bg-lavender-deep/15 text-lavender-deep shadow-soft">
+              <ShieldCheck className="h-7 w-7" strokeWidth={2} />
+            </span>
+            <h3 className="text-xl font-bold text-foreground sm:text-2xl">
+              These are covered as per your organization
+            </h3>
+            <p className="max-w-md text-xs text-muted-foreground sm:text-sm leading-relaxed">
+              Your organization has pre-subscribed to a plan that covers these core services under your corporate wellness entitlement. Plan purchase is not required.
+            </p>
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-lavender/30 px-3.5 py-1 text-xs font-semibold text-lavender-deep">
+                <Check className="h-3.5 w-3.5" /> Covered by Organization
+              </span>
+            </div>
+          </div>
+        )}
+        <div className={isOrgUser ? "pointer-events-none select-none blur-sm" : ""}>
+          <ComparePlansSection plans={dynamicPlans} onBuy={buyPlan} />
+        </div>
+      </section>
 
       {/* SECTION 6 — Why choose HappiMynd */}
       <section

@@ -36,12 +36,22 @@ import {
 } from "@/v2/lib/bookings";
 import { useUserProfile } from "@/v2/hooks/use-user-profile";
 import { type Psychologist } from "@/v2/data/psychologists";
-import { payForHappiTalk, payForHappiGuide } from "@/v2/lib/website-api";
+import { payForHappiTalk, payForHappiGuide, availFreeService } from "@/v2/lib/website-api";
 import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
 import { cart } from "@/v2/lib/cart-store";
 import { auth } from "@/v2/lib/auth";
 import { checkAuthOrRedirect } from "@/v2/lib/auth-guard";
 import { toast } from "sonner";
+
+/**
+ * Confirmed org plan ID → service key mapping (from tech lead investigation).
+ * When these IDs appear in organization_plan_ids, the backend accepts
+ * POST /api/v1/avail-free-services with amount=0 — no Razorpay redirect needed.
+ */
+const ORG_PLAN_ID_FOR_SERVICE: Record<string, number> = {
+  solv: 22,      // HappiGUIDE / SOLV
+  happitalk: 6,  // Corporate HappiTALK entitlement
+};
 
 export type BookServiceContext = {
   key: string;
@@ -60,6 +70,12 @@ export type BookServiceContext = {
     slot1: PreferredSlot;
     slot2: PreferredSlot;
   } | null;
+  /**
+   * Org plan IDs from organization_plan_ids (subscribed-services API).
+   * When set and a matching service plan ID is found, the booking bypasses
+   * the Razorpay payment gateway and calls availFreeService directly.
+   */
+  orgPlanIds?: number[];
 };
 
 export const SERVICE_OPTIONS: BookServiceContext[] = [
@@ -241,14 +257,14 @@ export function BookSessionDialog({
     const slotTimeStr = slot1; // e.g. "10:00 AM - 11:00 AM"
 
     const planId = isHappiTalk && selectedPsychologist
-      ? Number(service?.plan?.id ?? 21)
-      : Number(service?.plan?.id ?? 8);
+      ? Number(service?.plan?.id ?? selectedPsychologist.plans?.[0]?.id ?? 43)
+      : Number(service?.plan?.id ?? 22);
     const amount = isHappiTalk && selectedPsychologist
-      ? Number(service?.plan?.price ?? selectedPsychologist.startingFrom ?? 800)
+      ? Number(service?.plan?.price ?? selectedPsychologist.plans?.[0]?.price ?? selectedPsychologist.startingFrom ?? 800)
       : Number(service?.plan?.price ?? 599);
     const itemName = isHappiTalk && selectedPsychologist
       ? `HappiTALK - Session with ${selectedPsychologist.name}`
-      : `HappiGUIDE - Growth Consultation`;
+      : `SOLV - Growth Consultation`;
 
     setBreakdownData({
       itemName,
@@ -260,23 +276,66 @@ export function BookSessionDialog({
       dateStr: formattedDate,
       timeStr: slotTimeStr,
     });
+
+    // ── Org free-booking bypass ──
+    // If the user's org has this service covered, skip the PaymentBreakdownModal
+    // entirely and call availFreeService directly (no Razorpay redirect).
+    const orgCoveredPlanId = service?.orgPlanIds?.includes(ORG_PLAN_ID_FOR_SERVICE[selectedServiceKey])
+      ? ORG_PLAN_ID_FOR_SERVICE[selectedServiceKey]
+      : null;
+
+    if (orgCoveredPlanId) {
+      setSubmittingPayment(true);
+      const token = auth.get()?.token;
+      try {
+        const freeRes = await availFreeService({ plan_id: orgCoveredPlanId }, token);
+        if (freeRes.status === "success") {
+          clearPendingBooking();
+          toast.success(`Session booked! Your organisation plan covers this session.`);
+          setStep("confirmed");
+        } else {
+          throw new Error(freeRes.message || "Failed to process org booking.");
+        }
+      } catch (err: any) {
+        toast.error(err?.message ?? "Failed to process org booking. Please try again.");
+      } finally {
+        setSubmittingPayment(false);
+      }
+      return; // Don't open breakdown modal
+    }
+
     setBreakdownOpen(true);
   };
 
-  const handleConfirmBookingPayment = async (couponId?: number) => {
+  const handleConfirmBookingPayment = async (couponId?: number, discountedSubtotal?: number, discountPercent?: number) => {
     if (!breakdownData || !date1 || !date2 || !slot1 || !slot2) return;
     setSubmittingPayment(true);
     const token = auth.get()?.token;
 
+    const effectiveAmount = (discountPercent && discountPercent > 0 && typeof discountedSubtotal === "number")
+      ? discountedSubtotal
+      : breakdownData.basePrice;
+
     try {
       let res: { link: string } | null = null;
 
-      if (breakdownData.isHappiTalk && breakdownData.psychologistId) {
+      if (discountPercent === 100 && token) {
+        const freeRes = await availFreeService(
+          { plan_id: breakdownData.planId, coupen_id: couponId ?? undefined },
+          token,
+        );
+        if (freeRes.status === "success") {
+          toast.success(`Booking Confirmed for ${activeService.name} with 100% Promo Discount!`);
+          setBreakdownOpen(false);
+        } else {
+          throw new Error(freeRes.message || "Failed to process free booking.");
+        }
+      } else if (breakdownData.isHappiTalk && breakdownData.psychologistId) {
         res = await payForHappiTalk(
           {
             psychologist_id: breakdownData.psychologistId,
             plan_id: breakdownData.planId,
-            amount: breakdownData.basePrice,
+            amount: effectiveAmount,
             date: breakdownData.dateStr,
             time: breakdownData.timeStr,
             session: 1,
@@ -290,7 +349,7 @@ export function BookSessionDialog({
         res = await payForHappiGuide(
           {
             plan_id: breakdownData.planId,
-            amount: breakdownData.basePrice,
+            amount: effectiveAmount,
             date: breakdownData.dateStr,
             time: breakdownData.timeStr,
             coupen_id: couponId ?? 0,
