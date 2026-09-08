@@ -484,7 +484,7 @@ const GROWTH_PACKAGE_IDS = new Set([17, 18, 19, 20, 21, 22]);
 function SharedPricingPage() {
   const navigate = useV2Navigate();
   const { slug } = useParams();
-  const { isOrgUser } = useOrgStatus();
+  const { isOrgUser, hasSolv, hasHappiTalk } = useOrgStatus();
 
   const [reviewIdx, setReviewIdx] = useState(0);
   const [isReviewPaused, setIsReviewPaused] = useState(false);
@@ -824,6 +824,7 @@ function SharedPricingPage() {
               priceLabel: "₹599",
               suffix: "Per Session",
               desc: "One-on-one growth conversation with a certified growth expert.",
+              isCovered: isOrgUser ? hasSolv : true,
             },
             {
               key: "happitalk",
@@ -833,9 +834,11 @@ function SharedPricingPage() {
               priceLabel: "₹999 onwards",
               suffix: "Per Session",
               desc: "Therapeutic counselling with a professional psychologist.",
+              isCovered: isOrgUser ? hasHappiTalk : true,
             },
           ].map((s) => {
             const Icon = s.icon;
+            const isCoveredByOrg = isOrgUser && (s.key === "solv" ? hasSolv : hasHappiTalk);
             return (
               <div key={s.key} className="flex flex-col rounded-3xl bg-white p-6 shadow-soft">
                 <div className="flex items-start gap-4">
@@ -847,10 +850,12 @@ function SharedPricingPage() {
                     <p className="mt-1 text-sm text-muted-foreground">{s.desc}</p>
                   </div>
                 </div>
-                <div className="mt-5 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold">{s.priceLabel}</span>
-                  <span className="text-xs text-muted-foreground">+ Taxes · {s.suffix}</span>
-                </div>
+                {!isCoveredByOrg && (
+                  <div className="mt-5 flex items-baseline gap-1">
+                    <span className="text-2xl font-bold">{s.priceLabel}</span>
+                    <span className="text-xs text-muted-foreground">+ Taxes · {s.suffix}</span>
+                  </div>
+                )}
                 <Button
                   onClick={() => buyIndividual(s.name, s.key, s.price)}
                   className="mt-5 rounded-full bg-gradient-brand text-white shadow-glow transition-all duration-300 hover:scale-105 hover:shadow-[0_0_18px_rgba(139,92,246,0.65)] hover:brightness-110 active:scale-95 cursor-pointer font-bold"
@@ -883,9 +888,6 @@ function SharedPricingPage() {
               Your organization has pre-subscribed to a plan that covers these core services under your corporate wellness entitlement. Plan purchase is not required.
             </p>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-lavender/30 px-3.5 py-1 text-xs font-semibold text-lavender-deep">
-                <Check className="h-3.5 w-3.5" /> Covered by Organization
-              </span>
             </div>
           </div>
         )}

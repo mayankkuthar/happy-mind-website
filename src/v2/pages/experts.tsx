@@ -225,7 +225,7 @@ function getAvailabilityDetails(p: Psychologist) {
 function ExpertsPage() {
   const navigate = useV2Navigate();
   const { user } = useAuth();
-  const { isOrgUser, orgPlanIds, loading: orgLoading } = useOrgStatus();
+  const { isOrgUser, orgPlanIds, hasHappiTalk, loading: orgLoading } = useOrgStatus();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("All");
   const [concern, setConcern] = useState<string>("All");
@@ -244,9 +244,19 @@ function ExpertsPage() {
   // The backend /api/v1/website/psychologists endpoint returns all 66 psychologists
   // ONLY when called without an individual user token (public). If an individual token is passed,
   // the backend filters down to 45 consumer-eligible psychologists.
-  // For corporate / org users, sending the token filters to their assigned company panel (4-5).
   const userToken = user?.token || auth.get()?.token;
   const effectiveIsOrg = isOrgUser || orgDetail?.user_from === "organization";
+  const isHappiTalkCovered = Boolean(effectiveIsOrg && hasHappiTalk);
+
+  // If the user's organization covers HappiTALK, their corporate bookings use psychologist ID 301 from dashboard.
+  // Only redirect if HappiTALK IS covered by their organisation.
+  // If HappiTALK is NOT covered, they can browse /experts to choose their psychologist and pay individually.
+  useEffect(() => {
+    if (isHappiTalkCovered && !orgLoading) {
+      toast.info("Your organisation plan covers HappiTALK sessions directly from your dashboard.");
+      navigate({ to: "/" });
+    }
+  }, [isHappiTalkCovered, orgLoading, navigate]);
 
   useEffect(() => {
     // If the user has a token, wait until the org check finishes so we don't flash public experts for org users
@@ -256,9 +266,9 @@ function ExpertsPage() {
     setLoading(true);
     setApiError(null);
 
-    // Only pass the Bearer token when the user is an organisation user.
-    // For individual users and unauthenticated visitors, pass undefined so all 66 experts are returned.
-    const tokenForFetch = isOrgUser ? userToken : undefined;
+    // Only pass the Bearer token when HappiTALK is covered by the organisation.
+    // For individual users and uncovered org users, pass undefined so all experts are returned.
+    const tokenForFetch = isHappiTalkCovered ? userToken : undefined;
 
     fetchPsychologists(
       {
@@ -531,12 +541,58 @@ function ExpertsPage() {
     if (consumeBookingResume()) setBookOpen(true);
   }, []);
 
+  const handleExpertBookClick = (p: Psychologist) => {
+    if (isHappiTalkCovered) {
+      const pending = getPendingBooking();
+      setBookingServiceContext({
+        key: "happitalk",
+        name: "HappiTALK",
+        initialPsychologist: p,
+        initialStep: "form",
+        initialSlots: pending?.slot1
+          ? {
+              slot1: pending.slot1,
+              slot2: pending.slot2 || pending.slot1,
+            }
+          : null,
+        orgPlanIds,
+      });
+      setBookOpen(true);
+    } else {
+      setBooking(p);
+    }
+  };
+
   const bookPack = (
     p: Psychologist,
     pack: { id: string | number; label: string; price: number; billing: string },
   ) => {
     setBooking(null);
     const pending = getPendingBooking();
+
+    if (isHappiTalkCovered) {
+      setBookingServiceContext({
+        key: "happitalk",
+        name: "HappiTALK",
+        initialPsychologist: p,
+        plan: {
+          id: String(pack.id),
+          name: pack.label,
+          price: 0,
+          billing: pack.billing,
+        },
+        initialStep: "form",
+        initialSlots: pending?.slot1
+          ? {
+              slot1: pending.slot1,
+              slot2: pending.slot2 || pending.slot1,
+            }
+          : null,
+        orgPlanIds,
+      });
+      setBookOpen(true);
+      return;
+    }
 
     if (pending && pending.slot1) {
       // Step 2 complete: preferred slots were ALREADY selected!
@@ -682,6 +738,10 @@ function ExpertsPage() {
     ];
   };
 
+  if (isHappiTalkCovered) {
+    return null;
+  }
+
   return (
     <DashboardShell
       header={<TopHeaderBar title="Expert Panel" subtitle="Choose your psychologist" emoji="" />}
@@ -756,7 +816,9 @@ function ExpertsPage() {
                   : "Showing your organisation's assigned expert panel"}
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Your company has pre-approved these psychologists for you. Sessions are covered under your corporate plan.
+                {isHappiTalkCovered
+                  ? "Your company has pre-approved these psychologists for you. Sessions are covered under your corporate plan."
+                  : "Your company has pre-approved these psychologists for you."}
               </p>
             </div>
           </div>
@@ -837,6 +899,7 @@ function ExpertsPage() {
               <ExpertCard
                 key={p.id}
                 expert={p}
+                effectiveIsOrg={isHappiTalkCovered}
                 highlightConcern={concern}
                 badge={
                   i === 0
@@ -845,7 +908,7 @@ function ExpertsPage() {
                       ? "Recommended Match"
                       : "Specializes In Your Concern"
                 }
-                onBook={() => setBooking(p)}
+                onBook={() => handleExpertBookClick(p)}
               />
             ))}
           </div>
@@ -905,8 +968,9 @@ function ExpertsPage() {
               <ExpertCard
                 key={p.id}
                 expert={p}
+                effectiveIsOrg={isHappiTalkCovered}
                 highlightConcern={concern}
-                onBook={() => setBooking(p)}
+                onBook={() => handleExpertBookClick(p)}
               />
             ))}
 
@@ -1119,11 +1183,13 @@ function ExpertCard({
   expert: p,
   badge,
   highlightConcern,
+  effectiveIsOrg,
   onBook,
 }: {
   expert: Psychologist;
   badge?: string;
   highlightConcern: string;
+  effectiveIsOrg?: boolean;
   onBook: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -1240,22 +1306,24 @@ function ExpertCard({
         <div className="lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-2xl bg-lavender/15 p-4 text-center sm:rounded-3xl sm:p-5">
             <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground sm:text-[11px]">
-              Starting From
+              {effectiveIsOrg ? "Organisation Benefit" : "Starting From"}
             </div>
-            <div className="mt-0.5 text-2xl font-bold tracking-tight sm:mt-1 sm:text-3xl">
-              {inr(p.startingFrom)}
+            <div className="mt-0.5 text-2xl font-bold tracking-tight sm:mt-1 sm:text-3xl text-foreground">
+              {effectiveIsOrg ? "Free" : inr(p.startingFrom)}
             </div>
-            <div className="text-[11px] text-muted-foreground sm:text-xs">Per Session</div>
+            <div className="text-[11px] text-muted-foreground sm:text-xs">
+              {effectiveIsOrg ? "Covered by your organisation" : "Per Session"}
+            </div>
             <Button
               onClick={onBook}
               className="mt-3 w-full rounded-full bg-gradient-brand text-xs font-bold text-white shadow-glow transition-all duration-300 hover:brightness-110 cursor-pointer sm:mt-4 sm:text-sm"
             >
-              Book Now
+              {effectiveIsOrg ? "Book Free Session" : "Book Now"}
             </Button>
             <div className="mt-2.5 flex items-center justify-center gap-1 text-[10px] text-muted-foreground sm:mt-3 sm:gap-1.5">
               <Lock className="h-3 w-3 shrink-0" strokeWidth={2.2} />
               <span className="truncate">
-                {p.sessions ? `Confidential · ${p.sessions}` : "100% Confidential"}
+                {effectiveIsOrg ? "100% Confidential · Free" : p.sessions ? `Confidential · ${p.sessions}` : "100% Confidential"}
               </span>
             </div>
           </div>
