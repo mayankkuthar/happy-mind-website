@@ -198,11 +198,7 @@ function SubscriptionPage() {
                 </h3>
                 <p className="mt-1.5 max-w-xl text-sm text-muted-foreground leading-relaxed">
                   Your organisation subscription covers your access to HappiMynd services.
-                  Individual growth plans are not available under your corporate account.
                   Please reach out to your HR admin for plan changes or upgrades.
-                </p>
-                <p className="mt-3 text-xs font-semibold text-lavender-deep/80">
-                  Head to the Experts page to book a session — it&apos;s covered under your plan.
                 </p>
               </div>
             </div>

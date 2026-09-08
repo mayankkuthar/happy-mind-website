@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { auth } from "@/v2/lib/auth";
+import { useQuery } from "@tanstack/react-query";
+import { auth, type AuthUser } from "@/v2/lib/auth";
 import { fetchSubscribedServices } from "@/v2/lib/website-api";
 
 /**
@@ -31,51 +32,13 @@ export type OrgStatus = {
   loading: boolean;
 };
 
-// Module-level cache — fetched once per session, not per component mount.
-// Keyed on token so switching accounts gets fresh data.
-let _cacheToken: string | null = null;
-let _cacheResult: OrgStatus | null = null;
-let _inFlight: Promise<OrgStatus> | null = null;
-
 function makeFallback(): OrgStatus {
   return { isOrgUser: false, orgPlanIds: [], hasSolv: false, hasHappiTalk: false, loading: false };
 }
 
-async function resolveOrgStatus(token: string): Promise<OrgStatus> {
-  // Return cached result if token matches
-  if (_cacheToken === token && _cacheResult) return _cacheResult;
-
-  // Deduplicate concurrent fetches
-  if (_inFlight && _cacheToken === token) return _inFlight;
-
-  _cacheToken = token;
-  _inFlight = fetchSubscribedServices(token)
-    .then((data) => {
-      const orgPlanIds: number[] = data?.organization_plan_ids ?? [];
-      const result: OrgStatus = {
-        isOrgUser: orgPlanIds.length > 0,
-        orgPlanIds,
-        hasSolv: orgPlanIds.includes(ORG_PLAN_IDS.SOLV),
-        hasHappiTalk: orgPlanIds.includes(ORG_PLAN_IDS.HAPPITALK),
-        loading: false,
-      };
-      _cacheResult = result;
-      _inFlight = null;
-      return result;
-    })
-    .catch(() => {
-      _inFlight = null;
-      return makeFallback();
-    });
-
-  return _inFlight;
-}
-
-/** Call this when the user signs out to clear the cache. */
+/** No-op export for backward compatibility if any file calls clearOrgStatusCache */
 export function clearOrgStatusCache() {
-  _cacheToken = null;
-  _cacheResult = null;
-  _inFlight = null;
+  // Handled automatically by React Query + auth-change listener
 }
 
 /**
@@ -83,28 +46,74 @@ export function clearOrgStatusCache() {
  *
  * Uses organization_plan_ids from GET /api/v1/website/subscribed-services
  * as the reliable org detection signal (happimynd_code is broken on backend).
- * Results are cached for the lifetime of the session.
  *
  * Returns all-false/empty when not logged in.
  */
 export function useOrgStatus(): OrgStatus {
-  const [status, setStatus] = useState<OrgStatus>(() => {
-    // Optimistic: return cache synchronously if already resolved
-    const token = auth.get()?.token ?? null;
-    if (token && _cacheToken === token && _cacheResult) {
-      return _cacheResult;
-    }
-    return { isOrgUser: false, orgPlanIds: [], hasSolv: false, hasHappiTalk: false, loading: !!token };
-  });
+  const [authUser, setAuthUser] = useState<AuthUser | null>(() => auth.get());
 
   useEffect(() => {
-    const token = auth.get()?.token ?? null;
-    if (!token) {
-      setStatus(makeFallback());
-      return;
-    }
-    resolveOrgStatus(token).then(setStatus);
+    const handleAuthChange = () => setAuthUser(auth.get());
+    window.addEventListener("happimynd:auth-change", handleAuthChange);
+    return () => window.removeEventListener("happimynd:auth-change", handleAuthChange);
   }, []);
 
-  return status;
+  const token = authUser?.token;
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["orgStatus", token],
+    queryFn: async () => {
+      if (!token) return makeFallback();
+      try {
+        const res = await fetchSubscribedServices(token);
+        const rawIds = res?.organization_plan_ids ?? [];
+        const orgPlanIds: number[] = Array.isArray(rawIds)
+          ? rawIds.map((id: any) => Number(id)).filter((n: number) => !isNaN(n) && n > 0)
+          : [];
+
+        // HappiTALK is strictly Plan ID 6
+        const hasHappiTalk = orgPlanIds.includes(ORG_PLAN_IDS.HAPPITALK);
+        // SOLV is strictly Plan ID 22. Only free if Plan 22 is in organization_plan_ids.
+        const hasSolv = orgPlanIds.includes(ORG_PLAN_IDS.SOLV);
+
+        const result: OrgStatus = {
+          isOrgUser: orgPlanIds.length > 0,
+          orgPlanIds,
+          hasSolv,
+          hasHappiTalk,
+          loading: false,
+        };
+
+        if (import.meta.env.DEV) {
+          console.log("🏢 [useOrgStatus] Resolved organization plans:", {
+            orgPlanIds,
+            hasSolv,
+            hasHappiTalk,
+            tokenPrefix: token.slice(0, 8),
+          });
+        }
+
+        return result;
+      } catch (err) {
+        console.warn("Failed to resolve org status:", err);
+        return makeFallback();
+      }
+    },
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+
+  if (!token) {
+    return makeFallback();
+  }
+
+  return (
+    data ?? {
+      isOrgUser: false,
+      orgPlanIds: [],
+      hasSolv: false,
+      hasHappiTalk: false,
+      loading: isLoading,
+    }
+  );
 }

@@ -291,6 +291,33 @@ export type AvailFreeServiceResponse = {
   message: string;
 };
 
+export type AvailHappiTalkUserPayload = {
+  psychologist_id: number;
+  date: string;
+  time: string;
+  session?: number;
+  user_recording_permission?: number;
+  coupen_id?: number;
+};
+
+export type AvailHappiTalkUserResponse = {
+  status: string;
+  message: string;
+  [key: string]: unknown;
+};
+
+export type AvailHappiGuideUserPayload = {
+  plan_id: number;
+  date: string;
+  time: string;
+};
+
+export type AvailHappiGuideUserResponse = {
+  status: string;
+  message: string;
+  [key: string]: unknown;
+};
+
 export type ContactPayload = {
   first_name: string;
   last_name: string;
@@ -368,10 +395,18 @@ export async function fetchUserDashboard(token: string): Promise<ApiDashboard> {
 export async function fetchSubscribedServices(token: string): Promise<SubscribedServicesResponse> {
   const raw = await apiGet<unknown>("/api/v1/website/subscribed-services", token);
   const data = (raw as any)?.data ?? {};
-  const base = typeof data === "object" && data !== null ? data : {};
-  const root = typeof raw === "object" && raw !== null ? (raw as any) : {};
-  const rawIds = root.organization_plan_ids ?? base.organization_plan_ids ?? [];
-  const organization_plan_ids = Array.isArray(rawIds) ? rawIds.map((id: any) => Number(id)) : [];
+  const base = typeof data === "object" && data !== null && !Array.isArray(data) ? data : {};
+  const root = typeof raw === "object" && raw !== null && !Array.isArray(raw) ? (raw as any) : {};
+  const rawIds =
+    root.organization_plan_ids ??
+    base.organization_plan_ids ??
+    (Array.isArray((raw as any)?.organization_plan_ids) ? (raw as any).organization_plan_ids : undefined) ??
+    [];
+  const organization_plan_ids = Array.isArray(rawIds)
+    ? rawIds
+        .map((id: any) => (typeof id === "object" && id !== null ? Number(id.id ?? id.plan_id) : Number(id)))
+        .filter((n: number) => !isNaN(n) && n > 0)
+    : [];
   return {
     ...base,
     organization_plan_ids,
@@ -551,4 +586,41 @@ export async function availFreeService(
     coupen_id: payload.coupen_id ?? 0,
   }, token);
   return raw as AvailFreeServiceResponse;
+}
+
+/**
+ * POST /api/v1/avail-haapitalk-user 🔒
+ * Actually book an org HappiTALK session with psychologist_id, date, time (1st slot).
+ * Creates booking as user_type='b2b' with ₹0 amount immediately.
+ */
+export async function availHappiTalkUser(
+  payload: AvailHappiTalkUserPayload,
+  token?: string,
+): Promise<AvailHappiTalkUserResponse> {
+  const raw = await apiPost<unknown>("/api/v1/avail-haapitalk-user", {
+    psychologist_id: payload.psychologist_id,
+    date: payload.date,
+    time: payload.time,
+    session: payload.session ?? 1,
+    user_recording_permission: payload.user_recording_permission ?? 1,
+    coupen_id: payload.coupen_id ?? 0,
+  }, token);
+  return raw as AvailHappiTalkUserResponse;
+}
+
+/**
+ * POST /api/v1/avail-happiguide-user 🔒
+ * Actually book an org HappiGUIDE session (B2B, ₹0, backend auto-assigns psychologist).
+ * Sends plan_id, date, time (1st slot).
+ */
+export async function availHappiGuideUser(
+  payload: AvailHappiGuideUserPayload,
+  token?: string,
+): Promise<AvailHappiGuideUserResponse> {
+  const raw = await apiPost<unknown>("/api/v1/avail-happiguide-user", {
+    plan_id: payload.plan_id,
+    date: payload.date,
+    time: payload.time,
+  }, token);
+  return raw as AvailHappiGuideUserResponse;
 }

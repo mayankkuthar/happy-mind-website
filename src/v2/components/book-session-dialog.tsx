@@ -35,23 +35,20 @@ import {
   type BookingPayload,
 } from "@/v2/lib/bookings";
 import { useUserProfile } from "@/v2/hooks/use-user-profile";
+import { useOrgStatus } from "@/v2/hooks/use-org-status";
 import { type Psychologist } from "@/v2/data/psychologists";
-import { payForHappiTalk, payForHappiGuide, availFreeService } from "@/v2/lib/website-api";
+import {
+  payForHappiTalk,
+  payForHappiGuide,
+  availFreeService,
+  availHappiTalkUser,
+  availHappiGuideUser,
+} from "@/v2/lib/website-api";
 import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
 import { cart } from "@/v2/lib/cart-store";
 import { auth } from "@/v2/lib/auth";
 import { checkAuthOrRedirect } from "@/v2/lib/auth-guard";
 import { toast } from "sonner";
-
-/**
- * Confirmed org plan ID → service key mapping (from tech lead investigation).
- * When these IDs appear in organization_plan_ids, the backend accepts
- * POST /api/v1/avail-free-services with amount=0 — no Razorpay redirect needed.
- */
-const ORG_PLAN_ID_FOR_SERVICE: Record<string, number> = {
-  solv: 22,      // HappiGUIDE / SOLV
-  happitalk: 6,  // Corporate HappiTALK entitlement
-};
 
 export type BookServiceContext = {
   key: string;
@@ -70,15 +67,10 @@ export type BookServiceContext = {
     slot1: PreferredSlot;
     slot2: PreferredSlot;
   } | null;
-  /**
-   * Org plan IDs from organization_plan_ids (subscribed-services API).
-   * When set and a matching service plan ID is found, the booking bypasses
-   * the Razorpay payment gateway and calls availFreeService directly.
-   */
   orgPlanIds?: number[];
 };
 
-export const SERVICE_OPTIONS: BookServiceContext[] = [
+const SERVICE_OPTIONS: BookServiceContext[] = [
   {
     key: "solv",
     name: "SOLV",
@@ -111,11 +103,24 @@ export function BookSessionDialog({
 }) {
   const navigate = useV2Navigate();
   const { profile, loading: profileLoading } = useUserProfile();
+  const { isOrgUser, hasSolv, hasHappiTalk } = useOrgStatus();
 
-  // Default to SOLV first unless explicitly opened for HappiTALK
+  // Default to the provided service key, falling back to SOLV
   const [selectedServiceKey, setSelectedServiceKey] = useState<string>(
     service?.key?.toLowerCase() === "happitalk" ? "happitalk" : "solv"
   );
+
+  // Checks strictly if the selected service is covered in the organization's plan IDs
+  // HappiTALK: Plan 6 (hasHappiTalk) | SOLV: Plan 22 (hasSolv)
+  const isServiceCoveredByOrg = useMemo(() => {
+    if (!isOrgUser) return false;
+    if (selectedServiceKey === "happitalk") {
+      return Boolean(hasHappiTalk);
+    } else if (selectedServiceKey === "solv") {
+      return Boolean(hasSolv);
+    }
+    return false;
+  }, [isOrgUser, selectedServiceKey, hasSolv, hasHappiTalk]);
 
   const [step, setStep] = useState<FlowStep>(service?.initialStep || "form");
 
@@ -168,9 +173,15 @@ export function BookSessionDialog({
       setSlotErrors({});
       setSubmittingPayment(false);
       setPaymentResult(null);
-      setSelectedServiceKey(
-        service?.key?.toLowerCase() === "happitalk" || pending?.serviceKey?.toLowerCase() === "happitalk" ? "happitalk" : "solv"
-      );
+      const initialKey =
+        service?.key?.toLowerCase() === "happitalk"
+          ? "happitalk"
+          : service?.key?.toLowerCase() === "solv"
+            ? "solv"
+            : pending?.serviceKey?.toLowerCase() === "happitalk"
+              ? "happitalk"
+              : "solv";
+      setSelectedServiceKey(initialKey);
       setSelectedPsychologist(service?.initialPsychologist || null);
     }
   }, [open, service]);
@@ -244,7 +255,7 @@ export function BookSessionDialog({
       return;
     }
 
-    if (isHappiTalk && !selectedPsychologist) {
+    if (isHappiTalk && !isServiceCoveredByOrg && !selectedPsychologist) {
       // Slots are already saved above — redirect to /experts page to pick psychologist
       onOpenChange(false);
       toast.info("Preferred slots saved! Select your psychologist below to complete booking.");
@@ -254,8 +265,98 @@ export function BookSessionDialog({
 
     // Direct API hit & payment order generation (SOLV via payForHappiGuide or HappiTALK via payForHappiTalk)
     const formattedDate = format(date1, "yyyy-MM-dd");
-    const slotTimeStr = slot1; // e.g. "10:00 AM - 11:00 AM"
+    const slotTimeStr = slot1; // e.g. "10:00 AM - 11:00 AM" (1st slot)
 
+    // ── Org free-booking flow (B2B, ₹0, no Razorpay, no payment breakdown modal) ──
+    // As instructed by tech lead:
+    // HappiTALK -> POST /api/v1/avail-haapitalk-user with psychologist_id: 301, date, time, session
+    // HappiGUIDE / SOLV -> POST /api/v1/avail-happiguide-user with plan_id: 22, date, time
+    // Payload takes ONLY 1 time slot (1st slot, ignoring 2nd slot).
+    // Only ONE window is shown (the slot selection dialog), which transitions directly to confirmed.
+    if (isServiceCoveredByOrg) {
+      setSubmittingPayment(true);
+      const token = auth.get()?.token;
+
+      try {
+        if (isHappiTalk) {
+          const res = await availHappiTalkUser(
+            {
+              psychologist_id: 301,
+              date: formattedDate,
+              time: slotTimeStr,
+              session: Number(service?.plan?.id ?? 1) || 1,
+              user_recording_permission: 1,
+              coupen_id: 0,
+            },
+            token,
+          );
+
+          if (
+            res.status === "success" ||
+            (res as Record<string, unknown>)?.status === "1" ||
+            Boolean((res as Record<string, unknown>)?.success)
+          ) {
+            clearPendingBooking();
+            bookings.add({
+              service: activeService.name,
+              serviceKey: selectedServiceKey,
+              name: profile.name,
+              email: profile.email,
+              phone: profile.phone,
+              date: formattedDate,
+              slot: slot1,
+              date2: date2 ? format(date2, "yyyy-MM-dd") : undefined,
+              slot2: slot2,
+            });
+            toast.success(res.message || "Your HappiTALK session has been booked successfully.");
+            setStep("confirmed");
+          } else {
+            throw new Error(res.message || "Failed to process org HappiTALK booking.");
+          }
+        } else if (!isHappiTalk) {
+          // SOLV (Plan ID 22)
+          const res = await availHappiGuideUser(
+            {
+              plan_id: 22,
+              date: formattedDate,
+              time: slotTimeStr,
+            },
+            token,
+          );
+
+          if (
+            res.status === "success" ||
+            (res as Record<string, unknown>)?.status === "1" ||
+            Boolean((res as Record<string, unknown>)?.success)
+          ) {
+            clearPendingBooking();
+            bookings.add({
+              service: activeService.name,
+              serviceKey: selectedServiceKey,
+              name: profile.name,
+              email: profile.email,
+              phone: profile.phone,
+              date: formattedDate,
+              slot: slot1,
+              date2: date2 ? format(date2, "yyyy-MM-dd") : undefined,
+              slot2: slot2,
+            });
+            toast.success(res.message || "Your SOLV / HappiGUIDE session has been booked successfully.");
+            setStep("confirmed");
+          } else {
+            throw new Error(res.message || "Failed to process org SOLV booking.");
+          }
+        }
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Failed to process org booking. Please try again.";
+        toast.error(message);
+      } finally {
+        setSubmittingPayment(false);
+      }
+      return; // Do NOT open breakdown modal! Only 1 window is shown.
+    }
+
+    // ── Individual (B2C) booking flow — opens PaymentBreakdownModal as usual ──
     const planId = isHappiTalk && selectedPsychologist
       ? Number(service?.plan?.id ?? selectedPsychologist.plans?.[0]?.id ?? 43)
       : Number(service?.plan?.id ?? 22);
@@ -276,33 +377,6 @@ export function BookSessionDialog({
       dateStr: formattedDate,
       timeStr: slotTimeStr,
     });
-
-    // ── Org free-booking bypass ──
-    // If the user's org has this service covered, skip the PaymentBreakdownModal
-    // entirely and call availFreeService directly (no Razorpay redirect).
-    const orgCoveredPlanId = service?.orgPlanIds?.includes(ORG_PLAN_ID_FOR_SERVICE[selectedServiceKey])
-      ? ORG_PLAN_ID_FOR_SERVICE[selectedServiceKey]
-      : null;
-
-    if (orgCoveredPlanId) {
-      setSubmittingPayment(true);
-      const token = auth.get()?.token;
-      try {
-        const freeRes = await availFreeService({ plan_id: orgCoveredPlanId }, token);
-        if (freeRes.status === "success") {
-          clearPendingBooking();
-          toast.success(`Session booked! Your organisation plan covers this session.`);
-          setStep("confirmed");
-        } else {
-          throw new Error(freeRes.message || "Failed to process org booking.");
-        }
-      } catch (err: any) {
-        toast.error(err?.message ?? "Failed to process org booking. Please try again.");
-      } finally {
-        setSubmittingPayment(false);
-      }
-      return; // Don't open breakdown modal
-    }
 
     setBreakdownOpen(true);
   };
@@ -368,9 +442,10 @@ export function BookSessionDialog({
         toast.success(`Booking Confirmed for ${activeService.name}!`);
         setBreakdownOpen(false);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.warn("Direct booking API notice:", err);
-      toast.error(err?.message ?? `Failed to initiate booking for ${activeService.name}`);
+      const message = err instanceof Error ? err.message : `Failed to initiate booking for ${activeService.name}`;
+      toast.error(message);
     } finally {
       setSubmittingPayment(false);
     }
@@ -478,8 +553,8 @@ export function BookSessionDialog({
                 </Select>
               </div>
 
-              {/* Psychologist info pill if pre-selected for HappiTALK */}
-              {isHappiTalk && selectedPsychologist && (
+              {/* Psychologist info pill if pre-selected for HappiTALK (individual/paid flow) */}
+              {!isServiceCoveredByOrg && isHappiTalk && selectedPsychologist && (
                 <div className="flex items-center justify-between rounded-2xl border border-lavender-deep/40 bg-lavender/15 p-3 text-xs">
                   <div className="flex items-center gap-2">
                     <UserCheck className="h-4 w-4 text-lavender-deep" />
@@ -561,7 +636,7 @@ export function BookSessionDialog({
                     <>
                       <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Booking...
                     </>
-                  ) : isHappiTalk && !selectedPsychologist ? (
+                  ) : !isServiceCoveredByOrg && isHappiTalk && !selectedPsychologist ? (
                     <>
                       Next: Choose Psychologist <ArrowRight className="ml-1.5 h-4 w-4" />
                     </>
