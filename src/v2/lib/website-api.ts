@@ -125,6 +125,8 @@ export type ApiPsychologistPlan = {
 export type ApiPsychologist = {
   id: number;
   full_name: string;
+  expert_category?: string | null;
+  expert_level_id?: number | null;
   city?: { id: number; name: string } | string | null;
   languages?: Array<{ id: number; name: string } | string> | string | null;
   expert_level?: { id: number; name: string } | string | null;
@@ -132,8 +134,8 @@ export type ApiPsychologist = {
   plans?: Record<string, ApiPsychologistPlan> | ApiPsychologistPlan[] | null;
   profile_picture_url?: string | null;
   minimum_session_price?: number | null;
-  slot1?: number | null;
-  slot2?: number | null;
+  slot1?: { days?: string; time?: string } | string | number | null;
+  slot2?: { days?: string; time?: string } | string | number | null;
   summary?: string | null;
   [key: string]: unknown;
 };
@@ -141,6 +143,7 @@ export type ApiPsychologist = {
 export type PsychologistFilters = {
   specializations?: Array<{ id: number; name: string } | string>;
   expert_levels?: Array<{ id: number; name: string } | string>;
+  expert_categories?: Array<{ id: number; name: string } | string>;
   languages?: Array<{ id: number; name: string } | string>;
   cities?: Array<{ id: number; name: string } | string>;
 };

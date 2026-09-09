@@ -55,6 +55,13 @@ const TRUST = [
   { icon: UserCheck, label: "Choose Your Own Psychologist" },
 ];
 
+const SORT_OPTIONS = [
+  "Default",
+  "Price: Low to High",
+  "Price: High to Low",
+  "Experience: High to Low",
+  "Experience: Low to High",
+];
 
 const inr = (n: unknown) => {
   const num = typeof n === "number" ? n : typeof n === "string" ? Number(n) : 0;
@@ -231,6 +238,7 @@ function ExpertsPage() {
   const [concern, setConcern] = useState<string>("All");
   const [language, setLanguage] = useState<string>("All");
   const [city, setCity] = useState<string>("All");
+  const [sortBy, setSortBy] = useState<string>("Default");
   const [booking, setBooking] = useState<Psychologist | null>(null);
 
   // API state
@@ -274,7 +282,6 @@ function ExpertsPage() {
       {
         search: query || undefined,
         city: city !== "All" ? city : undefined,
-        expert_category: category !== "All" ? category : undefined,
         language: language !== "All" ? language : undefined,
         limit: 100,
       },
@@ -298,7 +305,7 @@ function ExpertsPage() {
     return () => {
       ignore = true;
     };
-  }, [query, city, category, language, userToken, isOrgUser, orgLoading]);
+  }, [query, city, language, userToken, isOrgUser, orgLoading]);
 
   // Map ApiPsychologist -> local Psychologist shape for re-use in existing card/dialog components
   const mappedPsychologists: Psychologist[] = apiPsychologists.map((ap) => {
@@ -445,19 +452,38 @@ function ExpertsPage() {
         ? price
         : (parsedPlans[0]?.sessionSellingPrice ?? parsedPlans[0]?.price ?? 0);
 
+    // Use expert_category directly from API; if it is "None", keep it "None"
+    const rawCategory = extractStr(ap.expert_category ?? (ap as any).category);
+    let cleanCategory = rawCategory.trim();
+    if (cleanCategory.toLowerCase() === "counselling psychologist") {
+      cleanCategory = "Counselling Psychologist";
+    } else if (cleanCategory.toLowerCase() === "clinical psychologist") {
+      cleanCategory = "Clinical Psychologist";
+    } else if (!cleanCategory || cleanCategory.toLowerCase().startsWith("grade")) {
+      cleanCategory = "None";
+    }
+
+    const rci =
+      Boolean((ap as any).rci) ||
+      cleanCategory.toLowerCase().includes("rci") ||
+      extractStr(ap.expert_level).toLowerCase().includes("rci") ||
+      parseSpecializations(ap.specialization ?? (ap as any).specializations).some((s) =>
+        s.toLowerCase().includes("rci"),
+      );
+
     return {
       id: String(ap.id),
       name: extractStr(ap.full_name ?? (ap as any).name),
-      designation: extractStr(ap.expert_level ?? (ap as any).designation ?? (ap as any).expert_category),
+      designation: cleanCategory,
       city: extractStr(ap.city),
       languages: parseLanguages(ap.languages),
       specializations: parseSpecializations(ap.specialization ?? (ap as any).specializations),
       bio: bioText,
       experience: Number(extractStr((ap as any).experience)) || summaryDetails.experience,
       availability: availabilityStr,
-      category: extractStr(ap.expert_level ?? (ap as any).category ?? (ap as any).expert_category),
-      premium: Boolean((ap as any).premium) || extractStr(ap.expert_level).toLowerCase().includes("premium"),
-      rci: Boolean((ap as any).rci) || extractStr(ap.expert_level).toLowerCase().includes("rci"),
+      category: cleanCategory,
+      premium: Boolean((ap as any).premium),
+      rci,
       startingFrom: finalStartingFrom,
       education: (ap as any).education ? parseSpecializations((ap as any).education) : summaryDetails.education,
       experienceDetail: (ap as any).experience_detail ? parseSpecializations((ap as any).experience_detail) : [],
@@ -474,15 +500,75 @@ function ExpertsPage() {
   // Filter IDs for filter dropdowns
   const filterCities = ["All", ...normalizeFilterArray(apiFilters.cities)];
   const filterLanguages = ["All", ...normalizeFilterArray(apiFilters.languages)];
-  const filterCategories = ["All", ...normalizeFilterArray(apiFilters.expert_levels)];
+  const filterCategories = useMemo(() => {
+    const set = new Set<string>();
+    mappedPsychologists.forEach((p) => {
+      if (p.category && !p.category.toLowerCase().startsWith("grade")) {
+        set.add(p.category);
+      }
+    });
+    if (apiFilters.expert_categories) {
+      normalizeFilterArray(apiFilters.expert_categories).forEach((c) => {
+        if (!c.toLowerCase().startsWith("grade")) set.add(c);
+      });
+    }
+    const list = Array.from(set);
+    return [
+      "All",
+      ...(list.length > 0
+        ? list
+        : ["Clinical Psychologist", "Counselling Psychologist", "None"]),
+    ];
+  }, [mappedPsychologists, apiFilters.expert_categories]);
   const filterApiConcerns = ["All", ...normalizeFilterArray(apiFilters.specializations)];
   const filterConcerns = filterApiConcerns.length > 1 ? filterApiConcerns : ["All", ...CONCERNS];
 
-  // Client-side concern filter (not supported as a query param yet)
+  // Client-side category, concern filter & dynamic sorting
   const filtered = useMemo(() => {
-    if (concern === "All") return mappedPsychologists;
-    return mappedPsychologists.filter((p) => matchesConcern(p.specializations, concern));
-  }, [mappedPsychologists, concern]);
+    const list = mappedPsychologists.filter((p) => {
+      const matchCategory =
+        category === "All" ||
+        p.category.toLowerCase() === category.toLowerCase() ||
+        p.designation.toLowerCase() === category.toLowerCase();
+      const matchConcern =
+        concern === "All" || matchesConcern(p.specializations, concern);
+      return matchCategory && matchConcern;
+    });
+
+    if (sortBy === "Price: Low to High") {
+      return list.slice().sort((a, b) => {
+        const priceA = a.startingFrom > 0 ? a.startingFrom : Infinity;
+        const priceB = b.startingFrom > 0 ? b.startingFrom : Infinity;
+        return priceA - priceB;
+      });
+    }
+
+    if (sortBy === "Price: High to Low") {
+      return list.slice().sort((a, b) => {
+        const priceA = a.startingFrom > 0 ? a.startingFrom : -Infinity;
+        const priceB = b.startingFrom > 0 ? b.startingFrom : -Infinity;
+        return priceB - priceA;
+      });
+    }
+
+    if (sortBy === "Experience: High to Low") {
+      return list.slice().sort((a, b) => {
+        const expA = typeof a.experience === "number" ? a.experience : 0;
+        const expB = typeof b.experience === "number" ? b.experience : 0;
+        return expB - expA;
+      });
+    }
+
+    if (sortBy === "Experience: Low to High") {
+      return list.slice().sort((a, b) => {
+        const expA = typeof a.experience === "number" ? a.experience : 0;
+        const expB = typeof b.experience === "number" ? b.experience : 0;
+        return expA - expB;
+      });
+    }
+
+    return list;
+  }, [mappedPsychologists, category, concern, sortBy]);
 
   const reset = () => {
     setQuery("");
@@ -490,6 +576,7 @@ function ExpertsPage() {
     setConcern("All");
     setLanguage("All");
     setCity("All");
+    setSortBy("Default");
   };
 
 
@@ -509,7 +596,7 @@ function ExpertsPage() {
 
   useEffect(() => {
     setVisibleCount(10);
-  }, [query, category, concern, language, city]);
+  }, [query, category, concern, language, city, sortBy]);
 
   const visibleRest = useMemo(
     () => rest.slice(0, visibleCount),
@@ -838,7 +925,7 @@ function ExpertsPage() {
             />
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:mt-5">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 sm:mt-5">
             <FilterSelect
               label="Expert Category"
               value={category}
@@ -858,6 +945,12 @@ function ExpertsPage() {
               options={filterLanguages.length > 1 ? filterLanguages : ["All"]}
             />
             <FilterSelect label="City" value={city} onChange={setCity} options={filterCities.length > 1 ? filterCities : ["All"]} />
+            <FilterSelect
+              label="Sort By"
+              value={sortBy}
+              onChange={setSortBy}
+              options={SORT_OPTIONS}
+            />
           </div>
         </section>
       )}
@@ -917,7 +1010,7 @@ function ExpertsPage() {
 
       {/* SECTION 4 — All Psychologist Cards */}
       <section>
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 sm:mb-6">
           <div>
             <h2 className="text-xl font-bold tracking-tight sm:text-2xl lg:text-3xl">
               {recommended.length > 0 ? "All Available Experts" : "Our Panel of Experts"}
@@ -925,6 +1018,24 @@ function ExpertsPage() {
             <p className="mt-1 text-xs text-muted-foreground sm:mt-2 sm:text-sm">
               {filtered.length} expert{filtered.length === 1 ? "" : "s"} matching your preferences
             </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-muted-foreground shrink-0 hidden sm:inline">Sort By:</span>
+            <div className="w-48 sm:w-56">
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="h-10 rounded-xl border-border/70 bg-white text-xs font-medium shadow-none focus:ring-lavender-deep/40">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-border/60 bg-white shadow-card">
+                  {SORT_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt} className="text-xs">
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
