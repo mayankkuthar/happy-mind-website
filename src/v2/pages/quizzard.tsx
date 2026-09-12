@@ -1,8 +1,9 @@
 import { V2Link } from "@/v2/lib/router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ArrowUpRight, Award, Baby, BatteryCharging, Brain, ChevronDown, CloudRain, Compass, Drama, Eye, Flame, Gauge, GraduationCap, Heart, HeartCrack, CircleHelp, Hourglass, LayoutGrid, Languages, ChartLine, MessageCircle, MessagesSquare, Moon, PersonStanding, Repeat, Rocket, Scale, School, Shield, Smile, Sparkles, Sun, Target, Timer, UserMinus, UserRound, Users, Waves, Zap } from "lucide-react";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
 import { Button } from "@/v2/components/ui/button";
+import { useOrgStatus } from "@/v2/hooks/use-org-status";
 import quizzardHeroImg from "@/v2/assets/quizzard-mascot.png";
 
 export default QuizzardPage;
@@ -104,6 +105,21 @@ const alsoExplore = [
 ];
 
 function QuizzardPage() {
+  const { isOrgUser } = useOrgStatus();
+  const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
+
+  const dynamicAlsoExplore = useMemo(() => {
+    return alsoExplore.map((s) => {
+      if (s.slug === "solv") {
+        return {
+          ...s,
+          name: solvName,
+        };
+      }
+      return s;
+    });
+  }, [solvName]);
+
   return (
     <DashboardShell
       header={
@@ -219,7 +235,7 @@ function QuizzardPage() {
         </div>
 
         <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {alsoExplore.map((s) => {
+          {dynamicAlsoExplore.map((s) => {
             const Icon = s.icon;
             return (
               <div
@@ -262,8 +278,20 @@ const chipStyles = [
 ];
 
 function ExploreDimensions() {
+  const { isOrgUser } = useOrgStatus();
   const [showAll, setShowAll] = useState(false);
-  const visible = showAll ? quizzes : quizzes.slice(0, INITIAL_VISIBLE);
+  const dynamicQuizzes = useMemo(() => {
+    return quizzes.map((q) => {
+      if (q.title.includes("SOLV")) {
+        return {
+          ...q,
+          title: isOrgUser ? "HappiGUIDE Session" : q.title,
+        };
+      }
+      return q;
+    });
+  }, [isOrgUser]);
+  const visible = showAll ? dynamicQuizzes : dynamicQuizzes.slice(0, INITIAL_VISIBLE);
 
   return (
     <section className="relative overflow-hidden rounded-[2rem] bg-white/70 p-6 shadow-soft border border-white/80 sm:p-8 md:p-10">
@@ -326,7 +354,7 @@ function ExploreDimensions() {
           onClick={() => setShowAll((v) => !v)}
           className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-xs font-semibold text-lavender-deep border border-lavender/40 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-lavender/15 hover:shadow-card cursor-pointer sm:text-sm"
         >
-          {showAll ? "Show fewer quizzes" : `Show all ${quizzes.length} quizzes`}
+          {showAll ? "Show fewer quizzes" : `Show all ${dynamicQuizzes.length} quizzes`}
           <ChevronDown
             className={`h-4 w-4 transition-transform duration-300 ${showAll ? "rotate-180" : ""}`}
           />

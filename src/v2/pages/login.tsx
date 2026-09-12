@@ -133,6 +133,7 @@ function LoginPage() {
                   onForgotPassword={() =>
                     setCard({ mode: "forgot", step: "forgot-send", contact: "", contactType: "mobile" })
                   }
+                  redirectTarget={redirectTarget}
                 />
               )}
 
@@ -207,11 +208,13 @@ function TabMode({
   onTabChange,
   onStartOtp,
   onForgotPassword,
+  redirectTarget,
 }: {
   tab: LoginTab;
   onTabChange: (t: LoginTab) => void;
   onStartOtp: () => void;
   onForgotPassword: () => void;
+  redirectTarget: string;
 }) {
   const search = useSearch();
   return (
@@ -260,7 +263,7 @@ function TabMode({
       </div>
 
       {tab === "password" && (
-        <PasswordForm onForgotPassword={onForgotPassword} />
+        <PasswordForm onForgotPassword={onForgotPassword} redirectTarget={redirectTarget} />
       )}
 
       {tab === "otp" && (
@@ -286,7 +289,13 @@ function TabMode({
 // PasswordForm — username + password
 // ---------------------------------------------------------------------------
 
-function PasswordForm({ onForgotPassword }: { onForgotPassword: () => void }) {
+function PasswordForm({
+  onForgotPassword,
+  redirectTarget,
+}: {
+  onForgotPassword: () => void;
+  redirectTarget: string;
+}) {
   const navigate = useV2Navigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -324,7 +333,7 @@ function PasswordForm({ onForgotPassword }: { onForgotPassword: () => void }) {
 
         auth.signIn({ name, email, token });
         toast.success(`Welcome back, ${name}!`);
-        navigate({ to: "/" });
+        navigate({ to: redirectTarget as any, replace: true });
       } else {
         toast.error((res as any).message ?? "Invalid username or password.");
       }

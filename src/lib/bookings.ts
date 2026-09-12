@@ -14,6 +14,7 @@ export type PendingBookingState = {
   slot1: PreferredSlot;
   slot2: PreferredSlot;
   createdAt?: string;
+  filledOutsideLogin?: boolean;
 };
 
 const PENDING_STORAGE_KEY = "happimynd_pending_booking_v1";

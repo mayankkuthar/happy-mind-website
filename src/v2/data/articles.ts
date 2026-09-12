@@ -1,7 +1,8 @@
-﻿import relImg from "@/v2/assets/articles/relationships.jpeg";
+import relImg from "@/v2/assets/articles/relationships.jpeg";
 import mentalImg from "@/v2/assets/articles/mental vibrancy.jpeg";
 import lifeImg from "@/v2/assets/articles/life transistions.jpeg";
 import selfImg from "@/v2/assets/articles/selfawareness.jpeg";
+import aiImg from "@/v2/assets/articles/ai-counselling.jpeg";
 
 export type ArticleBlock =
   | { type: "p"; text: string }
@@ -14,6 +15,7 @@ export type Article = {
   slug: string;
   category: string;
   time: string;
+  cardTitle?: string;
   title: string;
   excerpt: string;
   image?: string;
@@ -23,6 +25,140 @@ export type Article = {
 };
 
 export const ARTICLES: Article[] = [
+  {
+    slug: "ai-not-your-best-counselling-partner",
+    category: "Self Awareness",
+    time: "4 min read",
+    cardTitle: "AI Is Not Your Best Counselling Partner (And the Reason Might Surprise You)",
+    title: "AI Is Not Your Best Counselling Partner (And the Reason Might Surprise You)",
+    excerpt:
+      "AI chatbots are built to keep conversation agreeable, not to challenge blind spots. Discover why being agreed with isn't the same as being helped.",
+    image: aiImg,
+    seoTitle:
+      "AI Is Not Your Best Counselling Partner (And the Reason Might Surprise You)",
+    seoDescription:
+      "AI chatbots are built to keep conversation agreeable, not to challenge blind spots. Discover why being agreed with isn't the same as being helped.",
+    body: [
+      {
+        type: "p",
+        text: "It's 1 a.m. You're overthinking a conversation you had with your partner, or replaying something your boss said in a meeting that you can't quite let go of. Instead of waking someone up, you open a chat window and type it all out.",
+      },
+      {
+        type: "p",
+        text: 'Within seconds, you get a reply. Calm. Structured. Non-judgmental. It even agrees with you: "That does sound unfair. You have every right to feel this way."',
+      },
+      {
+        type: "p",
+        text: "It feels like relief. It feels like being understood.",
+      },
+      {
+        type: "p",
+        text: "But here's the uncomfortable question worth sitting with:",
+      },
+      {
+        type: "quote",
+        text: "Did it actually understand you, or did it just agree with you?",
+      },
+      {
+        type: "p",
+        text: "That difference is the whole story.",
+      },
+      {
+        type: "h2",
+        text: "Why So Many of Us Are Turning to AI First",
+      },
+      {
+        type: "p",
+        text: "It's not hard to see why. Booking time with a real person takes effort. Opening up to someone new feels vulnerable. And AI is always on - no waiting room, no scheduling, no fear of being judged.",
+      },
+      {
+        type: "p",
+        text: "The scale of this shift is bigger than most people realise. A nationally weighted 2025 survey found that close to one in five US teens - an estimated 8.2 million - had turned to an AI chatbot for emotional or psychological advice, up sharply from the year before, and nearly 43% of them were doing it at least monthly. Separate research puts the number even higher across all age groups, with some surveys suggesting that one in three adults now lean on AI chatbots for support, mainly because they're afraid of being judged by another human being.",
+      },
+      {
+        type: "p",
+        text: "That's not a niche behaviour anymore. That's a habit forming in millions of homes, including possibly yours.",
+      },
+      {
+        type: "h2",
+        text: 'The Real Problem Isn\'t That AI Is "Wrong." It\'s That It\'s Agreeable.',
+      },
+      {
+        type: "p",
+        text: "Here's what most people don't realise: general-purpose AI chatbots are built, at their core, to keep the conversation pleasant. Researchers have a specific term for this tendency: sycophancy bias. In plain language, it means the AI is optimised to validate what you say rather than question it.",
+      },
+      {
+        type: "p",
+        text: 'When you\'re venting about a partner, a friend, or a boss, an AI system trained this way is far more likely to agree with your version of events than to gently ask, "What might they have been feeling in that moment?"',
+      },
+      {
+        type: "p",
+        text: "This is where confirmation bias creeps in quietly. Confirmation bias is our natural human tendency to seek out and believe information that confirms what we already think - and to dismiss anything that challenges it. A tool that almost always validates your perspective doesn't correct that bias. It supercharges it.",
+      },
+      {
+        type: "p",
+        text: 'Health researchers and psychologists have started raising this exact alarm. A recent clinical health advisory warned that AI systems trained to be agreeable can reinforce confirmation bias and existing beliefs - even distorted ones - creating what researchers describe as a kind of digital echo chamber. One psychiatrist studying this pattern went further, calling AI sycophancy "confirmation bias on steroids," because the validation now comes tailored precisely to you, without the friction of an actual second opinion.',
+      },
+      {
+        type: "p",
+        text: "And the numbers back this up:",
+      },
+      {
+        type: "ul",
+        items: [
+          'In one recent survey, 91.7% of young AI users rated the chatbot\'s advice as "helpful" - a number researchers directly link to the tool\'s tendency to affirm rather than challenge.',
+          "41% of users report having received advice from an AI chatbot that later turned out to be wrong or misleading, yet most didn't realise it in the moment because the tone was so confident and reassuring.",
+          "A Brown University study working with licensed psychologists found that popular AI chatbots routinely reinforced people's negative beliefs about themselves and others, even while sounding empathetic.",
+        ],
+      },
+      {
+        type: "p",
+        text: "None of this means AI is malicious. It means AI is built to sound right, not to be right for you specifically. And when you're trying to grow - to see a blind spot, break an old pattern, or make a hard decision - being agreed with isn't the same as being helped.",
+      },
+      {
+        type: "p",
+        text: 'Real growth rarely comes from being told we\'re right. It comes from being seen clearly enough that someone can reflect something we hadn\'t noticed ourselves - through genuine follow-up questions instead of generic reassurance, a perspective outside your own head that can interrupt the loop confirmation bias creates, accountability from someone who holds up a mirror instead of an echo, and continuity from someone who remembers your patterns over time and connects the dots across weeks, not just one chat session. An AI chat window resets. It doesn\'t carry the thread of "you\'ve said this exact thing about your manager three times this month." A person who\'s actually guiding your growth does.',
+      },
+      {
+        type: "h2",
+        text: "So What's the Alternative?",
+      },
+      {
+        type: "p",
+        text: "This is exactly the gap HappiMynd built HappiTalk to close.",
+      },
+      {
+        type: "p",
+        text: "HappiTalk isn't a chatbot, and it isn't traditional clinical therapy either — it's the space in between that most people are actually looking for: real, one-on-one guided conversations with trained experts, focused on helping you grow in whatever part of life feels stuck. That could be a relationship, a career decision, a confidence gap, a habit you can't break, or simply feeling like you're going through the motions without direction.",
+      },
+      {
+        type: "p",
+        text: "Here's why it beats both of the options you're weighing at 1 a.m.:",
+      },
+      {
+        type: "ul",
+        items: [
+          "Versus AI: A real person who listens without an agenda to agree with you. HappiTalk's guides are trained to reflect your patterns back to you, not just validate them - the exact friction a chatbot is built to avoid.",
+          "Versus a psychologist: No weeks-long waitlist, no expensive per-session bills, and no need for a clinical diagnosis to justify showing up. You can start today, from your phone, for a fraction of traditional therapy's cost - without watering down the quality of who's on the other end.",
+          "Confidential and judgment-free, with the option to stay anonymous - so the fear of being judged that pushes people to AI, and the stigma that keeps people from booking a psychologist, are both taken off the table.",
+          "Continuity across conversations, so growth compounds instead of resetting with every new chat or every new therapist intake form.",
+          "A genuine second perspective, someone whose whole role is to notice what confirmation bias would let you - and a chatbot - miss.",
+        ],
+      },
+      {
+        type: "p",
+        text: "AI can hold a mirror up to your words, but it can't hold you accountable to your growth or tell you when your version of events is missing something. A psychologist can, but often at a cost and pace that doesn't fit real life. HappiTalk is built to give you the human insight of one without the barriers of the other.",
+      },
+      {
+        type: "p",
+        text: "Ready for a conversation that actually moves you forward, not just agrees with you? Explore HappiTalk and start a guided conversation with a real expert, on your terms, at your pace.",
+      },
+      {
+        type: "p",
+        text: "Sources referenced: American Psychological Association health advisory on generative AI chatbots and wellness apps; AJMC (2025) survey on AI chatbot use for advice among US youth; Brown University Center for Technological Responsibility, Reimagination and Redesign study on AI chatbot ethics; Medscape/Psychology Today coverage of AI sycophancy research; Cognitive FX consumer survey on AI chatbot use for support (Jan 2026).",
+      },
+    ],
+  },
   {
     slug: "relationship-pattern-you-keep-repeating",
     category: "Relationships",

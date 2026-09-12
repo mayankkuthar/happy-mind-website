@@ -19,6 +19,7 @@ import {
 
 import { useAssessmentPhase } from "@/v2/lib/assessment/use-assessment-phase";
 import { getAvatarUrl } from "@/v2/lib/avatars";
+import { useOrgStatus } from "@/v2/hooks/use-org-status";
 import logoImg from "@/v2/assets/happimynd-logo.png";
 
 type NavItem = {
@@ -258,6 +259,7 @@ export function TopHeaderBar({
   const navigate = useV2Navigate();
   const { user } = useAuth();
   const { phase, hasAnyCompletedReport } = useAssessmentPhase();
+  const { isOrgUser } = useOrgStatus();
 
   // Compute status automatically from HappiLIFE assessment phase unless overridden.
   // Once at least one attempt is complete, the pill stays "Active" — a newer
@@ -332,7 +334,7 @@ export function TopHeaderBar({
               </h1>
             )}
           </div>
-          {subtitle !== undefined ? (
+          {subtitle ? (
             typeof subtitle === "string" ? (
               <p className="hidden sm:block text-[10px] sm:text-xs md:text-sm text-muted-foreground leading-tight sm:whitespace-normal sm:break-words mt-0.5">
                 {subtitle}
@@ -340,7 +342,7 @@ export function TopHeaderBar({
             ) : (
               <div className="hidden sm:block text-[10px] sm:text-xs md:text-sm">{subtitle}</div>
             )
-          ) : (
+          ) : subtitle === "" || subtitle === null ? null : (
             <p className="hidden sm:block text-[10px] sm:text-xs md:text-sm text-muted-foreground leading-tight sm:whitespace-normal sm:break-words mt-0.5">
               Small steps toward conscious growth matter. Take a moment to check in with yourself
               today.
@@ -464,7 +466,7 @@ export function TopHeaderBar({
         <BookSessionDialog
           open={bookOpen}
           onOpenChange={setBookOpen}
-          service={{ key: "solv", name: "SOLV" }}
+          service={{ key: "solv", name: isOrgUser ? "HappiGUIDE" : "SOLV" }}
         />
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import happi from "@/assets/happi-mascot.png";
 
 /* Intro timeline (ms from load):
@@ -9,14 +10,24 @@ const MASCOT_IN = 300;
 const BUBBLE_IN = 1500;
 const EXIT_AT = 5000;
 const FADE_DURATION = 600;
+// Track whether this browser load started on the root route
+const isInitialLoadOnRoot =
+  typeof window !== "undefined" && window.location.pathname === "/";
+let hasShownMascotIntro = false;
 
 const MascotIntro = () => {
-  const [mounted, setMounted] = useState(true);
+  const { pathname } = useLocation();
+  const isEligible = pathname === "/" && isInitialLoadOnRoot && !hasShownMascotIntro;
+
+  const [mounted, setMounted] = useState(isEligible);
   const [mascotIn, setMascotIn] = useState(false);
   const [bubbleIn, setBubbleIn] = useState(false);
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
+    if (!isEligible) return;
+    hasShownMascotIntro = true;
+
     const timers = [
       setTimeout(() => setMascotIn(true), MASCOT_IN),
       setTimeout(() => setBubbleIn(true), BUBBLE_IN),
@@ -24,24 +35,24 @@ const MascotIntro = () => {
       setTimeout(() => setMounted(false), EXIT_AT + FADE_DURATION),
     ];
     return () => timers.forEach(clearTimeout);
-  }, []);
+  }, [isEligible]);
 
   // Hold the page still while the splash is up
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !isEligible) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previous;
     };
-  }, [mounted]);
+  }, [mounted, isEligible]);
 
   const skip = () => {
     setLeaving(true);
     setTimeout(() => setMounted(false), FADE_DURATION);
   };
 
-  if (!mounted) return null;
+  if (!mounted || !isEligible) return null;
 
   return (
     <div

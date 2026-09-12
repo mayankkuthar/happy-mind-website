@@ -46,7 +46,7 @@ import {
 } from "@/v2/lib/website-api";
 import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
 import { cart } from "@/v2/lib/cart-store";
-import { auth } from "@/v2/lib/auth";
+import { auth, useAuth } from "@/v2/lib/auth";
 import { checkAuthOrRedirect } from "@/v2/lib/auth-guard";
 import { toast } from "sonner";
 
@@ -161,40 +161,56 @@ export function BookSessionDialog({
     timeStr: string;
   } | null>(null);
 
+  const { authed } = useAuth();
+  const [isConfirmingPreAuth, setIsConfirmingPreAuth] = useState(false);
+
   // Reset/sync dialog state whenever opened
   useEffect(() => {
     if (open) {
       setStep(service?.initialStep || "form");
       const pending = getPendingBooking();
-      setDate1(service?.initialSlots?.slot1?.date || pending?.slot1?.date || undefined);
-      setSlot1(service?.initialSlots?.slot1?.slot || pending?.slot1?.slot || "");
-      setDate2(service?.initialSlots?.slot2?.date || pending?.slot2?.date || undefined);
-      setSlot2(service?.initialSlots?.slot2?.slot || pending?.slot2?.slot || "");
+      const currentUser = auth.get();
+      const isAuthed = Boolean(currentUser?.token || authed);
+      const isPreAuth = Boolean(pending?.filledOutsideLogin && isAuthed);
+      setIsConfirmingPreAuth(isPreAuth);
+
+      // Prioritize restored slots from pending booking storage
+      const restoredDate1 = pending?.slot1?.date || service?.initialSlots?.slot1?.date;
+      const restoredSlot1 = pending?.slot1?.slot || service?.initialSlots?.slot1?.slot || "";
+      const restoredDate2 = pending?.slot2?.date || service?.initialSlots?.slot2?.date;
+      const restoredSlot2 = pending?.slot2?.slot || service?.initialSlots?.slot2?.slot || "";
+
+      setDate1(restoredDate1);
+      setSlot1(restoredSlot1);
+      setDate2(restoredDate2);
+      setSlot2(restoredSlot2);
       setSlotErrors({});
       setSubmittingPayment(false);
       setPaymentResult(null);
+
+      // Prioritize restored serviceKey from pending booking
       const initialKey =
-        service?.key?.toLowerCase() === "happitalk"
-          ? "happitalk"
-          : service?.key?.toLowerCase() === "solv"
-            ? "solv"
-            : pending?.serviceKey?.toLowerCase() === "happitalk"
-              ? "happitalk"
-              : "solv";
+        pending?.serviceKey
+          ? (pending.serviceKey.toLowerCase() === "happitalk" ? "happitalk" : "solv")
+          : service?.key?.toLowerCase() === "happitalk"
+            ? "happitalk"
+            : "solv";
       setSelectedServiceKey(initialKey);
       setSelectedPsychologist(service?.initialPsychologist || null);
     }
-  }, [open, service]);
+  }, [open, service, authed]);
 
   const isHappiTalk = selectedServiceKey === "happitalk";
+  const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
   const activeService = useMemo(() => {
-    return (
-      SERVICE_OPTIONS.find((s) => s.key === selectedServiceKey) || {
-        key: selectedServiceKey,
-        name: isHappiTalk ? "HappiTALK" : "SOLV",
-      }
-    );
-  }, [selectedServiceKey, isHappiTalk]);
+    return {
+      key: selectedServiceKey,
+      name: isHappiTalk ? "HappiTALK" : solvName,
+      label: isHappiTalk
+        ? "HappiTALK (Therapeutic Counselling)"
+        : `${solvName} (One-on-one growth conversations)`,
+    };
+  }, [selectedServiceKey, isHappiTalk, solvName]);
 
   const today = useMemo(() => {
     const d = new Date();
@@ -239,21 +255,36 @@ export function BookSessionDialog({
       slot: slot2,
     };
 
-    // Save the visitor's chosen slots BEFORE any auth handoff, so the same
-    // form continues (pre-filled) once they come back from login.
+    // If visitor is not authenticated, save chosen slots with filledOutsideLogin: true
+    // and hand off to login/signup. Upon returning, dialog will open in "Confirm Your Booking" mode.
+    if (!auth.get()?.token) {
+      savePendingBooking({
+        serviceKey: selectedServiceKey,
+        serviceName: activeService.name,
+        slot1: slot1Data,
+        slot2: slot2Data,
+        plan: service?.plan || null,
+        filledOutsideLogin: true,
+      });
+      markBookingResume();
+      checkAuthOrRedirect(
+        navigate,
+        typeof window !== "undefined" ? window.location.pathname : "/",
+        "Please log in to book a session."
+      );
+      onOpenChange(false);
+      return;
+    }
+
+    // Otherwise, if already logged in, save normally
     savePendingBooking({
       serviceKey: selectedServiceKey,
       serviceName: activeService.name,
       slot1: slot1Data,
       slot2: slot2Data,
       plan: service?.plan || null,
+      filledOutsideLogin: false,
     });
-
-    if (!checkAuthOrRedirect(navigate, typeof window !== "undefined" ? window.location.pathname : "/", "Please log in to book a session.")) {
-      markBookingResume();
-      onOpenChange(false);
-      return;
-    }
 
     if (isHappiTalk && !isServiceCoveredByOrg && !selectedPsychologist) {
       // Slots are already saved above — redirect to /experts page to pick psychologist
@@ -341,10 +372,10 @@ export function BookSessionDialog({
               date2: date2 ? format(date2, "yyyy-MM-dd") : undefined,
               slot2: slot2,
             });
-            toast.success(res.message || "Your SOLV / HappiGUIDE session has been booked successfully.");
+            toast.success(res.message || `Your ${solvName} session has been booked successfully.`);
             setStep("confirmed");
           } else {
-            throw new Error(res.message || "Failed to process org SOLV booking.");
+            throw new Error(res.message || `Failed to process org ${solvName} booking.`);
           }
         }
       } catch (err: unknown) {
@@ -365,7 +396,7 @@ export function BookSessionDialog({
       : Number(service?.plan?.price ?? 599);
     const itemName = isHappiTalk && selectedPsychologist
       ? `HappiTALK - Session with ${selectedPsychologist.name}`
-      : `SOLV - Growth Consultation`;
+      : `${solvName} - Growth Consultation`;
 
     setBreakdownData({
       itemName,
@@ -468,6 +499,7 @@ export function BookSessionDialog({
 
     cart.clear();
     clearPendingBooking();
+    setIsConfirmingPreAuth(false);
     setSubmittingPayment(false);
     onOpenChange(false);
     navigate({
@@ -476,8 +508,18 @@ export function BookSessionDialog({
     });
   };
 
+  const handleDialogClose = (newOpen: boolean) => {
+    onOpenChange(newOpen);
+  };
+
+  const handleCancel = () => {
+    clearPendingBooking();
+    setIsConfirmingPreAuth(false);
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogContent className="max-h-[92vh] gap-0 overflow-y-auto rounded-3xl border-0 bg-white p-0 shadow-card sm:max-w-xl">
         {/* Branded Dialog Header */}
         <div className="relative overflow-hidden rounded-t-3xl bg-gradient-hero px-6 py-5">
@@ -489,12 +531,18 @@ export function BookSessionDialog({
               </span>
             </div>
             <DialogTitle className="text-2xl font-bold tracking-tight text-foreground">
-              {step === "form" ? "Book a Session" : "Booking Confirmed!"}
+              {step === "confirmed"
+                ? "Booking Confirmed!"
+                : isConfirmingPreAuth
+                  ? "Confirm Your Booking"
+                  : "Book a Session"}
             </DialogTitle>
             <DialogDescription className="text-sm text-foreground/70">
-              {step === "form"
-                ? `Reserve a 1:1 ${activeService.name} session. Select 2 preferred date and time slots.`
-                : "Your session request and payment confirmation are complete."}
+              {step === "confirmed"
+                ? "Your session request and payment confirmation are complete."
+                : isConfirmingPreAuth
+                  ? "Please review and confirm your selected slots below."
+                  : "Reserve a One-on-One Session. Select 2 preferred date and time slots."}
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -525,32 +573,63 @@ export function BookSessionDialog({
           {/* SINGLE STEP BOOKING FORM */}
           {step === "form" && (
             <div className="space-y-5">
-              {/* Service Selection Dropdown (Defaults to SOLV first) */}
+              {/* Service Selection Split Button (Defaults to SOLV on left, HappiTALK on right) */}
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-foreground/80">
-                  Service
+                  Select Service
                 </label>
-                <Select
-                  value={selectedServiceKey}
-                  onValueChange={(v) => {
-                    setSelectedServiceKey(v);
-                    setSlotErrors({});
-                  }}
-                >
-                  <SelectTrigger className="h-11 w-full rounded-2xl border-0 bg-white px-4 font-medium shadow-soft">
-                    <span className="flex items-center gap-2 truncate">
-                      <Sparkles className="h-4 w-4 shrink-0 text-lavender-deep" />
-                      <SelectValue placeholder="Select Service" />
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedServiceKey("solv");
+                      setSlotErrors({});
+                    }}
+                    className={cn(
+                      "flex flex-col items-center justify-center rounded-2xl py-2.5 px-2 text-center transition-all duration-200 cursor-pointer border-2",
+                      selectedServiceKey === "solv"
+                        ? "border-lavender-deep bg-gradient-brand text-white shadow-glow"
+                        : "border-lavender/60 bg-white text-foreground/80 hover:border-lavender-deep/60 hover:bg-lavender/10 shadow-soft"
+                    )}
+                  >
+                    <span className="text-sm font-bold tracking-wide">{solvName}</span>
+                    <span
+                      className={cn(
+                        "mt-0.5 text-[11px] font-medium leading-tight",
+                        selectedServiceKey === "solv"
+                          ? "text-white/90"
+                          : "text-muted-foreground"
+                      )}
+                    >
+                      (One-on-one growth conversations)
                     </span>
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl">
-                    {SERVICE_OPTIONS.map((s) => (
-                      <SelectItem key={s.key} value={s.key} className="rounded-xl font-medium">
-                        {s.label ?? s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedServiceKey("happitalk");
+                      setSlotErrors({});
+                    }}
+                    className={cn(
+                      "flex flex-col items-center justify-center rounded-2xl py-2.5 px-2 text-center transition-all duration-200 cursor-pointer border-2",
+                      selectedServiceKey === "happitalk"
+                        ? "border-lavender-deep bg-gradient-brand text-white shadow-glow"
+                        : "border-lavender/60 bg-white text-foreground/80 hover:border-lavender-deep/60 hover:bg-lavender/10 shadow-soft"
+                    )}
+                  >
+                    <span className="text-sm font-bold tracking-wide">HappiTALK</span>
+                    <span
+                      className={cn(
+                        "mt-0.5 text-[11px] font-medium leading-tight",
+                        selectedServiceKey === "happitalk"
+                          ? "text-white/90"
+                          : "text-muted-foreground"
+                      )}
+                    >
+                      (Therapeutic Counselling)
+                    </span>
+                  </button>
+                </div>
               </div>
 
               {/* Psychologist info pill if pre-selected for HappiTALK (individual/paid flow) */}
@@ -621,7 +700,7 @@ export function BookSessionDialog({
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => onOpenChange(false)}
+                  onClick={handleCancel}
                   className="h-11 rounded-full px-6 text-sm font-semibold"
                 >
                   Cancel
@@ -637,8 +716,18 @@ export function BookSessionDialog({
                       <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Booking...
                     </>
                   ) : !isServiceCoveredByOrg && isHappiTalk && !selectedPsychologist ? (
+                    isConfirmingPreAuth ? (
+                      <>
+                        Confirm &amp; Choose Psychologist <ArrowRight className="ml-1.5 h-4 w-4" />
+                      </>
+                    ) : (
+                      <>
+                        Next: Choose Psychologist <ArrowRight className="ml-1.5 h-4 w-4" />
+                      </>
+                    )
+                  ) : isConfirmingPreAuth ? (
                     <>
-                      Next: Choose Psychologist <ArrowRight className="ml-1.5 h-4 w-4" />
+                      Confirm Your Booking <ArrowRight className="ml-1.5 h-4 w-4" />
                     </>
                   ) : (
                     <>

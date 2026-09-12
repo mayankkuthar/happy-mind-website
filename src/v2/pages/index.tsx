@@ -18,12 +18,14 @@ import relImg from "@/v2/assets/articles/relationships.jpeg";
 import mentalImg from "@/v2/assets/articles/mental vibrancy.jpeg";
 import lifeImg from "@/v2/assets/articles/life transistions.jpeg";
 import selfImg from "@/v2/assets/articles/selfawareness.jpeg";
+import aiImg from "@/v2/assets/articles/ai-counselling.jpeg";
 import { useAuth } from "@/v2/lib/auth";
 import { useAssessmentPhase } from "@/v2/lib/assessment";
 import { toast } from "sonner";
 import { cn } from "@/v2/lib/utils";
 import { BookSessionDialog } from "@/v2/components/book-session-dialog";
 import { consumeBookingResume } from "@/v2/lib/bookings";
+import { useOrgStatus } from "@/v2/hooks/use-org-status";
 
 export default DashboardPage;
 
@@ -375,6 +377,8 @@ function QuickActions() {
 function ContinueJourney() {
   const [bookDialogOpen, setBookDialogOpen] = useState(false);
   const { phase: assessmentPhase, hasAnyCompletedReport } = useAssessmentPhase();
+  const { isOrgUser } = useOrgStatus();
+  const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
   const happiLearnLink = "/services/happilearn";
   const happibuddyLink = "/services/happibuddy";
 
@@ -573,7 +577,7 @@ function ContinueJourney() {
       <BookSessionDialog
         open={bookDialogOpen}
         onOpenChange={setBookDialogOpen}
-        service={{ key: "solv", name: "SOLV" }}
+        service={{ key: "solv", name: solvName }}
       />
     </section>
   );
@@ -581,6 +585,19 @@ function ContinueJourney() {
 
 const dashboardResources = [
   // Articles
+  {
+    type: "Articles",
+    cat: "Self Awareness",
+    title: "AI Is Not Your Best Counselling Partner (And the Reason Might Surprise You)",
+    time: "4 min read",
+    gradient: "bg-gradient-peach",
+    img: aiImg,
+    slug: "ai-not-your-best-counselling-partner",
+    icon: BookOpen,
+    to: "/articles/$slug",
+    params: { slug: "ai-not-your-best-counselling-partner" },
+    thumb: aiImg,
+  },
   {
     type: "Articles",
     cat: "Self Awareness",
@@ -606,19 +623,6 @@ const dashboardResources = [
     to: "/articles/$slug",
     params: { slug: "your-nervous-system-not-motivation" },
     thumb: mentalImg,
-  },
-  {
-    type: "Articles",
-    cat: "Relationships",
-    title: "The Relationship Pattern You Keep Repeating Isn't About Love.",
-    time: "3 min read",
-    gradient: "bg-gradient-mint",
-    img: relImg,
-    slug: "relationship-pattern-you-keep-repeating",
-    icon: BookOpen,
-    to: "/articles/$slug",
-    params: { slug: "relationship-pattern-you-keep-repeating" },
-    thumb: relImg,
   },
   // Audio
   {
@@ -959,6 +963,9 @@ const services = [
 ];
 
 function ServicesPreview() {
+  const { isOrgUser } = useOrgStatus();
+  const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
+
   return (
     <section>
       <SectionHeader
@@ -970,6 +977,7 @@ function ServicesPreview() {
       <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {services.map((s) => {
           const Icon = s.icon;
+          const displayTitle = s.slug === "solv" ? solvName : s.title;
           const cardInner = (
             <>
               <div>
@@ -978,7 +986,7 @@ function ServicesPreview() {
                 >
                   <Icon className="h-6 w-6 text-foreground/80" strokeWidth={2} />
                 </div>
-                <h4 className="mt-5 text-lg font-bold tracking-tight text-foreground">{s.title}</h4>
+                <h4 className="mt-5 text-lg font-bold tracking-tight text-foreground">{displayTitle}</h4>
                 <p className="mt-1.5 text-sm leading-relaxed text-foreground/70">{s.desc}</p>
               </div>
               <div className="mt-5">

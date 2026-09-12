@@ -195,8 +195,9 @@ const COMPARE_CATEGORIES: {
     },
   ];
 
-function renderFeatureLabel(label: string) {
-  const serviceNames = ["HappiSelf", "HappiLearn", "HappiBuddy", "SOLV", "HappiTalk", "HappiVibe"];
+function renderFeatureLabel(label: string, isOrgUser?: boolean) {
+  const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
+  const serviceNames = ["HappiSelf", "HappiLearn", "HappiBuddy", solvName, "SOLV", "HappiTalk", "HappiVibe"];
   const regex = new RegExp(`(${serviceNames.join("|")})`, "g");
   const parts = label.split(regex);
 
@@ -205,7 +206,7 @@ function renderFeatureLabel(label: string) {
       {parts.map((part, index) =>
         serviceNames.includes(part) ? (
           <span key={index} className="font-bold text-foreground">
-            {part}
+            {part === "SOLV" && isOrgUser ? "HappiGUIDE" : part}
           </span>
         ) : (
           part
@@ -331,6 +332,20 @@ function ComparePlansSection({
   onBuy: (p: Plan) => void;
 }) {
   const scrollTableRef = useRef<HTMLDivElement>(null);
+  const { isOrgUser } = useOrgStatus();
+  const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
+
+  const compareItems = useMemo(() => {
+    return COMPARE_CATEGORIES.flatMap((cat) => cat.items).map((item) => {
+      if (item.label.includes("SOLV")) {
+        return {
+          ...item,
+          label: item.label.replace("SOLV", solvName),
+        };
+      }
+      return item;
+    });
+  }, [solvName]);
 
   const scrollToPlan = (planId: string) => {
     const container = scrollTableRef.current;
@@ -380,18 +395,18 @@ function ComparePlansSection({
             <div className="flex h-16 items-center px-2 text-xs font-bold uppercase tracking-wider text-muted-foreground sm:text-sm">
               Features
             </div>
-            <div className="flex h-11 items-center px-2 text-xs font-bold text-foreground border-b border-lavender/30 sm:text-sm">
-              Subscription Fee
+            <div className="flex h-12 items-center px-2 text-xs font-bold text-foreground border-b border-lavender/30 sm:text-sm">
+              Subscription Fee*
             </div>
             <div className="flex h-10 items-center px-2 text-xs font-bold text-foreground border-b border-lavender/30 sm:text-sm">
               Validity
             </div>
-            {COMPARE_ITEMS.map((item) => (
+            {compareItems.map((item) => (
               <div
                 key={item.label}
                 className="flex h-[58px] items-center px-2 py-1 text-[11px] font-medium leading-snug text-foreground/85 border-b border-lavender/20 sm:text-xs md:text-sm"
               >
-                {renderFeatureLabel(item.label)}
+                {renderFeatureLabel(item.label, isOrgUser)}
               </div>
             ))}
             <div className="h-16" />
@@ -415,15 +430,17 @@ function ComparePlansSection({
               </div>
 
               {/* Price */}
-              <div className="flex h-11 items-center justify-center gap-1 border-b border-lavender/30 px-1 sm:gap-1.5">
-                {plan.mrp && (
-                  <span className="text-xs font-semibold text-muted-foreground line-through sm:text-xs">
-                    ₹{plan.mrp.toLocaleString()}
+              <div className="flex h-12 flex-col items-center justify-center border-b border-lavender/30 px-1">
+                <div className="flex items-center justify-center gap-1 sm:gap-1.5">
+                  {plan.mrp && (
+                    <span className="text-xs font-semibold text-muted-foreground line-through sm:text-xs">
+                      ₹{plan.mrp.toLocaleString()}
+                    </span>
+                  )}
+                  <span className="text-sm font-extrabold text-foreground sm:text-lg">
+                    ₹{plan.price.toLocaleString()}
                   </span>
-                )}
-                <span className="text-sm font-extrabold text-foreground sm:text-lg">
-                  ₹{plan.price.toLocaleString()}
-                </span>
+                </div>
               </div>
 
               {/* Validity */}
@@ -471,10 +488,15 @@ function ComparePlansSection({
         </div>
       </div>
 
-      <p className="mt-4 text-xs sm:text-sm font-medium text-foreground/80 leading-relaxed w-full">
-        *Experts in HappiTALK sessions within plans are allocated by HappiMynd. SOLV sessions are
-        thoughtfully matched with an expert from our psychologist panel.
-      </p>
+      <div className="mt-4 space-y-1 text-xs text-muted-foreground sm:text-sm">
+        <p>
+          *Prices are exclusive of GST. 18% GST will be added on it.
+        </p>
+        <p>
+          *Experts in HappiTALK sessions within plans are allocated by HappiMynd. {solvName} sessions are
+          thoughtfully matched with an expert from our psychologist panel.
+        </p>
+      </div>
     </section>
   );
 }
@@ -485,6 +507,14 @@ function SharedPricingPage() {
   const navigate = useV2Navigate();
   const { slug } = useParams();
   const { isOrgUser, hasSolv, hasHappiTalk } = useOrgStatus();
+  const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
+
+  const faqs = useMemo(() => {
+    return FAQS.map((f) => ({
+      q: f.q.replace(/SOLV/g, solvName),
+      a: f.a.replace(/SOLV/g, solvName),
+    }));
+  }, [solvName]);
 
   const [reviewIdx, setReviewIdx] = useState(0);
   const [isReviewPaused, setIsReviewPaused] = useState(false);
@@ -677,10 +707,10 @@ function SharedPricingPage() {
     const serviceKey = key.toLowerCase() === "happitalk" ? "happitalk" : "solv";
     setBookingServiceContext({
       key: serviceKey,
-      name: serviceKey === "happitalk" ? "HappiTALK" : "SOLV",
+      name: serviceKey === "happitalk" ? "HappiTALK" : solvName,
       plan: {
         id: serviceKey === "happitalk" ? "21" : "8",
-        name: `${serviceKey === "happitalk" ? "HappiTALK" : "SOLV"} 1:1 Session`,
+        name: `${serviceKey === "happitalk" ? "HappiTALK" : solvName} 1:1 Session`,
         price,
         billing: "Per Session",
       },
@@ -704,7 +734,7 @@ function SharedPricingPage() {
       header={
         <TopHeaderBar
           title="Start with HappiMynd"
-          subtitle="Choose a plan to get started"
+          subtitle={isOrgUser ? null : "Choose a plan to get started"}
           emoji=""
         />
       }
@@ -818,7 +848,7 @@ function SharedPricingPage() {
           {[
             {
               key: "solv",
-              name: "SOLV",
+              name: solvName,
               icon: LifeBuoy,
               price: 599,
               priceLabel: "₹599",
@@ -869,7 +899,7 @@ function SharedPricingPage() {
         <ul className="mt-4 list-disc space-y-1 pl-5 text-xs text-muted-foreground">
           <li>Individual HappiTALK bookings let you choose your psychologist.</li>
           <li>
-            SOLV sessions are thoughtfully matched with an expert from our psychologist panel.
+            {solvName} sessions are thoughtfully matched with an expert from our psychologist panel.
           </li>
         </ul>
       </section>
@@ -1234,7 +1264,7 @@ function SharedPricingPage() {
                 Experts in HappiTALK sessions within subscription plans are allocated by HappiMynd.
               </li>
               <li>
-                SOLV sessions are thoughtfully matched with an expert from our psychologist panel.
+                {solvName} sessions are thoughtfully matched with an expert from our psychologist panel.
               </li>
               <li>Individual HappiTALK bookings let you choose your psychologist.</li>
               <li>All subscription fees are exclusive of applicable taxes.</li>
@@ -1254,7 +1284,7 @@ function SharedPricingPage() {
           </p>
         </div>
         <Accordion type="single" collapsible className="w-full">
-          {FAQS.map((f, i) => (
+          {faqs.map((f, i) => (
             <AccordionItem
               key={i}
               value={`item-${i}`}

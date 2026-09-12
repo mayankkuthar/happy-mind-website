@@ -34,7 +34,7 @@ const SolvRealityCheck = () => {
 
   return (
     <section ref={sectionRef} className="py-12 px-6 lg:px-16">
-      <div className="container mx-auto max-w-4xl">
+      <div className="container mx-auto max-w-6xl">
         <div
           className={`text-center space-y-6 mb-12 transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
@@ -59,30 +59,32 @@ const SolvRealityCheck = () => {
         </div>
 
         <div
-          className={`text-center mb-8 transition-all duration-700 delay-150 ${
+          className={`text-center mb-10 transition-all duration-700 delay-150 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <h3 className="text-xl md:text-2xl font-semibold text-foreground font-sans">
+          <h3 className="text-2xl md:text-3xl font-semibold text-foreground font-sans">
             Fact Check About Growth Blockers
           </h3>
         </div>
 
         <div
-          className={`grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12 transition-all duration-700 delay-200 ${
+          className={`grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-10 mb-12 transition-all duration-700 delay-200 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
           {stats.map((stat, index) => (
             <div
               key={stat.label}
-              className="text-center space-y-2"
+              className="text-center space-y-3"
               style={{ transitionDelay: `${0.3 + index * 0.1}s` }}
             >
-              <div className="font-serif text-3xl md:text-4xl font-semibold text-primary">
+              <div className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-primary tracking-tight">
                 {stat.value}
               </div>
-              <div className="text-muted-foreground text-sm">{stat.label}</div>
+              <div className="text-muted-foreground text-sm sm:text-base md:text-lg leading-snug max-w-[240px] mx-auto">
+                {stat.label}
+              </div>
             </div>
           ))}
         </div>

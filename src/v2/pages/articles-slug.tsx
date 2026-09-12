@@ -1,4 +1,4 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ArrowLeft, Clock, Image, Share2 } from "lucide-react";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
@@ -196,7 +196,9 @@ export default function ArticlePage() {
                     <Clock className="h-3.5 w-3.5" /> {a.time}
                   </span>
                 </div>
-                <h3 className="mt-3 text-base font-bold leading-snug tracking-tight">{a.title}</h3>
+                <h3 className="mt-3 text-base font-bold leading-snug tracking-tight">
+                  {a.cardTitle || a.title}
+                </h3>
                 <div className="mt-4 flex-1" />
                 <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
                   Read Article

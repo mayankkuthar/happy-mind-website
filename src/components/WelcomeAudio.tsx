@@ -2,95 +2,130 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Pause, Play, Volume2 } from "lucide-react";
 import AUDIO_SRC from "@/v2/assets/audio/calm-morning.mp3";
 
-/* A calm note that greets visitors when they land.
-   It plays for 10s, fades out on its own, and can be paused at any time. */
-const INTRO_DURATION = 10000;
-const FADE_DURATION = 1200;
+/* A calm ambient track that greets visitors when they land and continues
+   seamlessly across page navigation, restricted to playing for 30 seconds total. */
+const TOTAL_PLAY_TIME_MS = 30000;
+const FADE_START_MS = 26000;
 const VOLUME = 0.35;
 
 const WelcomeAudio = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const stopTimer = useRef<number | null>(null);
-  const fadeTimer = useRef<number | null>(null);
-  const remaining = useRef(INTRO_DURATION);
-  const startedAt = useRef(0);
+  const tickTimerRef = useRef<number | null>(null);
+  const fadeIntervalRef = useRef<number | null>(null);
+  const totalPlayedMsRef = useRef<number>(0);
+  const isFinished30sRef = useRef<boolean>(false);
+  const isFadingRef = useRef<boolean>(false);
 
   const [playing, setPlaying] = useState(false);
   const [introDone, setIntroDone] = useState(false);
 
   const clearTimers = useCallback(() => {
-    if (stopTimer.current) window.clearTimeout(stopTimer.current);
-    if (fadeTimer.current) window.clearInterval(fadeTimer.current);
-    stopTimer.current = null;
-    fadeTimer.current = null;
+    if (tickTimerRef.current) {
+      window.clearInterval(tickTimerRef.current);
+      tickTimerRef.current = null;
+    }
+    if (fadeIntervalRef.current) {
+      window.clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
   }, []);
 
-  // Ease the volume down instead of cutting the track off mid-note
-  const fadeOut = useCallback(() => {
+  const startFadeOut = useCallback(() => {
+    if (isFadingRef.current || !audioRef.current) return;
+    isFadingRef.current = true;
     const audio = audioRef.current;
-    if (!audio) return;
+    const startVolume = audio.volume;
+    const steps = 20;
+    const stepTime = 200; // 20 * 200ms = 4000ms fade (from 26s to 30s)
+    let currentStep = 0;
 
-    const step = 50;
-    const drop = audio.volume / (FADE_DURATION / step);
-
-    fadeTimer.current = window.setInterval(() => {
-      if (!audioRef.current) return;
-      const next = audioRef.current.volume - drop;
-      if (next <= 0.01) {
+    fadeIntervalRef.current = window.setInterval(() => {
+      currentStep++;
+      if (audioRef.current) {
+        audioRef.current.volume = Math.max(0, startVolume * (1 - currentStep / steps));
+      }
+      if (currentStep >= steps) {
         clearTimers();
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        audioRef.current.volume = VOLUME;
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.volume = VOLUME;
+        }
         setPlaying(false);
         setIntroDone(true);
-        remaining.current = 0;
-      } else {
-        audioRef.current.volume = next;
+        isFinished30sRef.current = true;
+        isFadingRef.current = false;
       }
-    }, step);
+    }, stepTime);
   }, [clearTimers]);
+
+  const startTracking = useCallback(() => {
+    clearTimers();
+    if (isFinished30sRef.current) return;
+
+    tickTimerRef.current = window.setInterval(() => {
+      totalPlayedMsRef.current += 200;
+
+      if (totalPlayedMsRef.current >= FADE_START_MS && !isFadingRef.current) {
+        startFadeOut();
+      }
+
+      if (totalPlayedMsRef.current >= TOTAL_PLAY_TIME_MS) {
+        clearTimers();
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.volume = VOLUME;
+        }
+        setPlaying(false);
+        setIntroDone(true);
+        isFinished30sRef.current = true;
+      }
+    }, 200);
+  }, [clearTimers, startFadeOut]);
 
   const play = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return Promise.reject();
 
-    audio.volume = VOLUME;
+    if (isFinished30sRef.current) {
+      // Re-triggering resets the 30s budget
+      totalPlayedMsRef.current = 0;
+      isFinished30sRef.current = false;
+      isFadingRef.current = false;
+      setIntroDone(false);
+      audio.currentTime = 0;
+    }
+
+    if (!isFadingRef.current) {
+      audio.volume = VOLUME;
+    }
+
     return audio.play().then(() => {
       setPlaying(true);
-      // Only the intro run is time-boxed; a manual replay runs freely
-      if (remaining.current > 0) {
-        startedAt.current = Date.now();
-        stopTimer.current = window.setTimeout(fadeOut, remaining.current);
-      }
+      startTracking();
     });
-  }, [fadeOut]);
+  }, [startTracking]);
 
   const pause = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (remaining.current > 0 && startedAt.current) {
-      remaining.current = Math.max(
-        0,
-        remaining.current - (Date.now() - startedAt.current)
-      );
-    }
     clearTimers();
-    audio.pause();
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+    }
     setPlaying(false);
   }, [clearTimers]);
 
-  // Try to greet on load; browsers that block autoplay get the first gesture instead
+  // Try to play on load; browsers that block autoplay get the first gesture instead
   useEffect(() => {
     const audio = new Audio(AUDIO_SRC);
     audio.preload = "auto";
+    audio.loop = true;
     audio.volume = VOLUME;
     audioRef.current = audio;
 
     let cancelled = false;
 
     const startOnGesture = () => {
-      if (cancelled || remaining.current <= 0) return;
+      if (cancelled || isFinished30sRef.current) return;
       play().catch(() => undefined);
       removeGestureListeners();
     };
@@ -129,7 +164,7 @@ const WelcomeAudio = () => {
     <button
       type="button"
       onClick={toggle}
-      aria-label={playing ? "Pause welcome sound" : "Play welcome sound"}
+      aria-label={playing ? "Pause sound" : "Play sound"}
       aria-pressed={playing}
       className="fixed bottom-5 left-5 z-[110] flex items-center gap-1.5 rounded-full border border-border bg-card/90 backdrop-blur px-2.5 py-1.5 shadow-card text-xs text-foreground hover:bg-card transition-colors"
     >
