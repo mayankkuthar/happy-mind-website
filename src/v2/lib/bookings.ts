@@ -36,14 +36,17 @@ export type PendingBookingState = {
     price?: number;
     billing?: string;
   } | null;
+  filledOutsideLogin?: boolean;
 };
 
 export function savePendingBooking(state: PendingBookingState) {
   if (typeof window === "undefined") return;
   try {
-    sessionStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(state));
+    const raw = JSON.stringify(state);
+    sessionStorage.setItem(PENDING_STORAGE_KEY, raw);
+    localStorage.setItem(PENDING_STORAGE_KEY, raw);
   } catch (err) {
-    console.error("Failed to save pending booking to sessionStorage", err);
+    console.error("Failed to save pending booking to storage", err);
   }
 }
 
@@ -53,8 +56,14 @@ export function getPendingBooking(): PendingBookingState | null {
     const raw = sessionStorage.getItem(PENDING_STORAGE_KEY) || localStorage.getItem(PENDING_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (parsed?.slot1?.date) parsed.slot1.date = new Date(parsed.slot1.date);
-    if (parsed?.slot2?.date) parsed.slot2.date = new Date(parsed.slot2.date);
+    if (parsed?.slot1?.date) {
+      const d = new Date(parsed.slot1.date);
+      parsed.slot1.date = !isNaN(d.getTime()) ? d : undefined;
+    }
+    if (parsed?.slot2?.date) {
+      const d = new Date(parsed.slot2.date);
+      parsed.slot2.date = !isNaN(d.getTime()) ? d : undefined;
+    }
     return parsed as PendingBookingState;
   } catch {
     return null;
@@ -65,6 +74,7 @@ export function clearPendingBooking() {
   if (typeof window === "undefined") return;
   try {
     sessionStorage.removeItem(PENDING_STORAGE_KEY);
+    localStorage.removeItem(PENDING_STORAGE_KEY);
   } catch {
     // ignore
   }
@@ -78,6 +88,7 @@ export function markBookingResume() {
   if (typeof window === "undefined") return;
   try {
     sessionStorage.setItem(RESUME_KEY, "1");
+    localStorage.setItem(RESUME_KEY, "1");
   } catch {
     // ignore
   }
@@ -91,9 +102,10 @@ export function consumeBookingResume(): boolean {
   if (typeof window === "undefined") return false;
   let resume = false;
   try {
-    if (sessionStorage.getItem(RESUME_KEY) === "1") {
+    if (sessionStorage.getItem(RESUME_KEY) === "1" || localStorage.getItem(RESUME_KEY) === "1") {
       resume = true;
       sessionStorage.removeItem(RESUME_KEY);
+      localStorage.removeItem(RESUME_KEY);
     }
   } catch {
     // ignore unavailable storage

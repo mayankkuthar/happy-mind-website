@@ -1,5 +1,5 @@
 import { V2Link, useV2Navigate, useSearch } from "@/v2/lib/router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Compass, Sparkles, MessagesSquare, BookOpen, Phone, LifeBuoy, Check, Image, ShieldCheck, Layers, HeartHandshake, Route as RouteIcon, Lightbulb, Users, ArrowRight } from "lucide-react";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
 import viewPlansHeroImg from "@/v2/assets/service-page-mascot.png";
@@ -12,6 +12,7 @@ import happitalkBanner from "@/v2/assets/images/services/happitalk-banner.webp";
 import { Button } from "@/v2/components/ui/button";
 import { cn } from "@/v2/lib/utils";
 import { useAssessmentPhase } from "@/v2/lib/assessment";
+import { useOrgStatus } from "@/v2/hooks/use-org-status";
 
 type ServicesSearch = {
   service?: string;
@@ -343,6 +344,8 @@ function ServicesPage() {
   const navigate = useV2Navigate();
   const search = useSearch();
   const { phase: assessmentPhase } = useAssessmentPhase();
+  const { isOrgUser } = useOrgStatus();
+  const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
 
   const initial = (search.service && ORDER.includes(search.service as ServiceKey))
     ? (search.service as ServiceKey)
@@ -364,7 +367,30 @@ function ServicesPage() {
     });
   };
 
-  const service = SERVICES[selected];
+  const service = useMemo(() => {
+    const s = SERVICES[selected];
+    if (selected === "solv") {
+      return {
+        ...s,
+        name: solvName,
+        bannerAlt: `One-on-one ${solvName} session with a growth expert.`,
+      };
+    }
+    return s;
+  }, [selected, solvName]);
+
+  const goalCards = useMemo(() => {
+    return GOAL_CARDS.map((card) => {
+      if (card.serviceKey === "solv") {
+        return {
+          ...card,
+          serviceName: solvName,
+          cta: `Explore ${solvName}`,
+        };
+      }
+      return card;
+    });
+  }, [solvName]);
 
   const getHappiLifePrimaryCta = () => {
     switch (assessmentPhase) {
@@ -413,7 +439,8 @@ function ServicesPage() {
       <section id="service-tabs">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {ORDER.map((key) => {
-            const s = SERVICES[key];
+            const rawS = SERVICES[key];
+            const s = key === "solv" ? { ...rawS, name: solvName } : rawS;
             const Icon = s.icon;
             const active = key === selected;
             return (
@@ -562,7 +589,7 @@ function ServicesPage() {
           </p>
         </div>
         <div className="grid grid-cols-2 place-items-center gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {GOAL_CARDS.map((card) => (
+          {goalCards.map((card) => (
             <GoalFlipCard key={card.goal} card={card} />
           ))}
         </div>

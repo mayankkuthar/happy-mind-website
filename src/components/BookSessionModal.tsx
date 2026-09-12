@@ -37,6 +37,7 @@ import {
   type PreferredSlot,
 } from "@/lib/bookings";
 import { fetchCurrentUser } from "@/lib/happimyndAuth";
+import { useOrgStatus } from "@/v2/hooks/use-org-status";
 
 export type BookServiceOption = {
   key: string;
@@ -85,6 +86,7 @@ const BookSessionModal = ({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [isConfirmingPreAuth, setIsConfirmingPreAuth] = useState(false);
 
   // Reset/sync dialog state whenever opened
   useEffect(() => {
@@ -95,6 +97,7 @@ const BookSessionModal = ({
       // Check if there are pending saved slots to restore
       const pending = getPendingBooking();
       if (pending) {
+        setIsConfirmingPreAuth(Boolean(pending.filledOutsideLogin));
         if (pending.serviceKey) setSelectedServiceKey(pending.serviceKey);
         if (pending.slot1?.date) setDate1(new Date(pending.slot1.date));
         if (pending.slot1?.slot) setSlot1(pending.slot1.slot);
@@ -103,6 +106,8 @@ const BookSessionModal = ({
         if (pending.name) setName(pending.name);
         if (pending.email) setEmail(pending.email);
         if (pending.phone) setPhone(pending.phone);
+      } else {
+        setIsConfirmingPreAuth(false);
       }
 
       // Also try fetching current authenticated user profile
@@ -120,12 +125,18 @@ const BookSessionModal = ({
     }
   }, [isOpen]);
 
+  const { isOrgUser } = useOrgStatus();
+  const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
+
   const activeService = useMemo(() => {
-    return (
-      SERVICE_OPTIONS.find((s) => s.key === selectedServiceKey) ||
-      SERVICE_OPTIONS[0]
-    );
-  }, [selectedServiceKey]);
+    return {
+      key: selectedServiceKey,
+      name: selectedServiceKey === "happitalk" ? "HappiTALK" : solvName,
+      label: selectedServiceKey === "happitalk"
+        ? "HappiTALK (Therapeutic Counselling)"
+        : `${solvName} (One-on-one growth conversations)`,
+    };
+  }, [selectedServiceKey, solvName]);
 
   const today = useMemo(() => {
     const d = new Date();
@@ -182,6 +193,7 @@ const BookSessionModal = ({
       phone,
       slot1: slot1Data,
       slot2: slot2Data,
+      filledOutsideLogin: true,
     });
 
     bookings.add({
@@ -217,10 +229,12 @@ const BookSessionModal = ({
               </span>
             </div>
             <DialogTitle className="text-2xl font-bold tracking-tight text-foreground">
-              Book a Session
+              {isConfirmingPreAuth ? "Confirm Your Booking" : "Book a Session"}
             </DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
-              Reserve a 1:1 {activeService.name} session. Select 2 preferred date and time slots.
+              {isConfirmingPreAuth
+                ? "Please review and confirm your selected slots below."
+                : "Reserve a One-on-One Session. Select 2 preferred date and time slots."}
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -228,36 +242,59 @@ const BookSessionModal = ({
         <div className="p-6">
           {/* SINGLE STEP BOOKING FORM */}
           <div className="space-y-5">
-            {/* Service Selection Dropdown */}
+            {/* Service Selection Split Button */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground/80">
-                Service
+                Select Service
               </label>
-              <Select
-                value={selectedServiceKey}
-                onValueChange={(v) => {
-                  setSelectedServiceKey(v);
-                  setSlotErrors({});
-                }}
-              >
-                <SelectTrigger className="h-11 w-full rounded-2xl border border-border bg-background px-4 font-medium shadow-sm">
-                  <span className="flex items-center gap-2 truncate text-sm">
-                    <Sparkles className="h-4 w-4 shrink-0 text-primary" />
-                    <SelectValue placeholder="Select Service" />
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedServiceKey("solv");
+                    setSlotErrors({});
+                  }}
+                  className={`flex flex-col items-center justify-center rounded-2xl py-2.5 px-2 text-center transition-all duration-200 cursor-pointer border-2 ${
+                    selectedServiceKey === "solv"
+                      ? "border-primary bg-primary text-primary-foreground shadow-md"
+                      : "border-border/80 bg-background text-foreground/80 hover:border-primary/50 hover:bg-muted/40 shadow-sm"
+                  }`}
+                >
+                  <span className="text-sm font-bold tracking-wide">{solvName}</span>
+                  <span
+                    className={`mt-0.5 text-[11px] font-medium leading-tight ${
+                      selectedServiceKey === "solv"
+                        ? "text-primary-foreground/90"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    (One-on-one growth conversations)
                   </span>
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl">
-                  {SERVICE_OPTIONS.map((s) => (
-                    <SelectItem
-                      key={s.key}
-                      value={s.key}
-                      className="rounded-xl font-medium text-xs cursor-pointer"
-                    >
-                      {s.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedServiceKey("happitalk");
+                    setSlotErrors({});
+                  }}
+                  className={`flex flex-col items-center justify-center rounded-2xl py-2.5 px-2 text-center transition-all duration-200 cursor-pointer border-2 ${
+                    selectedServiceKey === "happitalk"
+                      ? "border-primary bg-primary text-primary-foreground shadow-md"
+                      : "border-border/80 bg-background text-foreground/80 hover:border-primary/50 hover:bg-muted/40 shadow-sm"
+                  }`}
+                >
+                  <span className="text-sm font-bold tracking-wide">HappiTALK</span>
+                  <span
+                    className={`mt-0.5 text-[11px] font-medium leading-tight ${
+                      selectedServiceKey === "happitalk"
+                        ? "text-primary-foreground/90"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    (Therapeutic Counselling)
+                  </span>
+                </button>
+              </div>
             </div>
 
             {/* Requirement notice box */}
@@ -331,7 +368,8 @@ const BookSessionModal = ({
                   </>
                 ) : (
                   <>
-                    Book Now <ArrowRight className="ml-1.5 h-4 w-4" />
+                    {isConfirmingPreAuth ? "Confirm Your Booking" : "Book Now"}{" "}
+                    <ArrowRight className="ml-1.5 h-4 w-4" />
                   </>
                 )}
               </Button>

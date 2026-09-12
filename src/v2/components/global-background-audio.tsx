@@ -1,11 +1,11 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Music, VolumeX } from "lucide-react";
 import calmMorningUrl from "@/v2/assets/audio/calm-morning.mp3";
 import { cn } from "@/v2/lib/utils";
 
-const TOTAL_PLAY_TIME_MS = 15000;
-const FADE_START_MS = 12000;
+const TOTAL_PLAY_TIME_MS = 30000;
+const FADE_START_MS = 25000;
 
 export function GlobalBackgroundAudio() {
   const location = useLocation();
@@ -36,8 +36,8 @@ export function GlobalBackgroundAudio() {
     isFadingRef.current = true;
     const audio = audioRef.current;
     const startVolume = audio.volume;
-    const steps = 15;
-    const stepTime = 200; // 200ms * 15 = 3000ms
+    const steps = 25;
+    const stepTime = 200; // 200ms * 25 = 5000ms
     let currentStep = 0;
 
     fadeIntervalRef.current = setInterval(() => {
@@ -125,7 +125,7 @@ export function GlobalBackgroundAudio() {
   };
 
   // Route-based auto-pause & resume:
-  // Pauses audio when reading articles or taking assessment; resumes from paused spot when leaving if under 15s!
+  // Pauses audio when reading articles or taking assessment; resumes from paused spot when leaving if under 30s!
   useEffect(() => {
     const path = location.pathname.toLowerCase();
     const isReadingArticle = path.startsWith("/v2/articles") || path.startsWith("/articles");
@@ -239,7 +239,7 @@ export function GlobalBackgroundAudio() {
     if (!audioRef.current) return;
     if (!isPlaying) {
       if (isFinished30sRef.current) {
-        // Reset 15s budget if user manually re-starts after finishing
+        // Reset 30s budget if user manually re-starts after finishing
         totalPlayedMsRef.current = 0;
         isFinished30sRef.current = false;
         isFadingRef.current = false;

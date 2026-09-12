@@ -138,7 +138,7 @@ function SubscriptionPage() {
 
   return (
     <DashboardShell
-      header={<TopHeaderBar title="My Subscription" subtitle="Your membership & plans from the comparison table" />}
+      header={<TopHeaderBar title="My Subscription" subtitle="" />}
     >
       <div className="space-y-10 pb-10">
         {/* Section 1 — Current Active Subscriptions */}
@@ -197,8 +197,7 @@ function SubscriptionPage() {
                   Organisation Plan Active
                 </h3>
                 <p className="mt-1.5 max-w-xl text-sm text-muted-foreground leading-relaxed">
-                  Your organisation subscription covers your access to HappiMynd services.
-                  Please reach out to your HR admin for plan changes or upgrades.
+                  Your organisation subscription covers your access to HappiMynd services. Please reach out to your HR admin for plan changes or upgrades.
                 </p>
               </div>
             </div>

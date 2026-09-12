@@ -8,7 +8,6 @@ import rajivPareenjaImage from "@/assets/team/rajiv-pareenja.png";
 import kamleshSinghImage from "@/assets/team/kamlesh-singh.png";
 import chandanaMImage from "@/assets/team/chandana-m.png";
 import aparnaDasImage from "@/assets/team/aparna-das.png";
-import amitRathiCoachImage from "@/assets/team/amit-rathi-coach.jpg";
 import induAnanthImage from "@/assets/team/indu-ananth.jpg";
 import maheshwariJaniImage from "@/assets/team/maheshwari-jani.jpg";
 import nidhiSharmaImage from "@/assets/team/nidhi-sharma.jpg";
@@ -102,7 +101,7 @@ const growthCoaches: GrowthCoach[] = [
     role: "Leadership & Executive Coach",
     description:
       "Executive & Leadership Coaching | Enterprise Thinking | Conscious Growth Development | Role Transition Expert | Corporate Training | Emotional Intelligence",
-    image: amitRathiCoachImage,
+    image: amitRathiImage,
   },
   {
     name: "Jaya Azad",
@@ -367,7 +366,7 @@ const AboutTeamSection = () => {
 
   return (
     <section id="our-team" className="py-24 px-6 lg:px-16">
-      <div className="container mx-auto max-w-6xl">
+      <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
@@ -385,12 +384,12 @@ const AboutTeamSection = () => {
         </div>
 
         {/* First line: 3 Core Team Members */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12 max-w-4xl mx-auto mb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-10 max-w-5xl mx-auto mb-20">
           {mainTeamMembers.map((member, index) => (
             <div key={index} className="text-center group">
               {/* Photo Container */}
-              <div className="relative mb-4 mx-auto w-32 h-32 md:w-40 md:h-40">
-                <div className="w-full h-full rounded-full overflow-hidden border-4 border-primary/20 group-hover:border-primary/30 transition-all duration-300 shadow-sm">
+              <div className="relative mb-5 mx-auto w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48">
+                <div className="w-full h-full rounded-full overflow-hidden border-4 border-primary/20 group-hover:border-primary/40 group-hover:scale-105 transition-all duration-300 shadow-md group-hover:shadow-lg">
                   <img
                     src={member.image}
                     alt={member.name}
@@ -400,13 +399,13 @@ const AboutTeamSection = () => {
               </div>
 
               {/* Info */}
-              <h3 className="font-serif text-lg font-semibold text-foreground mb-1">
+              <h3 className="font-serif text-lg sm:text-xl md:text-2xl font-semibold text-foreground mb-1.5">
                 {member.name}
               </h3>
-              <p className="text-primary text-sm font-medium mb-1">
+              <p className="text-primary text-sm sm:text-base font-semibold mb-1.5">
                 {member.role}
               </p>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">
                 {member.description}
               </p>
             </div>
@@ -547,7 +546,7 @@ const AboutTeamSection = () => {
             aria-expanded={showExperts}
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-primary/30 text-primary text-sm font-medium hover:bg-primary/5 hover:border-primary/50 transition-all duration-300"
           >
-            {showExperts ? "See Less" : `See More Experts (${experts.length})`}
+            {showExperts ? "See Less" : `See More Experts`}
             <ChevronDown
               className={`w-4 h-4 transition-transform duration-300 ${
                 showExperts ? "rotate-180" : ""

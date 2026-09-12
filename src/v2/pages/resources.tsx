@@ -227,7 +227,7 @@ function MobileArticleDeck() {
         </div>
         <div className="flex flex-1 flex-col p-4">
           <h3 className="text-base font-bold leading-snug tracking-tight text-foreground line-clamp-2">
-            {activeArticle.title}
+            {activeArticle.cardTitle || activeArticle.title}
           </h3>
           <div className="mt-4 flex items-center justify-between border-t border-muted/20 pt-3">
             <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
@@ -369,6 +369,7 @@ function ResourcesPage() {
   const studioScrollRef = useRef<HTMLDivElement>(null);
   const audioScrollRef = useRef<HTMLDivElement>(null);
   const insightsScrollRef = useRef<HTMLDivElement>(null);
+  const articlesScrollRef = useRef<HTMLDivElement>(null);
 
   const scrollContainer = (ref: React.RefObject<HTMLDivElement | null>, dir: "left" | "right") => {
     if (ref.current) {
@@ -714,21 +715,42 @@ function ResourcesPage() {
               Latest Articles & Insights
             </h2>
           </div>
-          <V2Link
-            to="/articles"
-            className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline"
-          >
-            View all
-          </V2Link>
+          <div className="flex items-center gap-3">
+            <V2Link
+              to="/articles"
+              className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline"
+            >
+              View all
+            </V2Link>
+            <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+              <button
+                onClick={() => scrollContainer(articlesScrollRef, "left")}
+                className="grid h-8 w-8 place-items-center rounded-full bg-white/90 text-muted-foreground shadow-soft border border-white/80 transition hover:bg-white hover:text-foreground active:scale-95 cursor-pointer"
+                aria-label="Previous article"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => scrollContainer(articlesScrollRef, "right")}
+                className="grid h-8 w-8 place-items-center rounded-full bg-white/90 text-muted-foreground shadow-soft border border-white/80 transition hover:bg-white hover:text-foreground active:scale-95 cursor-pointer"
+                aria-label="Next article"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
 
         <MobileArticleDeck />
 
-        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div
+          ref={articlesScrollRef}
+          className="hidden sm:flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {ARTICLES.map((a) => (
             <article
               key={a.slug}
-              className="group relative flex flex-col overflow-hidden rounded-3xl bg-white/95 shadow-soft border border-white/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow"
+              className="group relative flex w-[300px] sm:w-[320px] shrink-0 snap-start flex-col overflow-hidden rounded-3xl bg-white/95 shadow-soft border border-white/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow"
             >
               <V2Link
                 to={`/articles/${a.slug}`}
@@ -756,7 +778,9 @@ function ResourcesPage() {
                     <Clock className="h-3.5 w-3.5" /> {a.time}
                   </span>
                 </div>
-                <h3 className="mt-3 text-base font-bold leading-snug tracking-tight">{a.title}</h3>
+                <h3 className="mt-3 text-base font-bold leading-snug tracking-tight">
+                  {a.cardTitle || a.title}
+                </h3>
                 <div className="mt-4 flex-1" />
                 <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
                   Read Article
