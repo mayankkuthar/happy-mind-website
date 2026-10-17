@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { format } from "date-fns";
 import {
   Search,
   ShieldCheck,
@@ -38,8 +39,20 @@ import {
   type GrowthCoach,
 } from "@/v2/data/growth-coaches";
 import { toast } from "sonner";
+import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
+import { payForHappiGuide, availFreeService } from "@/v2/lib/website-api";
+import { auth, useAuth } from "@/v2/lib/auth";
+import { checkAuthOrRedirect } from "@/v2/lib/auth-guard";
+import { useV2Navigate } from "@/v2/lib/router";
 
 export default GrowthCoachesPage;
+
+// Growth coaching is billed through the HappiGUIDE / SOLV payment endpoint.
+const GROWTH_COACH_PLAN_ID = 22;
+// Coach the visitor tried to book before being sent to login; resumed on return.
+const PENDING_COACH_KEY = "hm_pending_growth_coach";
+// Placeholder time sent to the payment API, which requires one.
+const GROWTH_COACH_TIME = "To be scheduled";
 
 const TRUST = [
   { icon: ShieldCheck, label: "ICF Certified Coaches Available" },
@@ -79,7 +92,24 @@ function GrowthCoachesPage() {
   // Booking & Payment State
   const [bookingCoach, setBookingCoach] = useState<GrowthCoach | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
+
+  const navigate = useV2Navigate();
+  const { authed, hydrated } = useAuth();
+
+  // Resume the booking the visitor started before logging in
+  useEffect(() => {
+    if (!hydrated || !authed) return;
+    let pendingId: string | null = null;
+    try {
+      pendingId = sessionStorage.getItem(PENDING_COACH_KEY);
+      sessionStorage.removeItem(PENDING_COACH_KEY);
+    } catch {
+      /* storage unavailable */
+    }
+    const coach = pendingId ? GROWTH_COACHES.find((c) => c.id === pendingId) : undefined;
+    if (coach) openBooking(coach);
+  }, [hydrated, authed]);
 
   const filtered = useMemo(() => {
     let list = GROWTH_COACHES.filter((c) => {
@@ -120,23 +150,90 @@ function GrowthCoachesPage() {
     setSortBy("Default");
   };
 
-  const handleRazorpayPayment = async () => {
+  function openBooking(coach: GrowthCoach) {
+    setBookingCoach(coach);
+  }
+
+  // Visitors must log in before booking; remember the coach so the dialog reopens after login.
+  const handleBookClick = (coach: GrowthCoach) => {
+    if (!auth.get()?.token) {
+      try {
+        sessionStorage.setItem(PENDING_COACH_KEY, coach.id);
+      } catch {
+        /* storage unavailable */
+      }
+      checkAuthOrRedirect(navigate, "/growth-coaches", "Please login");
+      return;
+    }
+    openBooking(coach);
+  };
+
+  const handleProceedToPayment = () => {
+    setBreakdownOpen(true);
+  };
+
+  const handleConfirmPayment = async (
+    couponId?: number,
+    discountedSubtotal?: number,
+    discountPercent?: number,
+  ) => {
+    if (!bookingCoach) return;
+    const token = auth.get()?.token;
+    if (!token) {
+      checkAuthOrRedirect(navigate, "/growth-coaches", "Please login");
+      return;
+    }
+
+    const effectiveAmount =
+      discountPercent && discountPercent > 0 && typeof discountedSubtotal === "number"
+        ? discountedSubtotal
+        : bookingCoach.feesForHM;
+    // No slot is picked for growth coaching; the team schedules the session after payment.
+    const dateStr = format(new Date(), "yyyy-MM-dd");
+
     setIsProcessing(true);
-    
-    // Simulate Razorpay SDK loading and payment processing delay
-    // In a real implementation, you would:
-    // 1. Fetch order_id from backend (/api/v1/payment-growth-coach)
-    // 2. Load Razorpay script (https://checkout.razorpay.com/v1/checkout.js)
-    // 3. Initialize Razorpay with order_id and handle the success callback
-    
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate successful payment callback
-      setPaymentSuccess(true);
-      toast.success("Payment successful! Your session is booked.");
-    } catch (error) {
-      toast.error("Payment failed. Please try again.");
+      if (discountPercent === 100) {
+        const freeRes = await availFreeService(
+          { plan_id: GROWTH_COACH_PLAN_ID, coupen_id: couponId ?? undefined },
+          token,
+        );
+        if (freeRes.status !== "success") {
+          throw new Error(freeRes.message || "Failed to process free booking.");
+        }
+        setBreakdownOpen(false);
+        setBookingCoach(null);
+        navigate({
+          to: "/checkout/success",
+          search: {
+            status: "success",
+            purchased: `Growth Coaching Session with ${bookingCoach.name}`,
+            plan: "Growth Coaching",
+            date: dateStr,
+          },
+        });
+        return;
+      }
+
+      const res = await payForHappiGuide(
+        {
+          plan_id: GROWTH_COACH_PLAN_ID,
+          amount: effectiveAmount,
+          date: dateStr,
+          time: GROWTH_COACH_TIME,
+          coupen_id: couponId ?? 0,
+        },
+        token,
+      );
+
+      if (!res?.link) {
+        throw new Error(res?.message || "Could not start payment. Please try again.");
+      }
+      toast.success("Redirecting to secure payment gateway…");
+      window.location.href = res.link;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Payment failed. Please try again.";
+      toast.error(message);
     } finally {
       setIsProcessing(false);
     }
@@ -289,7 +386,7 @@ function GrowthCoachesPage() {
               <CoachCard 
                 key={c.id} 
                 coach={c} 
-                onBook={() => setBookingCoach(c)} 
+                onBook={() => handleBookClick(c)}
               />
             ))}
           </div>
@@ -355,32 +452,10 @@ function GrowthCoachesPage() {
         onOpenChange={(open) => {
           if (!open && !isProcessing) {
             setBookingCoach(null);
-            // Reset success state after dialog closes animation
-            setTimeout(() => setPaymentSuccess(false), 300);
           }
         }}
       >
-        <DialogContent className="sm:max-w-md rounded-[2rem] p-0 overflow-hidden border-0 shadow-2xl">
-          {paymentSuccess ? (
-            <div className="p-8 text-center bg-white flex flex-col items-center animate-in fade-in zoom-in duration-300">
-              <div className="h-16 w-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-5">
-                <BadgeCheck className="h-8 w-8" strokeWidth={2.5} />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-2">Payment Successful!</h3>
-              <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-                Your session with <span className="font-semibold text-foreground">{bookingCoach?.name}</span> has been confirmed. Our team will reach out to you. Thanks
-              </p>
-              <Button 
-                className="w-full rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-soft"
-                onClick={() => {
-                  setBookingCoach(null);
-                  setTimeout(() => setPaymentSuccess(false), 300);
-                }}
-              >
-                Done
-              </Button>
-            </div>
-          ) : (
+        <DialogContent className="sm:max-w-md max-h-[92vh] overflow-y-auto rounded-[2rem] p-0 border-0 shadow-2xl">
             <div className="bg-white">
               <div className="p-6 pb-5 border-b border-border/50 bg-background/30">
                 <DialogTitle className="text-xl font-bold text-foreground">Complete Your Booking</DialogTitle>
@@ -399,7 +474,7 @@ function GrowthCoachesPage() {
                      {inr(bookingCoach?.feesForHM)}
                    </div>
                  </div>
-                 
+
                  <div className="rounded-xl bg-amber-50/80 p-3 border border-amber-100">
                    <div className="text-[11px] text-amber-800/80 leading-relaxed text-center font-medium">
                      By proceeding, you agree to our booking terms and conditions.
@@ -408,7 +483,7 @@ function GrowthCoachesPage() {
                  
                  <Button 
                    className="w-full h-12 rounded-full bg-gradient-brand text-white font-bold text-base mt-2 shadow-glow transition-all duration-300 hover:brightness-110"
-                   onClick={handleRazorpayPayment}
+                   onClick={handleProceedToPayment}
                    disabled={isProcessing}
                  >
                    {isProcessing ? (
@@ -417,7 +492,7 @@ function GrowthCoachesPage() {
                        Connecting to Razorpay...
                      </span>
                    ) : (
-                     "Pay with Razorpay"
+                     "Proceed to Payment"
                    )}
                  </Button>
                  
@@ -427,9 +502,21 @@ function GrowthCoachesPage() {
                  </div>
               </div>
             </div>
-          )}
         </DialogContent>
       </Dialog>
+
+      {bookingCoach && (
+        <PaymentBreakdownModal
+          open={breakdownOpen}
+          onOpenChange={setBreakdownOpen}
+          itemName={`Growth Coaching - Session with ${bookingCoach.name}`}
+          itemDescription="Growth Coaching Session (60 min)"
+          basePrice={bookingCoach.feesForHM}
+          planId={GROWTH_COACH_PLAN_ID}
+          onConfirmPayment={handleConfirmPayment}
+          isLoading={isProcessing}
+        />
+      )}
     </DashboardShell>
   );
 }
