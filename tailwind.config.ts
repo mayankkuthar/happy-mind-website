@@ -201,6 +201,49 @@ export default {
 				'50%': {
 					boxShadow: '0 0 12px 2px hsl(320 85% 62% / 0.55)'
 				}
+			},
+			'letter-drop': {
+				'0%': {
+					opacity: '0',
+					transform: 'translateY(-120%) scale(0.6)'
+				},
+				'60%': {
+					opacity: '1',
+					transform: 'translateY(12%) scale(1.08)'
+				},
+				'100%': {
+					opacity: '1',
+					transform: 'translateY(0) scale(1)'
+				}
+			},
+			'word-flash': {
+				'0%': {
+					opacity: '0',
+					transform: 'scale(0.7)'
+				},
+				'20%, 70%': {
+					opacity: '1',
+					transform: 'scale(1)'
+				},
+				'100%': {
+					opacity: '0',
+					transform: 'translateY(-40%) scale(1.15)',
+					filter: 'blur(4px)'
+				}
+			},
+			'letter-hop': {
+				'0%, 50%, 100%': {
+					transform: 'translateY(0)'
+				},
+				'15%': {
+					transform: 'translateY(-55%)'
+				},
+				'30%': {
+					transform: 'translateY(0) scaleY(0.85)'
+				},
+				'38%': {
+					transform: 'translateY(-12%)'
+				}
 			}
 		},
 		animation: {
@@ -216,7 +259,10 @@ export default {
 			'mist-pulse': 'mist-pulse 4s ease-in-out infinite',
 			'scroll-left': 'scroll-left 20s linear infinite',
 			'badge-shine': 'badge-shine 2.8s ease-in-out infinite',
-			'badge-glow': 'badge-glow 2.4s ease-in-out infinite'
+			'badge-glow': 'badge-glow 2.4s ease-in-out infinite',
+			'letter-drop': 'letter-drop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+			'letter-hop': 'letter-hop 2s ease-in-out infinite',
+			'word-flash': 'word-flash 650ms ease-in-out both'
 		},
   		boxShadow: {
   			'2xs': 'var(--shadow-2xs)',

@@ -77,7 +77,7 @@ export function Footer() {
                 to="/games"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Games
+                HappiPAUSE
               </V2Link>
             </li>
             <li>

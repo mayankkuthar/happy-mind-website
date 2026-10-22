@@ -3,6 +3,64 @@ import { ArrowLeft, Gamepad2, Clock, Sparkles, BookOpen, CircleHelp, LayoutDashb
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
 import { Button } from "@/v2/components/ui/button";
 import gamesHeroImg from "@/v2/assets/games-mascot.png";
+import { useEffect, useState } from "react";
+
+// Words that flash in and vanish one after another before the wordmark lands.
+const INTRO_WORDS = ["Joy", "Games", "Fun", "Play", "Smile", "Relax", "Calm"];
+const INTRO_WORD_MS = 650;
+
+function HappiPauseIntro() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (index >= INTRO_WORDS.length) return;
+    const timer = setTimeout(() => setIndex((i) => i + 1), INTRO_WORD_MS);
+    return () => clearTimeout(timer);
+  }, [index]);
+
+  if (index >= INTRO_WORDS.length) return <HappiPauseWordmark />;
+
+  const word = INTRO_WORDS[index];
+  return (
+    <span aria-label="HappiPAUSE" className="inline-flex text-lavender-deep">
+      <span
+        key={word}
+        aria-hidden="true"
+        className="inline-flex animate-word-flash"
+        style={{ animationDuration: `${INTRO_WORD_MS}ms` }}
+      >
+        {word.split("").map((letter, i) => (
+          <span key={i} className="inline-block animate-letter-drop" style={{ animationDelay: `${i * 40}ms` }}>
+            {letter}
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+}
+
+// Letters drop in one by one, then take turns hopping in a wave.
+function HappiPauseWordmark() {
+  return (
+    <span aria-label="HappiPAUSE" className="inline-flex text-lavender-deep">
+      {"HappiPAUSE".split("").map((letter, i) => (
+        <span
+          key={i}
+          aria-hidden="true"
+          className="inline-block animate-letter-drop"
+          style={{ animationDelay: `${i * 70}ms` }}
+        >
+          <span
+            className="inline-block animate-letter-hop origin-bottom"
+            style={{ animationDelay: `${700 + i * 80}ms` }}
+          >
+            {letter}
+          </span>
+        </span>
+      ))}
+    </span>
+  );
+}
 
 export default GamesPage;
 
@@ -35,7 +93,7 @@ function GamesPage() {
     <DashboardShell
       header={
         <TopHeaderBar
-          title="Games & Activities"
+          title={<HappiPauseIntro />}
           emoji=""
           subtitle="Playful experiences designed to help you recharge and refocus."
         />
@@ -48,7 +106,7 @@ function GamesPage() {
         {/* Mascot sitting cleanly on bottom-right edge */}
         <img
           src={gamesHeroImg}
-          alt="HappiMynd Mindful Games Mascot"
+          alt="HappiMynd HappiPAUSE Mascot"
           className="pointer-events-none absolute bottom-0 right-6 hidden h-auto w-[170px] max-h-[92%] object-contain object-bottom md:block xl:right-12 xl:w-[210px]"
         />
 
@@ -63,7 +121,7 @@ function GamesPage() {
 
           <div className="space-y-3">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Mindful Games Are on the Way
+              HappiPAUSE Is on the Way
             </h2>
             <p className="text-base text-foreground/70 sm:text-lg">
               We're building a collection of playful, calming activities that help you relax, reset,

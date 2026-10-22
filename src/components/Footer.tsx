@@ -90,7 +90,7 @@ const Footer = () => {
                   to="/v2/games"
                   className="hover:text-primary transition-colors"
                 >
-                  Games
+                  HappiPAUSE
                 </Link>
               </li>
               <li>

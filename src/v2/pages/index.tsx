@@ -320,7 +320,7 @@ const quickActions = [
     to: "/services",
   },
   {
-    title: "Games",
+    title: "HappiPAUSE",
     desc: "Relax, reset, and recharge with mindful games and activities.",
     cta: "Play & Explore",
     icon: Gamepad2,

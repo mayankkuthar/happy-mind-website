@@ -37,7 +37,7 @@ const navItems: NavItem[] = [
   { icon: Puzzle, label: "Quizzard", key: "quizzard", to: "/quizzard", isNew: true },
   { icon: BookOpen, label: "Resources", key: "resources", to: "/resources" },
   { icon: Sparkles, label: "Services", key: "services", to: "/services" },
-  { icon: Gamepad2, label: "Games", key: "games", to: "/games", isNew: true },
+  { icon: Gamepad2, label: "HappiPAUSE", key: "games", to: "/games", isNew: true },
   { icon: TrendingUp, label: "Growth Coaches", key: "growth-coaches", to: "/growth-coaches" },
 ];
 
@@ -277,7 +277,7 @@ export function TopHeaderBar({
   status: explicitStatus,
   onStatusClick,
 }: {
-  title?: string;
+  title?: ReactNode;
   subtitle?: ReactNode;
   emoji?: string;
   /** Drives the coloured status pill in the header. */
@@ -353,7 +353,7 @@ export function TopHeaderBar({
         <div className="min-w-0 border-l border-border/40 pl-2 sm:pl-4">
           <div className="flex items-center gap-1.5 sm:gap-2">
             {title ? (
-              <h1 className="text-sm sm:text-xl md:text-2xl font-bold tracking-tight text-foreground leading-tight truncate max-w-[130px] xs:max-w-[190px] sm:max-w-none sm:whitespace-normal sm:break-words">
+              <h1 className={`text-sm sm:text-xl md:text-2xl font-bold tracking-tight text-foreground leading-tight truncate max-w-[130px] xs:max-w-[190px] sm:max-w-none sm:whitespace-normal sm:break-words ${typeof title === "string" ? "" : "overflow-visible"}`}>
                 {title}
               </h1>
             ) : (
