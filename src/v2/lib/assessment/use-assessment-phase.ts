@@ -51,7 +51,8 @@ export function useAssessmentPhase(): AssessmentPhaseData {
   // call site instead of firing a fresh network request each time.
   const startQuery = useQuery({
     queryKey: ["assessment", "current-page"],
-    queryFn: startAssessment,
+    // Status read only: never ask for a new attempt from here
+    queryFn: () => startAssessment(),
     staleTime: 1000 * 30, // 30 seconds
     retry: 1,
     enabled: !!token,

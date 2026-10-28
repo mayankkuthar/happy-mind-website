@@ -42,6 +42,9 @@ function AssessmentPage() {
   useProtectedRoute("Please log in to take the assessment.");
   const [appState, setAppState] = useState<AppState>("checking");
   const [hasCompletedBefore, setHasCompletedBefore] = useState(false);
+  // Set by "Retake": the server only opens a new attempt after a finished one
+  // when start-assessment is explicitly asked for it
+  const [retakeRequested, setRetakeRequested] = useState(false);
   const queryClient = useQueryClient();
 
   // ── checkifany on mount ──────────────────────────────────────────────────
@@ -120,6 +123,7 @@ function AssessmentPage() {
     queryClient.removeQueries({ queryKey: ["assessment", "current-page"] });
     queryClient.removeQueries({ queryKey: ["assessment", "all-reports"] });
     await queryClient.invalidateQueries({ queryKey: ["assessment"] });
+    setRetakeRequested(true);
     setAppState("in-progress");
   };
 
@@ -154,8 +158,12 @@ function AssessmentPage() {
 
       {appState === "in-progress" && (
         <InProgressFlow
+          newAttempt={retakeRequested}
           onMaxAttempts={() => setAppState("max-attempts")}
-          onComplete={() => setAppState("completing")}
+          onComplete={() => {
+            setRetakeRequested(false);
+            setAppState("completing");
+          }}
         />
       )}
 
@@ -363,13 +371,28 @@ function IntroModal({
 // ---------------------------------------------------------------------------
 
 function InProgressFlow({
+  newAttempt = false,
   onMaxAttempts,
   onComplete,
 }: {
+  newAttempt?: boolean;
   onMaxAttempts: () => void;
   onComplete: () => void;
 }) {
   const queryClient = useQueryClient();
+
+  // Ask for a new attempt only until the server has opened one (it replies
+  // with an overview); later refetches must just resume, or a refetch after
+  // the last answer would open yet another attempt.
+  const newAttemptRef = useRef(newAttempt);
+  const fetchCurrentPage = async () => {
+    const res = await startAssessment({ newAttempt: newAttemptRef.current });
+    if (res?.overview) newAttemptRef.current = false;
+    return res;
+  };
+
+  // Set when save-option reports the attempt as finished
+  const attemptCompletedRef = useRef(false);
 
   // ── Persistent selections (survive page refresh / tab close) ─────────────
   // Cache key is scoped to the logged-in user so different accounts don't share state
@@ -404,7 +427,7 @@ function InProgressFlow({
     refetch,
   } = useQuery({
     queryKey: ["assessment", "current-page"],
-    queryFn: startAssessment,
+    queryFn: fetchCurrentPage,
     refetchOnWindowFocus: false,
     staleTime: 0,
     retry: 1,
@@ -534,6 +557,7 @@ function InProgressFlow({
       // This avoids the jarring experience of the assessment auto-submitting
       // the instant they select the last option.
       if (data?.message === "completed") {
+        attemptCompletedRef.current = true;
         toast.success("All questions answered — click Submit to finish.");
       }
     },
@@ -610,6 +634,14 @@ function InProgressFlow({
           ?.scrollIntoView({ behavior: "smooth", block: "center" });
       }
       toast.error("Please answer every question on this page before continuing.");
+      return;
+    }
+
+    // The server already marked the attempt finished: go straight to the
+    // completion step rather than asking for another page
+    if (attemptCompletedRef.current) {
+      try { localStorage.removeItem(cacheKey); } catch { /* ignore */ }
+      onComplete();
       return;
     }
 

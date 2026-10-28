@@ -62,6 +62,8 @@ export interface StartAssessmentResponse {
   max_attempts_reached?: boolean;
   /** Present when user completed within the last minute — server blocks new attempts temporarily */
   recently_completed?: boolean;
+  /** The latest attempt is finished and no new attempt was requested */
+  completed?: boolean;
   message?: string;
   status?: string | number;
   /** Questions for the current page */

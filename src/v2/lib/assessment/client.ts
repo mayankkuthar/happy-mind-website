@@ -33,6 +33,8 @@ const BASE_URL = ((import.meta.env.VITE_HAPPILIFE_API_URL as string | undefined)
  * @returns     — parsed JSON response body as T
  * @throws ApiError on non-2xx HTTP status
  */
+const RATE_LIMIT_RETRIES = 2;
+
 export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   const token = auth.get()?.token;
 
@@ -45,11 +47,24 @@ export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetchWithCsrf(BASE_URL, path, {
-    method: "POST",
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  const send = () =>
+    fetchWithCsrf(BASE_URL, path, {
+      method: "POST",
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+
+  // The API rate-limits each user (429 "Too Many Attempts."). A throttled
+  // request was rejected before doing anything, so wait as long as the server
+  // asks and send it again instead of failing the save.
+  let response = await send();
+  for (let attempt = 0; response.status === 429 && attempt < RATE_LIMIT_RETRIES; attempt++) {
+    const retryAfter = Number(response.headers.get("Retry-After"));
+    // Retry-After isn't readable cross-origin unless the API exposes it
+    const waitSec = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter, 60) : 15;
+    await new Promise((resolve) => setTimeout(resolve, waitSec * 1000 + 500));
+    response = await send();
+  }
 
   // Parse JSON regardless of status so we can surface the API's error message
   let json: unknown;

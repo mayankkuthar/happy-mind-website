@@ -32,9 +32,16 @@ export function checkIfAny(): Promise<CheckIfAnyResponse> {
 // 2. start-assessment — start or resume; returns paginated questions
 //    platform: "mobile" is required per the API spec
 // ---------------------------------------------------------------------------
-export function startAssessment(): Promise<StartAssessmentResponse> {
+//    Once an attempt is finished the server only opens a new one when
+//    new_attempt is sent (the Retake button); otherwise it replies with
+//    completed: true and no questions. Status checks must never send it.
+// ---------------------------------------------------------------------------
+export function startAssessment(
+  options: { newAttempt?: boolean } = {},
+): Promise<StartAssessmentResponse> {
   return apiPost<StartAssessmentResponse>("/api/v1/start-assessment", {
     platform: "mobile",
+    ...(options.newAttempt === true ? { new_attempt: true } : {}),
   });
 }
 
