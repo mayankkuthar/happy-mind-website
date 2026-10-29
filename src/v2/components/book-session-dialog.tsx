@@ -40,7 +40,6 @@ import { type Psychologist } from "@/v2/data/psychologists";
 import {
   payForHappiTalk,
   payForHappiGuide,
-  availFreeService,
   availHappiTalkUser,
   availHappiGuideUser,
 } from "@/v2/lib/website-api";
@@ -436,10 +435,29 @@ export function BookSessionDialog({
       let res: { link: string } | null = null;
 
       if (discountPercent === 100 && token) {
-        const freeRes = await availFreeService(
-          { plan_id: breakdownData.planId, coupen_id: couponId ?? undefined },
-          token,
-        );
+        // Book the chosen slot straight away (as the app does); only
+        // activating the plan left the user without a session
+        const freeRes = breakdownData.isHappiTalk && breakdownData.psychologistId
+          ? await availHappiTalkUser(
+              {
+                psychologist_id: breakdownData.psychologistId,
+                date: breakdownData.dateStr,
+                time: breakdownData.timeStr,
+                session: 1,
+                user_recording_permission: 1,
+                coupen_id: couponId ?? 0,
+              },
+              token,
+            )
+          : await availHappiGuideUser(
+              {
+                plan_id: breakdownData.planId,
+                date: breakdownData.dateStr,
+                time: breakdownData.timeStr,
+                coupen_id: couponId ?? 0,
+              },
+              token,
+            );
         if (freeRes.status === "success") {
           toast.success(`Booking Confirmed for ${activeService.name} with 100% Promo Discount!`);
           setBreakdownOpen(false);

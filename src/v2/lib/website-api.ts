@@ -318,6 +318,7 @@ export type AvailHappiGuideUserPayload = {
   plan_id: number;
   date: string;
   time: string;
+  coupen_id?: number;
 };
 
 export type AvailHappiGuideUserResponse = {
@@ -629,6 +630,7 @@ export async function availHappiGuideUser(
     plan_id: payload.plan_id,
     date: payload.date,
     time: payload.time,
+    coupen_id: payload.coupen_id ?? 0,
   }, token);
   return raw as AvailHappiGuideUserResponse;
 }
