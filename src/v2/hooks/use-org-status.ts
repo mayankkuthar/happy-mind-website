@@ -28,12 +28,24 @@ export type OrgStatus = {
   hasSolv: boolean;
   /** Convenience: plan ID 6 (HappiTALK) is in orgPlanIds */
   hasHappiTalk: boolean;
+  /** SOLV is pre-paid: covered by the org or sessions left from a bundle */
+  solvCovered: boolean;
+  /** HappiTALK is pre-paid: covered by the org or sessions left from a bundle */
+  happiTalkCovered: boolean;
   /** Still fetching from /subscribed-services */
   loading: boolean;
 };
 
 function makeFallback(): OrgStatus {
-  return { isOrgUser: false, orgPlanIds: [], hasSolv: false, hasHappiTalk: false, loading: false };
+  return {
+    isOrgUser: false,
+    orgPlanIds: [],
+    hasSolv: false,
+    hasHappiTalk: false,
+    solvCovered: false,
+    happiTalkCovered: false,
+    loading: false,
+  };
 }
 
 /** No-op export for backward compatibility if any file calls clearOrgStatusCache */
@@ -75,12 +87,18 @@ export function useOrgStatus(): OrgStatus {
         const hasHappiTalk = orgPlanIds.includes(ORG_PLAN_IDS.HAPPITALK);
         // SOLV is strictly Plan ID 22. Only free if Plan 22 is in organization_plan_ids.
         const hasSolv = orgPlanIds.includes(ORG_PLAN_IDS.SOLV);
+        // Bundles grant SOLV / HappiTALK sessions too (same as the app)
+        const sessionsLeft = (res as any)?.sessions_left ?? {};
+        const solvCredits = Number(sessionsLeft.solv_sessions_left) || 0;
+        const happiTalkCredits = Number(sessionsLeft.happitalk_sessions_left) || 0;
 
         const result: OrgStatus = {
           isOrgUser: orgPlanIds.length > 0,
           orgPlanIds,
           hasSolv,
           hasHappiTalk,
+          solvCovered: hasSolv || solvCredits > 0,
+          happiTalkCovered: hasHappiTalk || happiTalkCredits > 0,
           loading: false,
         };
 
@@ -113,6 +131,8 @@ export function useOrgStatus(): OrgStatus {
       orgPlanIds: [],
       hasSolv: false,
       hasHappiTalk: false,
+      solvCovered: false,
+      happiTalkCovered: false,
       loading: isLoading,
     }
   );

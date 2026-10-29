@@ -232,7 +232,7 @@ function getAvailabilityDetails(p: Psychologist) {
 function ExpertsPage() {
   const navigate = useV2Navigate();
   const { user } = useAuth();
-  const { isOrgUser, orgPlanIds, hasHappiTalk, loading: orgLoading } = useOrgStatus();
+  const { isOrgUser, orgPlanIds, hasHappiTalk, happiTalkCovered, loading: orgLoading } = useOrgStatus();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("All");
   const [concern, setConcern] = useState<string>("All");
@@ -249,19 +249,20 @@ function ExpertsPage() {
   const [apiError, setApiError] = useState<string | null>(null);
 
   // Re-fetch whenever filters, auth token, or org status change.
-  // The backend /api/v1/website/psychologists endpoint returns all 66 psychologists
-  // ONLY when called without an individual user token (public). If an individual token is passed,
-  // the backend filters down to 45 consumer-eligible psychologists.
+  // /api/v1/website/psychologists returns the full panel, or only the
+  // organisation's panel when called with the token of a user whose
+  // organisation pays for HappiTALK.
   const userToken = user?.token || auth.get()?.token;
   const effectiveIsOrg = isOrgUser || orgDetail?.user_from === "organization";
-  const isHappiTalkCovered = Boolean(effectiveIsOrg && hasHappiTalk);
+  // Bundle users with HappiTALK sessions left book like org users: no expert panel
+  const isHappiTalkCovered = Boolean((effectiveIsOrg && hasHappiTalk) || happiTalkCovered);
 
   // If the user's organization covers HappiTALK, their corporate bookings use psychologist ID 301 from dashboard.
   // Only redirect if HappiTALK IS covered by their organisation.
   // If HappiTALK is NOT covered, they can browse /experts to choose their psychologist and pay individually.
   useEffect(() => {
     if (isHappiTalkCovered && !orgLoading) {
-      toast.info("Your organisation plan covers HappiTALK sessions directly from your dashboard.");
+      toast.info("Your plan covers HappiTALK sessions. Book them directly from your dashboard.");
       navigate({ to: "/" });
     }
   }, [isHappiTalkCovered, orgLoading, navigate]);

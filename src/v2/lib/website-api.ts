@@ -200,6 +200,11 @@ export type SubscribedServicesResponse = {
   user_id?: number;
   subscribed_plan_ids?: number[];
   organization_plan_ids?: number[];
+  sessions_left?: {
+    happitalk_sessions_left?: number;
+    solv_sessions_left?: number;
+    [key: string]: unknown;
+  };
 };
 
 // Other Services

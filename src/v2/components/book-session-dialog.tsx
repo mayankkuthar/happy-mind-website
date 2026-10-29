@@ -103,24 +103,23 @@ export function BookSessionDialog({
 }) {
   const navigate = useV2Navigate();
   const { profile, loading: profileLoading } = useUserProfile();
-  const { isOrgUser, hasSolv, hasHappiTalk } = useOrgStatus();
+  const { isOrgUser, solvCovered, happiTalkCovered } = useOrgStatus();
 
   // Default to the provided service key, falling back to SOLV
   const [selectedServiceKey, setSelectedServiceKey] = useState<string>(
     service?.key?.toLowerCase() === "happitalk" ? "happitalk" : "solv"
   );
 
-  // Checks strictly if the selected service is covered in the organization's plan IDs
-  // HappiTALK: Plan 6 (hasHappiTalk) | SOLV: Plan 22 (hasSolv)
+  // Pre-paid when the organisation covers the service (HappiTALK: Plan 6,
+  // SOLV: Plan 22) or the user has sessions left from a bundle
   const isServiceCoveredByOrg = useMemo(() => {
-    if (!isOrgUser) return false;
     if (selectedServiceKey === "happitalk") {
-      return Boolean(hasHappiTalk);
+      return Boolean(happiTalkCovered);
     } else if (selectedServiceKey === "solv") {
-      return Boolean(hasSolv);
+      return Boolean(solvCovered);
     }
     return false;
-  }, [isOrgUser, selectedServiceKey, hasSolv, hasHappiTalk]);
+  }, [selectedServiceKey, solvCovered, happiTalkCovered]);
 
   const [step, setStep] = useState<FlowStep>(service?.initialStep || "form");
 

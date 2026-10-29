@@ -506,7 +506,7 @@ const GROWTH_PACKAGE_IDS = new Set([17, 18, 19, 20, 21, 22]);
 function SharedPricingPage() {
   const navigate = useV2Navigate();
   const { slug } = useParams();
-  const { isOrgUser, hasSolv, hasHappiTalk } = useOrgStatus();
+  const { isOrgUser, hasSolv, hasHappiTalk, solvCovered, happiTalkCovered } = useOrgStatus();
   const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
 
   const faqs = useMemo(() => {
@@ -868,7 +868,7 @@ function SharedPricingPage() {
             },
           ].map((s) => {
             const Icon = s.icon;
-            const isCoveredByOrg = isOrgUser && (s.key === "solv" ? hasSolv : hasHappiTalk);
+            const isCoveredByOrg = s.key === "solv" ? solvCovered : happiTalkCovered;
             return (
               <div key={s.key} className="flex flex-col rounded-3xl bg-white p-6 shadow-soft">
                 <div className="flex items-start gap-4">
