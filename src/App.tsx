@@ -14,6 +14,7 @@ import FloatingContactButton from "./components/FloatingContactButton";
 import ScrollToTop from "./components/ScrollToTop";
 import MascotIntro from "./components/MascotIntro";
 import WelcomeAudio from "./components/WelcomeAudio";
+import CookieConsent from "./components/CookieConsent";
 
 import { Toaster as V2Sonner } from "@/v2/components/ui/sonner";
 import { ContactUsWidget } from "@/v2/components/contact-us-widget";
@@ -70,6 +71,7 @@ const App = () => (
     <TooltipProvider>
       <BrowserRouter>
         <GlobalChrome />
+        <CookieConsent />
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
