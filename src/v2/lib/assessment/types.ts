@@ -40,6 +40,55 @@ export interface AssessmentOverview {
   current_page: number;
   /** last_page is NOT returned by API — calculate as Math.ceil(total / perPage) */
   last_page?: number;
+  // ── Resume context (newer backends only — treat as optional) ──
+  assessment_id?: number;
+  progress_percent?: number;
+  remaining?: number;
+  /** Number of the first question on this page (answered + 1) */
+  next_question_number?: number;
+  started_at?: string | null;
+  last_answered_at?: string | null;
+  /** True when this attempt already had saved answers */
+  is_resumed?: boolean;
+}
+
+/** Progress of the user's unfinished attempt (from happilife-progress) */
+export interface HappiLifeProgress {
+  assessment_id: number;
+  answered: number;
+  total: number;
+  percent: number;
+  remaining: number;
+  started_at: string | null;
+  last_answered_at: string | null;
+  last_activity_at: string | null;
+  completed: boolean;
+}
+
+/** GET|POST /api/v1/happilife-progress — read-only, never opens an attempt */
+export interface HappiLifeProgressResponse {
+  status?: string;
+  in_progress: boolean;
+  completed_count: number;
+  max_attempts: number;
+  max_attempts_reached: boolean;
+  progress: HappiLifeProgress | null;
+  last_reminder_at?: string | null;
+}
+
+/** "3 days ago" style label for a saved-progress timestamp */
+export function timeAgo(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const then = new Date(iso).getTime();
+  if (!Number.isFinite(then)) return null;
+  const mins = Math.max(0, Math.round((Date.now() - then) / 60_000));
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.round(hours / 24);
+  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
+  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
 // ---------------------------------------------------------------------------

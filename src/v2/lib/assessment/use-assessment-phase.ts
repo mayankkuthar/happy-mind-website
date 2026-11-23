@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { startAssessment, checkIfAny, assessmentStatus, getAllReports } from "./api";
+import { startAssessment, checkIfAny, assessmentStatus, getAllReports, getProgress } from "./api";
 import { auth } from "@/v2/lib/auth";
+import type { HappiLifeProgress } from "./types";
 
 export type AssessmentPhase = "not-started" | "in-progress" | "completed";
 
@@ -19,6 +20,12 @@ export interface AssessmentPhaseData {
    * are allowed.
    */
   hasAnyCompletedReport: boolean;
+  /**
+   * The unfinished attempt with at least one saved answer, if any — also set
+   * when an earlier attempt was completed and a retake is part-way through.
+   * Progress is stored on the server, so it's the same on website and app.
+   */
+  unfinished: HappiLifeProgress | null;
   /** True once the backend's own attempt cap (currently 6) has been hit */
   maxAttemptsReached: boolean;
   isLoading: boolean;
@@ -39,23 +46,31 @@ export function useAssessmentPhase(): AssessmentPhaseData {
     refetchOnWindowFocus: false,
   });
 
-  // Query 2: Start / resume assessment to get total and answered question counts.
-  // IMPORTANT: this shares the exact same query key ("assessment","current-page")
-  // as the actual in-progress assessment flow (see assessment.tsx InProgressFlow).
-  // start-assessment is a "start OR resume" endpoint with server-side page
-  // tracking and no client-supplied cursor, so calling it independently from
-  // every page that renders the header (15+ pages via TopHeaderBar) was firing
-  // a background "resume" call on every navigation — which could shift the
-  // server's notion of "current page" out from under an active attempt.
-  // Sharing the query key means React Query dedupes/caches this across every
-  // call site instead of firing a fresh network request each time.
+  // Query 2: Read-only progress of the unfinished attempt. This replaces the
+  // old trick of calling start-assessment from every page that renders the
+  // header — start-assessment is "start OR resume", so that call could open
+  // an attempt just by visiting the dashboard.
+  const progressQuery = useQuery({
+    queryKey: ["assessment", "progress"],
+    queryFn: getProgress,
+    staleTime: 1000 * 30,
+    // A failure here almost always means an older backend without the
+    // endpoint; fall back to start-assessment below instead of retrying.
+    retry: false,
+    enabled: !!token,
+    refetchOnWindowFocus: false,
+  });
+
+  // Fallback for backends without happilife-progress. Shares the exact query
+  // key with the in-progress flow (assessment.tsx InProgressFlow) so React
+  // Query dedupes it instead of firing a fresh "resume" call per page.
   const startQuery = useQuery({
     queryKey: ["assessment", "current-page"],
     // Status read only: never ask for a new attempt from here
     queryFn: () => startAssessment(),
     staleTime: 1000 * 30, // 30 seconds
     retry: 1,
-    enabled: !!token,
+    enabled: !!token && progressQuery.isError,
     refetchOnWindowFocus: false,
   });
 
@@ -79,9 +94,13 @@ export function useAssessmentPhase(): AssessmentPhaseData {
     refetchOnWindowFocus: false,
   });
 
-  const isLoading = checkQuery.isLoading || startQuery.isLoading || statusQuery.isLoading;
-  const isError = checkQuery.isError && startQuery.isError;
-  
+  const usingFallback = progressQuery.isError;
+  const isLoading =
+    checkQuery.isLoading ||
+    statusQuery.isLoading ||
+    (usingFallback ? startQuery.isLoading : progressQuery.isLoading);
+  const isError = checkQuery.isError && (usingFallback ? startQuery.isError : progressQuery.isError);
+
   const checkMessage = checkQuery.data?.message ?? checkQuery.data?.data;
   const reportsRaw = reportsQuery.data as { data?: unknown } | undefined;
   const reportsListLength =
@@ -94,36 +113,53 @@ export function useAssessmentPhase(): AssessmentPhaseData {
   const hasCompletedBefore =
     checkMessage === "Yes" || statusQuery.data?.completed === true;
   const hasAnyCompletedReport =
-    reportsListLength > 0 || hasCompletedBefore;
+    reportsListLength > 0 || hasCompletedBefore ||
+    (progressQuery.data?.completed_count ?? 0) > 0;
 
-  const maxAttemptsReached = Boolean(startQuery.data?.max_attempts_reached);
-  const overview = startQuery.data?.overview; // top-level, not under 'data'
-  const answered = overview?.answered ?? 0;
-  const total = overview?.total ?? 0;
-  const lastPage = overview ? Math.ceil(total / Math.max(overview.perPage, 1)) : 1;
+  // ── Unfinished attempt, from whichever source answered ──────────────────
+  let attempt: HappiLifeProgress | null = null;
+  if (!usingFallback) {
+    attempt = progressQuery.data?.in_progress ? progressQuery.data.progress : null;
+  } else {
+    const overview = startQuery.data?.overview; // top-level, not under 'data'
+    if (overview && overview.total > 0 && overview.answered < overview.total) {
+      attempt = {
+        assessment_id: overview.assessment_id ?? 0,
+        answered: overview.answered,
+        total: overview.total,
+        percent: overview.progress_percent ??
+          Math.min(99, Math.floor((overview.answered / overview.total) * 100)),
+        remaining: overview.remaining ?? overview.total - overview.answered,
+        started_at: overview.started_at ?? null,
+        last_answered_at: overview.last_answered_at ?? null,
+        last_activity_at: overview.last_answered_at ?? overview.started_at ?? null,
+        completed: false,
+      };
+    }
+  }
+  const unfinished = attempt && attempt.answered > 0 ? attempt : null;
+
+  const maxAttemptsReached = usingFallback
+    ? Boolean(startQuery.data?.max_attempts_reached || startQuery.data?.status === "true")
+    : Boolean(progressQuery.data?.max_attempts_reached);
+  const answered = attempt?.answered ?? 0;
+  const total = attempt?.total ?? 0;
 
   let phase: AssessmentPhase = "not-started";
   let progressPercent = 0;
 
-  if (hasAnyCompletedReport || maxAttemptsReached || (answered >= total && total > 0)) {
+  if (hasAnyCompletedReport || maxAttemptsReached) {
     phase = "completed";
     progressPercent = 100;
-  } else if (overview) {
-    if (answered > 0 && answered < total) {
-      phase = "in-progress";
-      progressPercent = Math.min(99, Math.max(1, Math.round((answered / total) * 100)));
-    } else {
-      phase = "not-started";
-      progressPercent = 0;
-    }
-  } else if (hasCompletedBefore) {
-    phase = "completed";
-    progressPercent = 100;
+  } else if (unfinished) {
+    phase = "in-progress";
+    progressPercent = Math.min(99, Math.max(1, unfinished.percent));
   }
 
   const refetch = () => {
     checkQuery.refetch();
-    startQuery.refetch();
+    if (usingFallback) startQuery.refetch();
+    else progressQuery.refetch();
     statusQuery.refetch();
     reportsQuery.refetch();
   };
@@ -135,6 +171,7 @@ export function useAssessmentPhase(): AssessmentPhaseData {
     total,
     hasCompletedBefore,
     hasAnyCompletedReport,
+    unfinished,
     maxAttemptsReached,
     isLoading,
     isError,

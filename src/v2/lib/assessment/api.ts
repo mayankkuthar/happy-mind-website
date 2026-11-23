@@ -19,7 +19,17 @@ import type {
   AssessmentStatusResponse,
   UpdateLastAnswerRequest,
   UpdateLastAnswerResponse,
+  HappiLifeProgressResponse,
 } from "./types";
+
+// ---------------------------------------------------------------------------
+// 0. happilife-progress — read-only progress of the unfinished attempt
+//    (answered / total / percent / last saved). Safe to call from any page:
+//    unlike start-assessment it never opens an attempt or changes data.
+// ---------------------------------------------------------------------------
+export function getProgress(): Promise<HappiLifeProgressResponse> {
+  return apiPost<HappiLifeProgressResponse>("/api/v1/happilife-progress");
+}
 
 // ---------------------------------------------------------------------------
 // 1. checkifany — has the user completed at least one assessment?

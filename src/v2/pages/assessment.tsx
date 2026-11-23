@@ -16,8 +16,9 @@ import {
   getReport,
   getAllReports,
   useAssessmentPhase,
+  timeAgo,
 } from "@/v2/lib/assessment";
-import type { Question, AssessmentOverview, ReportItem, ApiError } from "@/v2/lib/assessment";
+import type { Question, AssessmentOverview, ReportItem, ApiError, HappiLifeProgress } from "@/v2/lib/assessment";
 import { fetchSubscribedServices } from "@/v2/lib/website-api";
 import { useAuth } from "@/v2/lib/auth";
 import { CouponPurchaseDialog } from "@/v2/components/coupon-purchase-dialog";
@@ -171,7 +172,15 @@ function AssessmentPage() {
         <CompletingScreen onDone={() => setAppState("report")} />
       )}
 
-      {appState === "report" && <ReportScreen onRetake={handleRetake} />}
+      {appState === "report" && (
+        <ReportScreen
+          onRetake={handleRetake}
+          onResume={() => {
+            setRetakeRequested(false);
+            setAppState("in-progress");
+          }}
+        />
+      )}
 
       {appState === "max-attempts" && <MaxAttemptsScreen />}
     </DashboardShell>
@@ -216,6 +225,51 @@ function ErrorBanner({
   );
 }
 
+/**
+ * "You've answered 42 of 115 (36%) · last saved 3 days ago" — shown wherever
+ * a user comes back to an unfinished attempt, so resuming isn't a surprise.
+ */
+function SavedProgressCard({
+  progress,
+  className,
+  children,
+}: {
+  progress: Pick<HappiLifeProgress, "answered" | "total" | "percent" | "last_answered_at"> & {
+    last_activity_at?: string | null;
+  };
+  className?: string;
+  children?: ReactNode;
+}) {
+  const savedAgo = timeAgo(progress.last_answered_at ?? progress.last_activity_at);
+  const remaining = Math.max(0, progress.total - progress.answered);
+  const minutesLeft = Math.max(1, Math.ceil((remaining * 10) / 60));
+  return (
+    <div className={cn("rounded-2xl border border-lavender-deep/30 bg-gradient-to-r from-lavender/40 to-lavender/10 p-5", className)}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <History className="h-4 w-4 text-lavender-deep" />
+            Your progress is saved
+          </p>
+          <p className="mt-1 text-sm text-foreground/70">
+            You've answered <strong>{progress.answered}</strong> of <strong>{progress.total}</strong> questions
+            {savedAgo && <> · last saved {savedAgo}</>}.
+          </p>
+          <p className="mt-0.5 text-xs text-foreground/55">
+            {remaining} question{remaining === 1 ? "" : "s"} left (about {minutesLeft} min) · you'll continue from Question {progress.answered + 1}.
+          </p>
+        </div>
+        <div className="text-2xl font-bold text-lavender-deep">{progress.percent}%</div>
+      </div>
+      <Progress
+        value={progress.percent}
+        className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/70 [&>div]:bg-gradient-brand"
+      />
+      {children}
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Intro Modal
 // ---------------------------------------------------------------------------
@@ -230,7 +284,7 @@ function IntroModal({
   onViewReport: () => void;
 }) {
   const navigate = useV2Navigate();
-  const { phase } = useAssessmentPhase();
+  const { phase, unfinished } = useAssessmentPhase();
 
   const handleClose = () => {
     if (typeof window !== "undefined" && window.history.length > 1) {
@@ -250,9 +304,11 @@ function IntroModal({
     }
     if (phase === "in-progress") {
       return {
-        h1: "Complete Your HappiLIFE",
-        body: "Understand your emotional wellbeing through a guided Self Check In designed to help you gain personalized insights.",
-        primaryCta: "Continue Assessment",
+        h1: "Welcome Back — Complete Your HappiLIFE",
+        body: "Your answers so far are saved. Pick up right where you left off and finish your Self Check In to unlock your personalized insights.",
+        primaryCta: unfinished
+          ? `Continue from Question ${unfinished.answered + 1}`
+          : "Continue Assessment",
       };
     }
     return {
@@ -307,6 +363,10 @@ function IntroModal({
         <p className="mt-3 max-w-2xl text-sm text-foreground/70 sm:text-base leading-relaxed">
           {body}
         </p>
+
+        {phase === "in-progress" && unfinished && !hasCompletedBefore && (
+          <SavedProgressCard progress={unfinished} className="mt-6" />
+        )}
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           {instructions.map((i) => (
@@ -441,6 +501,28 @@ function InProgressFlow({
   useEffect(() => {
     setShowValidation(false);
   }, [pageData?.overview?.current_page]);
+
+  // ── "Welcome back" banner ────────────────────────────────────────────────
+  // The server only sends the questions still to answer, so without this a
+  // returning user lands mid-way with no idea how much they'd already done.
+  // Captured once, from the first response of this visit.
+  const [resumeBanner, setResumeBanner] = useState<
+    { answered: number; total: number; percent: number; last_answered_at: string | null } | null
+  >(null);
+  const resumeCheckedRef = useRef(false);
+  useEffect(() => {
+    const o = pageData?.overview;
+    if (resumeCheckedRef.current || !o) return;
+    resumeCheckedRef.current = true;
+    if (o.answered > 0 && o.total > 0 && o.answered < o.total) {
+      setResumeBanner({
+        answered: o.answered,
+        total: o.total,
+        percent: o.progress_percent ?? Math.min(99, Math.floor((o.answered / o.total) * 100)),
+        last_answered_at: o.last_answered_at ?? null,
+      });
+    }
+  }, [pageData?.overview]);
 
   // Handle max-attempts from query result
   // API may return status: "true" (string) or max_attempts_reached: true (boolean)
@@ -673,6 +755,8 @@ function InProgressFlow({
       }
 
       // More questions came back — they're already rendering from pageData.
+      setResumeBanner(null);
+      queryClient.invalidateQueries({ queryKey: ["assessment", "progress"] });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setIsAdvancing(false);
@@ -774,18 +858,39 @@ function InProgressFlow({
   // wrong guess here only mislabels a button for one page, not skips work.
   const isLastPage = overview.current_page >= lastPage;
 
-  // Calculate dynamic answered count so the top header bar and question cards on screen match 100%
-  const firstQuestionNumber = (overview.current_page - 1) * perPage + 1;
+  // Calculate dynamic answered count so the top header bar and question cards on screen match 100%.
+  // The server serves the NEXT UNANSWERED questions, so numbering starts at
+  // answered + 1 — not (page - 1) * perPage + 1, which was wrong whenever the
+  // user had left part-way through a page (resume showed e.g. Q24 and
+  // "23 answered" when they had actually answered 30).
+  const answeredBeforePage = Math.max(0, Math.min(canonicalTotal, overview.answered ?? 0));
+  const firstQuestionNumber = answeredBeforePage + 1;
   const currentAnswersOnThisPage = questions.filter(isQuestionAnswered).length;
   const totalAnswered = Math.min(
     canonicalTotal,
-    firstQuestionNumber - 1 + currentAnswersOnThisPage,
+    answeredBeforePage + currentAnswersOnThisPage,
   );
 
   const progressPct = Math.round((totalAnswered / Math.max(canonicalTotal, 1)) * 100);
 
   return (
     <section className="space-y-6">
+      {/* Welcome back — shown on the first page after resuming */}
+      {resumeBanner && (
+        <SavedProgressCard progress={resumeBanner} className="relative bg-white shadow-soft">
+          <button
+            onClick={() => setResumeBanner(null)}
+            aria-label="Dismiss"
+            className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full text-foreground/50 transition hover:bg-lavender/40 cursor-pointer"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+          <p className="mt-3 text-xs font-medium text-lavender-deep">
+            Welcome back! Your earlier answers are kept — the questions below continue from where you stopped.
+          </p>
+        </SavedProgressCard>
+      )}
+
       {/* Progress header */}
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-white/95 p-5 shadow-soft border border-white/80 sm:p-6">
         <div className="min-w-0 flex-1">
@@ -915,6 +1020,7 @@ function CompletingScreen({ onDone }: { onDone: () => void }) {
       queryClient.invalidateQueries({ queryKey: ["assessment", "checkifany"] });
       queryClient.invalidateQueries({ queryKey: ["assessment", "status"] });
       queryClient.invalidateQueries({ queryKey: ["assessment", "current-page"] });
+      queryClient.invalidateQueries({ queryKey: ["assessment", "progress"] });
       // view-report is cached with staleTime: Infinity and all-reports needs
       // to pick up the attempt that was just completed — without these, a
       // repeat attempt would keep showing the previous attempt's report.
@@ -950,9 +1056,11 @@ function CompletingScreen({ onDone }: { onDone: () => void }) {
 // Report Screen
 // ---------------------------------------------------------------------------
 
-function ReportScreen({ onRetake }: { onRetake: () => void }) {
+function ReportScreen({ onRetake, onResume }: { onRetake: () => void; onResume: () => void }) {
   const [pdfLoading, setPdfLoading] = useState(false);
   const { user } = useAuth();
+  // A retake that was started and left part-way — offer to continue it
+  const { unfinished } = useAssessmentPhase();
 
   // ── Subscription check — only subscribed users can download PDFs ─────────
   const [hasActiveBundle, setHasActiveBundle] = useState<boolean | null>(null);
@@ -1125,6 +1233,22 @@ function ReportScreen({ onRetake }: { onRetake: () => void }) {
 
   return (
     <section className="space-y-6">
+      {/* Unfinished retake */}
+      {unfinished && (
+        <SavedProgressCard progress={unfinished} className="bg-white shadow-card">
+          <p className="mt-3 text-sm text-foreground/70">
+            You started another HappiLIFE Self Check In and didn't finish it.
+          </p>
+          <Button
+            onClick={onResume}
+            size="lg"
+            className="mt-4 h-11 rounded-full bg-gradient-brand px-6 text-sm font-semibold text-white shadow-glow transition hover:opacity-95"
+          >
+            Continue from Question {unfinished.answered + 1}
+          </Button>
+        </SavedProgressCard>
+      )}
+
       {/* Success banner */}
       <div className="rounded-[2rem] bg-white p-8 shadow-card sm:p-10">
         <div className="flex flex-col items-center text-center">
@@ -1329,7 +1453,7 @@ function ReportScreen({ onRetake }: { onRetake: () => void }) {
       </div>
 
       {/* Retake */}
-      {reports.length < 6 && (
+      {reports.length < 6 && !unfinished && (
         <div className="flex flex-col items-center gap-2">
           <Button
             onClick={onRetake}

@@ -174,7 +174,7 @@ function HeroCarouselBox() {
 }
 
 function HeroAssessment() {
-  const { phase, progressPercent, hasAnyCompletedReport } = useAssessmentPhase();
+  const { phase, progressPercent, answered, total, hasAnyCompletedReport } = useAssessmentPhase();
 
   const getContent = () => {
     // Once the user has finished at least one attempt, always offer View
@@ -197,8 +197,10 @@ function HeroAssessment() {
         return {
           h1: "Complete Your HappiLIFE Self Check In",
           body: "Understand your emotional wellbeing through a guided Self Check In designed to help you gain personalized insights.",
-          progressLabel: `${progressPercent}% completed`,
-          progressValue: progressPercent || 65,
+          progressLabel: total > 0
+            ? `${progressPercent}% · ${answered} of ${total} answered`
+            : `${progressPercent}% completed`,
+          progressValue: progressPercent,
           primaryCta: "Continue Assessment",
           secondaryCta: "Quizzard",
           isCompleted: false,
