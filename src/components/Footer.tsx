@@ -1,5 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
+import { openCookieSettings } from "@/lib/cookieConsent";
 import { Linkedin, Instagram, Facebook, Youtube } from "lucide-react";
 import logo from "@/assets/happimynd-logo.png";
 import playStoreImg from "@/assets/play_store.png";
@@ -191,6 +192,15 @@ const Footer = () => {
                 >
                   Terms
                 </a>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={openCookieSettings}
+                  className="hover:text-primary transition-colors text-left"
+                >
+                  Cookie Settings
+                </button>
               </li>
             </ul>
           </div>

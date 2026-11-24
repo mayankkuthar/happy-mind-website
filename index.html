@@ -1,15 +1,32 @@
 <!doctype html>
 <html lang="en" class="scroll-smooth">
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WMR2JZVGWZ"></script>
+    <!-- Google tag (gtag.js) with Consent Mode v2: everything is denied until
+         the visitor opts in via the cookie banner (src/components/CookieConsent.tsx).
+         Cookie name must match COOKIE_NAME in src/lib/cookieConsent.ts. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      (function () {
+        var c = { analytics: false, marketing: false };
+        try {
+          var m = document.cookie.match(/(?:^|; )hm_cookie_consent=([^;]*)/);
+          if (m) { var p = JSON.parse(decodeURIComponent(m[1])); if (p.v === 1) c = p; }
+        } catch (e) {}
+        gtag('consent', 'default', {
+          analytics_storage: c.analytics ? 'granted' : 'denied',
+          ad_storage: c.marketing ? 'granted' : 'denied',
+          ad_user_data: c.marketing ? 'granted' : 'denied',
+          ad_personalization: c.marketing ? 'granted' : 'denied',
+          functionality_storage: 'granted',
+          security_storage: 'granted'
+        });
+      })();
       gtag('js', new Date());
 
       gtag('config', 'G-WMR2JZVGWZ');
     </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WMR2JZVGWZ"></script>
 
     <meta name="google-site-verification" content="x75gqmw58vJaivx3uRF583p3qP22jv1amawhnMzfpu8" />
 
