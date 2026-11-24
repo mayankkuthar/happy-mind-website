@@ -4,7 +4,7 @@ import { ArrowRight, Download, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const BROCHURE_URL = "https://drive.google.com/file/d/1AmW0MIjUj7U3UUbkAJiXznMPkJ8wezgA/view?usp=sharing";
+const BROCHURE_URL = "/happimynd-brochure.pdf";
 
 const ctaClass = "rounded-full px-7 py-6 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-xl transition-all";
 

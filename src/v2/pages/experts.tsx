@@ -281,7 +281,6 @@ function ExpertsPage() {
 
     fetchPsychologists(
       {
-        search: query || undefined,
         city: city !== "All" ? city : undefined,
         language: language !== "All" ? language : undefined,
         limit: 100,
@@ -306,7 +305,7 @@ function ExpertsPage() {
     return () => {
       ignore = true;
     };
-  }, [query, city, language, userToken, isOrgUser, orgLoading]);
+  }, [city, language, userToken, isOrgUser, orgLoading]);
 
   // Map ApiPsychologist -> local Psychologist shape for re-use in existing card/dialog components
   const mappedPsychologists: Psychologist[] = apiPsychologists.map((ap) => {
@@ -524,9 +523,15 @@ function ExpertsPage() {
   const filterApiConcerns = ["All", ...normalizeFilterArray(apiFilters.specializations)];
   const filterConcerns = filterApiConcerns.length > 1 ? filterApiConcerns : ["All", ...CONCERNS];
 
-  // Client-side category, concern filter & dynamic sorting
+  // Client-side search, category, concern filter & dynamic sorting.
+  // Search is local (not the API `search` param) so it filters instantly and every
+  // word must appear in the name or specializations, e.g. "pooja d" finds Pooja Deoke.
   const filtered = useMemo(() => {
+    const queryTerms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
     const list = mappedPsychologists.filter((p) => {
+      const haystack = `${p.name} ${p.specializations.join(" ")}`.toLowerCase();
+      const matchQuery = queryTerms.every((term) => haystack.includes(term));
+      if (!matchQuery) return false;
       const matchCategory =
         category === "All" ||
         p.category.toLowerCase() === category.toLowerCase() ||
@@ -569,7 +574,7 @@ function ExpertsPage() {
     }
 
     return list;
-  }, [mappedPsychologists, category, concern, sortBy]);
+  }, [mappedPsychologists, query, category, concern, sortBy]);
 
   const reset = () => {
     setQuery("");
@@ -913,9 +918,8 @@ function ExpertsPage() {
         </section>
       )}
 
-      {/* SECTION 2 — Search & Smart Filters (hidden for org users — backend controls the panel) */}
-      {!effectiveIsOrg && (
-        <section className="rounded-[1.75rem] bg-white p-4 shadow-soft sm:rounded-[2rem] sm:p-6 lg:p-7">
+      {/* SECTION 2 — Search (everyone) & Smart Filters (hidden for org users — backend controls the panel) */}
+      <section className="rounded-[1.75rem] bg-white p-4 shadow-soft sm:rounded-[2rem] sm:p-6 lg:p-7">
           <div className="relative">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground sm:left-5 sm:h-5 sm:w-5" />
             <Input
@@ -926,6 +930,7 @@ function ExpertsPage() {
             />
           </div>
 
+          {!effectiveIsOrg && (
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 sm:mt-5">
             <FilterSelect
               label="Expert Category"
@@ -953,8 +958,8 @@ function ExpertsPage() {
               options={SORT_OPTIONS}
             />
           </div>
-        </section>
-      )}
+          )}
+      </section>
 
       {/* Microcopy */}
       <section className="rounded-2xl border border-lavender/50 bg-lavender/15 p-4 sm:rounded-3xl sm:p-5 sm:px-7">

@@ -41,7 +41,7 @@ const OrgScrollingBanner = () => {
           >
             Talk To HappiMynd
           </Button>
-          <a href="https://drive.google.com/file/d/1AmW0MIjUj7U3UUbkAJiXznMPkJ8wezgA/view?usp=sharing">
+          <a href="/happimynd-brochure.pdf" target="_blank" rel="noopener noreferrer">
           
           <Button
             variant="default"
