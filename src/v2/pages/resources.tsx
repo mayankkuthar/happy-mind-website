@@ -1,4 +1,5 @@
 import { V2Link } from "@/v2/lib/router";
+import { QUIZZARD_SSO_URL } from "@/v2/lib/sso-links";
 import { useState, useRef, useEffect } from "react";
 import { ArrowLeft, BookOpen, Headphones, CirclePlay, Lightbulb, Clock, Image, Play, Sparkles, ChevronLeft, ChevronRight, Pause, X } from "lucide-react";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
@@ -868,7 +869,7 @@ function ResourcesPage() {
               variant="outline"
               className="h-11 rounded-full border-white/60 bg-white/10 px-5 text-xs sm:text-sm font-semibold text-white hover:bg-white/20 hover:text-white cursor-pointer shrink-0"
             >
-              <a href="https://quizzard.happimynd.com/" target="_blank" rel="noopener noreferrer">
+              <a href={QUIZZARD_SSO_URL} target="_blank" rel="noopener noreferrer">
                 Try Quizzard
               </a>
             </Button>

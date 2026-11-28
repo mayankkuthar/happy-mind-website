@@ -1,5 +1,6 @@
 ﻿import { V2Link } from "@/v2/lib/router";
 import { ArrowLeft, ArrowUpRight, Brain, Leaf, Play, Smile, Timer, Sparkles, BookOpen, CircleHelp, LayoutDashboard } from "lucide-react";
+import { HAPPIPAUSE_SSO_URL } from "@/v2/lib/sso-links";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
 import { Button } from "@/v2/components/ui/button";
 import gamesHeroImg from "@/v2/assets/games-mascot.png";
@@ -64,7 +65,7 @@ function HappiPauseWordmark() {
 
 export default GamesPage;
 
-const HAPPIPAUSE_URL = "https://happipause.happimynd.com/";
+const HAPPIPAUSE_URL = HAPPIPAUSE_SSO_URL;
 
 const benefits = [
   {

@@ -311,3 +311,41 @@ export async function editProfile(
     };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Single sign-on into Quizzard / the Games Hub (HappiPAUSE)
+// ---------------------------------------------------------------------------
+
+export type SsoApp = "quizzard" | "hub";
+
+export type SsoCodeResult =
+  | { status: "success"; redirect_url: string }
+  | { status: "unauthorized" }
+  | { status: "error"; message: string };
+
+/**
+ * POST /api/v1/sso/code (Bearer). The server checks return_to against the
+ * app's allowed origins and answers with the URL to send the browser to,
+ * carrying a one-time ?sso_code=… the app swaps for its own session.
+ */
+export async function createSsoCode(token: string, app: SsoApp, returnTo: string): Promise<SsoCodeResult> {
+  try {
+    const res = await fetch(`${BASE_URL}/api/v1/sso/code`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ app, return_to: returnTo }),
+    });
+    if (res.status === 401) return { status: "unauthorized" };
+    const json = (await res.json().catch(() => null)) as { status?: string; redirect_url?: string; message?: string } | null;
+    if (res.ok && json?.status === "success" && json.redirect_url) {
+      return { status: "success", redirect_url: json.redirect_url };
+    }
+    return { status: "error", message: json?.message ?? `Server returned ${res.status}` };
+  } catch (err) {
+    return { status: "error", message: err instanceof Error ? err.message : "Network error" };
+  }
+}

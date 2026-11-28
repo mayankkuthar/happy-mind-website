@@ -1,4 +1,5 @@
 import { V2Link, useV2Navigate, useSearch } from "@/v2/lib/router";
+import { QUIZZARD_SSO_URL } from "@/v2/lib/sso-links";
 import { useState, useEffect, useMemo } from "react";
 import { Compass, Sparkles, MessagesSquare, BookOpen, Phone, LifeBuoy, Check, Image, ShieldCheck, Layers, HeartHandshake, Route as RouteIcon, Lightbulb, Users, ArrowRight } from "lucide-react";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
@@ -548,7 +549,7 @@ function ServicesPage() {
                   </V2Link>
                 </Button>
                 {assessmentPhase !== "not-started" && (
-                  <a href="https://quizzard.happimynd.com/" target="_blank" rel="noopener noreferrer">
+                  <a href={QUIZZARD_SSO_URL} target="_blank" rel="noopener noreferrer">
                     <Button
                       size="lg"
                       variant="outline"

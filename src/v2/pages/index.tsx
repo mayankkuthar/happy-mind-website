@@ -1,4 +1,5 @@
 import { V2Link, useV2Navigate } from "@/v2/lib/router";
+import { QUIZZARD_SSO_URL } from "@/v2/lib/sso-links";
 import { useEffect, useState, useRef } from "react";
 import { ClipboardCheck, CircleCheck, BookOpen, Sparkles, Gamepad2, Play, Headphones, Users, MessageCircle, CircleHelp, LifeBuoy, Clock, Lightbulb, ChevronLeft, ChevronRight, Calendar, LoaderCircle, Star, Music, Volume2, VolumeX, ArrowRight, PhoneCall, X } from "lucide-react";
 import calmMorningUrl from "@/v2/assets/audio/calm-morning.mp3";
@@ -260,7 +261,7 @@ function HeroAssessment() {
               </Button>
             </V2Link>
             <div className="group relative inline-flex items-center">
-              <a href="https://quizzard.happimynd.com/" target="_blank" rel="noopener noreferrer">
+              <a href={QUIZZARD_SSO_URL} target="_blank" rel="noopener noreferrer">
                 <Button
                   size="lg"
                   className="h-12 rounded-full bg-white px-7 text-sm font-semibold text-foreground border border-white/70 shadow-soft transition hover:bg-white"
@@ -960,7 +961,7 @@ const services = [
     desc: "Explore 25+ mini quizzes designed for quick personalized growth insights.",
     icon: CircleHelp,
     gradient: "bg-gradient-mint",
-    externalUrl: "https://quizzard.happimynd.com/",
+    externalUrl: QUIZZARD_SSO_URL,
   },
 ];
 

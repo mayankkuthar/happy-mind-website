@@ -1,4 +1,5 @@
 import { V2Link } from "@/v2/lib/router";
+import { QUIZZARD_SSO_URL } from "@/v2/lib/sso-links";
 import { useState, useMemo } from "react";
 import { ArrowUpRight, Award, Baby, BatteryCharging, Brain, ChevronDown, CloudRain, Compass, Drama, Eye, Flame, Gauge, GraduationCap, Heart, HeartCrack, CircleHelp, Hourglass, LayoutGrid, Languages, ChartLine, MessageCircle, MessagesSquare, Moon, PersonStanding, Repeat, Rocket, Scale, School, Shield, Smile, Sparkles, Sun, Target, Timer, UserMinus, UserRound, Users, Waves, Zap } from "lucide-react";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
@@ -8,7 +9,7 @@ import quizzardHeroImg from "@/v2/assets/quizzard-mascot.png";
 
 export default QuizzardPage;
 
-const QUIZZARD_URL = "https://quizzard.happimynd.com/";
+const QUIZZARD_URL = QUIZZARD_SSO_URL;
 
 const features = [
   {

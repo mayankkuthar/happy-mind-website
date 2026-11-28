@@ -40,6 +40,7 @@ import CheckoutLayout from "@/v2/pages/checkout";
 import SuccessPage from "@/v2/pages/checkout-success";
 import SubscriptionPage from "@/v2/pages/subscription";
 import SupportPage from "@/v2/pages/support";
+import SsoPage from "@/v2/pages/sso";
 
 function V2Layout() {
   return (
@@ -84,6 +85,7 @@ const App = () => (
             <Route index element={<DashboardPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="signup" element={<SignupPage />} />
+            <Route path="sso" element={<SsoPage />} />
             <Route path="journey" element={<JourneyPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="assessment" element={<AssessmentPage />} />

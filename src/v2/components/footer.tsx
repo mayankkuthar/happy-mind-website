@@ -1,4 +1,5 @@
 import { V2Link } from "@/v2/lib/router";
+import { QUIZZARD_SSO_URL } from "@/v2/lib/sso-links";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import logoImg from "@/v2/assets/happimynd-logo.png";
 const PinterestIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -82,7 +83,7 @@ export function Footer() {
             </li>
             <li>
               <a
-                href="https://quizzard.happimynd.com/"
+                href={QUIZZARD_SSO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"

@@ -190,7 +190,7 @@ function SignupPage() {
           token,
         });
         toast.success(`Welcome back, ${name}!`);
-        navigate({ to: "/" });
+        navigate({ to: redirectTarget as any, replace: true });
         return true;
       } else if (res.status === "register" && "mobile_verified_token" in res) {
         setVerifiedMobile(phoneMobile);
@@ -272,10 +272,10 @@ function SignupPage() {
             token: authToken,
           });
           toast.success(`Welcome to HappiMynd, ${nickName.trim()}!`);
-          navigate({ to: "/" });
+          navigate({ to: redirectTarget as any, replace: true });
         } else {
           toast.success("Account created successfully! Please log in.");
-          navigate({ to: "/login" });
+          navigate({ to: "/login", search: { redirect: searchParams.redirect } });
         }
       } else {
         toast.error(res.message ?? "Failed to create account. Please try again.");

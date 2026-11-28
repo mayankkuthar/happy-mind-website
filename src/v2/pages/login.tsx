@@ -145,7 +145,7 @@ function LoginPage() {
                   onBack={() => setCard({ mode: "tab", tab: "otp" })}
                   onMobileSubmit={(mobile) => setCard({ mode: "otp", step: "otp-verify", mobile })}
                   onOtpResend={() => setCard({ mode: "otp", step: "otp-verify", mobile: card.mobile })}
-                  onSuccess={() => navigate({ to: "/" })}
+                  onSuccess={() => navigate({ to: redirectTarget as any, replace: true })}
                   onRegister={(mobile, countryCode, token) =>
                     setCard({ mode: "register", mobile, countryCode, mobileVerifiedToken: token })
                   }
@@ -159,7 +159,7 @@ function LoginPage() {
                   countryCode={card.countryCode}
                   mobileVerifiedToken={card.mobileVerifiedToken}
                   onBack={() => setCard({ mode: "otp", step: "otp-verify", mobile: card.mobile })}
-                  onSuccess={() => navigate({ to: "/" })}
+                  onSuccess={() => navigate({ to: redirectTarget as any, replace: true })}
                 />
               )}
 
